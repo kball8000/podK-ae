@@ -1,0 +1,12 @@
+application: your-app-id  # doesn’t matter for local server
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /.*
+  script: helloworld.application
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
