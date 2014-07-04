@@ -3,8 +3,12 @@ import webapp2
 class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/html'
-        self.response.write('Hello, World!<br>')
-        self.response.write('Two!')
+        self.response.write('<html><body><head>')
+        self.response.write('<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/4597121/podcatchor/styles/podK.css">')
+        self.response.write('</head>')
+        self.response.write('<h1>Header should be blue</h1>')
+        self.response.write('Two!<br>')
+        self.response.write('</body></html>')
 
 class SecondPage(webapp2.RequestHandler):
     def get(self):
