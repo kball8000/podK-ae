@@ -26,7 +26,8 @@ class SecondPage(webapp2.RequestHandler):
         else:
             # self.response.write('<h1>Herro, you are not logged in</h1><br>')
             # self.response.write('User is not logged in to google')
-            self.response.write('<a href="%s">Click here to login</a>' % users.create_login_url(self.request.uri)
+            # self.response.write('<a href="%s">Click here to login</a>' % users.create_login_url(self.request.uri)
+            self.redirect(users.create_login_url(self.request.uri))
         self.response.write('Page 2!<br>')
         self.response.write('<p>any errors</p>')
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br>')
