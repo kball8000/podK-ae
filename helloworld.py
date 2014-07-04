@@ -13,7 +13,7 @@ class MainPage(webapp2.RequestHandler):
 
 class SecondPage(webapp2.RequestHandler):
     def get(self):
-        # user = users.get_current_user()
+        user = users.get_current_user()
         self.response.headers['Content-Type'] = 'text/html'
         # if user:
             # self.response.write('Hello, ' + (user.nickname())
