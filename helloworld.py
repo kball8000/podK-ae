@@ -21,7 +21,7 @@ class SecondPage(webapp2.RequestHandler):
         self.response.write('</head>')
         if user:
             self.response.write('<h1>Hello, you ARE logged in</h1><br>')
-            # self.response.write('Hello, ' + (user.nickname())
+            self.response.write('Hello, ' + (user.nickname())
             # self.response.write('Hello, %s (<a href="%s">Sign out</a>)' % (user.get_nickname(), users.create_logout_url('/'))
         else:
             # self.response.write('<h1>Herro, you are not logged in</h1><br>')
