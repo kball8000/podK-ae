@@ -6,7 +6,7 @@ threadsafe: true
 
 handlers:
 - url: /.*
-  script: helloworld.application
+  script: helloworld.app
 
 libraries:
 - name: webapp2
