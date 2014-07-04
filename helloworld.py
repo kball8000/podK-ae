@@ -12,8 +12,12 @@ class MainPage(webapp2.RequestHandler):
 
 class SecondPage(webapp2.RequestHandler):
     def get(self):
+        user = user.get_current_user()
         self.response.headers['Content-Type'] = 'text/html'
-        self.response.write('Hello, World!')
+        if user:
+            self.response.write('Hello, ' + user.get_nickname())
+        else:
+            self.response.write('<a href="%s">Click here to login</a>' %s users.create_login_uri(self.request.uri)
         self.response.write('Page 2!<br>')
         self.response.write('<p>any errors</p>')
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br>')
