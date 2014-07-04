@@ -1,4 +1,5 @@
 from google.appengine.api import users
+
 import webapp2
 
 class MainPage(webapp2.RequestHandler):
@@ -16,7 +17,8 @@ class SecondPage(webapp2.RequestHandler):
         user = users.get_current_user()
         self.response.headers['Content-Type'] = 'text/html'
         if user:
-            self.response.write('Hello, ' + (user.nickname())
+            self.response.write('Hello, you ARE logged in')
+            # self.response.write('Hello, ' + (user.nickname())
             # self.response.write('Hello, %s (<a href="%s">Sign out</a>)' % (user.get_nickname(), users.create_logout_url('/'))
         else:
             self.response.write('<br>Herro, you are not logged in')
