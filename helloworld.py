@@ -21,13 +21,13 @@ class SecondPage(webapp2.RequestHandler):
         self.response.write('</head>')
         if user:
             self.response.write('<h1>Hello, you ARE logged in</h1><br>')
-            self.response.write('Hello, ' + (user.nickname())
+            self.response.write('<h1>Hello, %s</h1>' % (user.nickname())
             # self.response.write('Hello, %s (<a href="%s">Sign out</a>)' % (user.get_nickname(), users.create_logout_url('/'))
         else:
+            self.redirect(users.create_login_url(self.request.uri))
             # self.response.write('<h1>Herro, you are not logged in</h1><br>')
             # self.response.write('User is not logged in to google')
             # self.response.write('<a href="%s">Click here to login</a>' % users.create_login_url(self.request.uri)
-            self.redirect(users.create_login_url(self.request.uri))
         self.response.write('Page 2!<br>')
         self.response.write('<p>any errors</p>')
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br>')
