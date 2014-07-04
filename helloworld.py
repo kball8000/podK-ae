@@ -13,13 +13,13 @@ class MainPage(webapp2.RequestHandler):
 
 class SecondPage(webapp2.RequestHandler):
     def get(self):
-        user = users.get_current_user()
+        # user = users.get_current_user()
         self.response.headers['Content-Type'] = 'text/html'
-        if user:
-            self.response.write('Hello, ' + (user.nickname())
+        # if user:
+            # self.response.write('Hello, ' + (user.nickname())
             # self.response.write('Hello, %s (<a href="%s">Sign out</a>)' % (user.get_nickname(), users.create_logout_url('/'))
-        else:
-            self.response.write('User is not logged in to google')
+        # else:
+            # self.response.write('User is not logged in to google')
             # self.response.write('<a href="%s">Click here to login</a>' %s users.create_login_url(self.request.uri)
         self.response.write('Page 2!<br>')
         self.response.write('<p>any errors</p>')
