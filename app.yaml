@@ -1,4 +1,5 @@
-application: your-app-id  # doesn’t matter for local server
+application: kball-test-tools
+version: 1
 runtime: python27
 api_version: 1
 threadsafe: true
