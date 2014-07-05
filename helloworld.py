@@ -46,7 +46,8 @@ class MainPage(webapp2.RequestHandler):
         for feed in podcast_feeds:
             self.response.write('%s added %s<br>' %(feed.content, feed.date))
 
-        self.response.write('<h1><a href="http://kball-test-tools.appspot.com/second">Second page</a></h1>')
+        self.response.write('<h1>Header</h1>')
+        self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write(FORM_HTML)
         self.response.write('</body></html>')
 
