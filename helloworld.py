@@ -11,6 +11,12 @@ podcast feed
     <div><input type="submit" value = "Sign Guestbook"></div>
 </form>
 """
+# In order to use guestbook example, this is a cross reference list
+# Greeting          = PodcastFeed
+# guestbook_name    = podcast_feed_list = default_podcast_feed_list
+# 'Guestbook'       = 'podcast_feed_list' for nbd
+# greetings         = podcastfeeds
+# greeting          = podcastfeed
 
 DEFAULT_PODCAST_FEED_LIST = 'default_podcast_feed_list'
 # http://feeds.twit.tv/twit.xml
@@ -29,7 +35,7 @@ class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
-        self.response.write('<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/4597121/podcatchor/styles/podK.css">')
+        self.response.write('<link rel="stylesheet" href="stylesheets/helloworld.css">')
         self.response.write('</head>')
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
