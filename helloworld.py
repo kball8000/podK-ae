@@ -7,9 +7,9 @@ import logging
 
 FORM_HTML = """\
 podcast feed
-<form action="/sign?%s" method="post">
+<form action="/addpodcas" method="post">
     <div><textarea name='content' rows="1" columns="60"></textarea></div>
-    <div><input type="submit" value = "Sign Guestbook"></div>
+    <div><input type="submit" value = "Add podcast"></div>
 </form>
 """
 # In order to use guestbook example, this is a cross reference list
@@ -69,9 +69,12 @@ class Podcasts(webapp2.RequestHandler):
         podcast_feed.content = self.request.get('content')
 
 # Debubbing code
+        self.response.write('<html><body>You wrote<pre>')
         self.response.write('podcast feed content = %s <br>' % podcast_feed.content)
+        self.response.write('podcast feed = %s <br>' % podcast_feed)
         self.response.write('podcast feed list = %s <br>' % podcast_feed_list)
-        
+        self.response.write('</pre></body></html>')
+
         # podcast_feed.put()
 
 class Guestbook(webapp2.RequestHandler):
@@ -82,25 +85,30 @@ class Guestbook(webapp2.RequestHandler):
 
 class SecondPage(webapp2.RequestHandler):
     def get(self):
+        logging.info("Starting page 2")
+
         user = users.get_current_user()
+
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
-        self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         # self.response.write('<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/4597121/podcatchor/styles/podK.css">')
         self.response.write('</head>')
+
         if user:
             self.response.write('<h1>Hello, %s, you are logged in!B</h1>' % user.nickname())
             # self.response.write('Hello, %s (<a href="%s">Sign out</a>)' % (user.nickname(), users.create_logout_url('/'))
         else:
             self.redirect(users.create_login_url(self.request.uri))
             # self.response.write('You are not logged in <a href="%s">Click here to login</a>' % users.create_login_url(self.request.uri)
-        self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br>')
+
+        self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
         self.response.write("<audio controls><source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3'></audio>")
         self.response.write('</body></html>')
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
+    ('/addpodcast', Podcasts),
     ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
