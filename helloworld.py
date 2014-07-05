@@ -35,7 +35,7 @@ class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
-        self.response.write('<link rel="stylesheet" href="stylesheets/helloworld.css">')
+        self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         self.response.write('</head>')
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
