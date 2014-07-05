@@ -22,7 +22,7 @@ def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
 
 class PodcastFeed(ndb.Model):
     content = ndb.StringProperty(indexed=False)
-    date = ndb.DateTimeProperty(auto_add_now=True)
+    date = ndb.DateTimeProperty(auto_now_add=True)
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
