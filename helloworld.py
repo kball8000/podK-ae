@@ -22,7 +22,7 @@ class MainPage(webapp2.RequestHandler):
 class Guestbook(webapp2.RequestHandler):
     def post(self):
         self.response.write('<html><body>You wrote<pre>')
-        self.response.write(cgi.escape(self.response.get('content')))
+        self.response.write(cgi.escape(self.request.get('content')))
         self.response.write('</pre></body></html>')
 
 class SecondPage(webapp2.RequestHandler):
