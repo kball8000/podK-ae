@@ -65,7 +65,7 @@ class SecondPage(webapp2.RequestHandler):
         self.response.write('<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/4597121/podcatchor/styles/podK.css">')
         self.response.write('</head>')
         if user:
-            self.response.write('<h1>Hello, %s, you are logged in!</h1>' % user.nickname())
+            self.response.write('<h1>Hello, %s, you are logged in!A</h1>' % user.nickname())
             # self.response.write('Hello, %s (<a href="%s">Sign out</a>)' % (user.nickname(), users.create_logout_url('/'))
         else:
             self.redirect(users.create_login_url(self.request.uri))
