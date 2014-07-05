@@ -31,9 +31,9 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/4597121/podcatchor/styles/podK.css">')
         self.response.write('</head>')
 
-        podcast_feed = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
+        podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         podcast_feed_query = PodcastFeed.query(
-            ancestor = podcast_feed_key(podcast_feed)).order(-PodcastFeed.date)
+            ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
         
         for feed in podcast_feeds:
@@ -45,7 +45,7 @@ class MainPage(webapp2.RequestHandler):
 
 class Podcasts(webapp2.RequestHandler):
     def post(self):
-        podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
+        podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
         podcast_feed = PodcastFeed(parent=podcast_feed_key(podcast_feed_list))
         podcast_feed.content = self.request.get('content')
         podcast_feed.put()
