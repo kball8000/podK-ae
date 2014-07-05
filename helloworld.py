@@ -2,7 +2,7 @@ from google.appengine.api import users
 import cgi
 import webapp2
 
-FORM_HTML = """
+FORM_HTML = """\
 <form action="/sign" method="post">
     <div><textarea name='content' rows="3" columns="60"></textarea></div>
     <div><input type="submit" value = "Sign Guestbook"></div>
