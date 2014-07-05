@@ -7,10 +7,13 @@ threadsafe: true
 handlers:
 - url: /.*
   script: helloworld.app
+
 - url: /stylesheets
   static_dir: stylesheets
+
 - url: /scripts
   static_dir: scripts
+
 - url: /images
   static_dir: images
 
