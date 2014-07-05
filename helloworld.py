@@ -3,7 +3,6 @@ from google.appengine.ext import ndb
 import cgi
 import webapp2
 import urllib
-import logging
 
 FORM_HTML = """\
 podcast feed
@@ -50,11 +49,11 @@ class MainPage(webapp2.RequestHandler):
         podcast_feeds = podcast_feed_query.fetch(10)
         for feed in podcast_feeds:
             self.response.write('%s added %s<br>' %(feed.content, feed.date))
-
-        self.logging.info('Hello, looging is working...')        
+        
+        self.response.write('<script>console.log("%s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderE</h1>')
+        self.response.write('<h1>HeaderF</h1>')
 
 
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
@@ -90,7 +89,6 @@ class Guestbook(webapp2.RequestHandler):
 
 class SecondPage(webapp2.RequestHandler):
     def get(self):
-        logging.info("Starting page 2")
 
         user = users.get_current_user()
 
