@@ -71,6 +71,7 @@ class Podcasts(webapp2.RequestHandler):
 # Debubbing code
         self.response.write('<html><body>You wrote<pre>')
         self.response.write('podcast feed content = %s <br>' % podcast_feed.content)
+        self.response.write('podcast feed date = %s <br>' % podcast_feed.date)
         self.response.write('podcast feed = %s <br>' % podcast_feed)
         self.response.write('podcast feed list = %s <br>' % podcast_feed_list)
         self.response.write('</pre></body></html>')
