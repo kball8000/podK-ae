@@ -55,6 +55,10 @@ class MainPage(webapp2.RequestHandler):
 
         self.response.write('<h1>Header</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
+        self.response.write('http://feeds.twit.tv/twit.xml<br>')
+        self.response.write('http://feeds.twit.tv/sn.xml<br>')
+        self.response.write('http://feeds.twit.tv/hn.xml<br>')
+        self.response.write('http://feeds.twit.tv/mbw.xml<br>')
         self.response.write(FORM_HTML)
         self.response.write('</body></html>')
 
