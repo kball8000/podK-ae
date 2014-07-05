@@ -7,8 +7,8 @@ import logging
 
 FORM_HTML = """\
 podcast feed
-<form action="/addpodcas" method="post">
-    <div><textarea name='content' rows="1" columns="60"></textarea></div>
+<form action="/addpodcast" method="post">
+    <div><input type='text' name='content' width='50em'></input></div>
     <div><input type="submit" value = "Add podcast"></div>
 </form>
 """
@@ -53,7 +53,7 @@ class MainPage(webapp2.RequestHandler):
 
         logging.info('Hello, looging is working...')        
 
-        self.response.write('<h1>Header</h1>')
+        self.response.write('<h1>HeaderA</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
