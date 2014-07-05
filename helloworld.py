@@ -53,7 +53,10 @@ class MainPage(webapp2.RequestHandler):
 
         logging.info('Hello, looging is working...')        
 
-        self.response.write('<h1>HeaderA</h1>')
+# For revving so I know when I"ve got a new page
+        self.response.write('<h1>HeaderB</h1>')
+
+
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
@@ -72,6 +75,7 @@ class Podcasts(webapp2.RequestHandler):
         self.response.write('<html><body>You wrote<pre>')
         self.response.write('podcast feed content = %s <br>' % podcast_feed.content)
         self.response.write('podcast feed date = %s <br>' % podcast_feed.date)
+        self.response.write('podcast feed date = %s <br>' % podcast_feed.author)
         self.response.write('podcast feed = %s <br>' % podcast_feed)
         self.response.write('podcast feed list = %s <br>' % podcast_feed_list)
         self.response.write('</pre></body></html>')
