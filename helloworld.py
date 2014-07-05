@@ -8,7 +8,7 @@ import logging
 FORM_HTML = """\
 podcast feed
 <form action="/addpodcast" method="post">
-    <div><input type='text' name='content' width='50em'></input></div>
+    <div><input type='text' name='content' style='width:50em'></input></div>
     <div><input type="submit" value = "Add podcast"></div>
 </form>
 """
@@ -51,10 +51,10 @@ class MainPage(webapp2.RequestHandler):
         for feed in podcast_feeds:
             self.response.write('%s added %s<br>' %(feed.content, feed.date))
 
-        logging.info('Hello, looging is working...')        
+        self.logging.info('Hello, looging is working...')        
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderD</h1>')
+        self.response.write('<h1>HeaderE</h1>')
 
 
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
@@ -75,7 +75,7 @@ class Podcasts(webapp2.RequestHandler):
         self.response.write('<html><body>You wrote<pre>')
         self.response.write('podcast feed content = %s <br>' % podcast_feed.content)
         self.response.write('podcast feed date = %s <br>' % podcast_feed.date)
-        self.response.write('podcast feed date = %s <br>' % podcast_feed.author)
+        self.response.write('podcast feed author = %s <br>' % podcast_feed.author)
         self.response.write('podcast feed = %s <br>' % podcast_feed)
         self.response.write('podcast feed list = %s <br>' % podcast_feed_list)
         self.response.write('</pre></body></html>')

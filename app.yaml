@@ -17,6 +17,11 @@ handlers:
 - url: /.*
   script: helloworld.app
 
+# To use this, I think I need to add a static folder and put images in there.
+# - url: /(.*\.(gif|png|jpg))$
+#   static_files: static/\1
+#   upload: static/.*\.(gif|png|jpg)$
+
 libraries:
 - name: webapp2
   version: "2.5.2"
