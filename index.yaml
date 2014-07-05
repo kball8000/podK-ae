@@ -1,0 +1,6 @@
+indexes:
+- kind: PodcastFeed
+  ancestor: yes
+  properties:
+  - name: date
+    direction: desc
