@@ -12,7 +12,7 @@ podcast feed
 </form>
 """
 
-DEFAULT_PODCAST_FEED_LIST = "default_podcast_feed_list"
+DEFAULT_PODCAST_FEED_LIST = 'default_podcast_feed_list'
 # http://feeds.twit.tv/twit.xml
 # http://feeds.twit.tv/sn.xml
 # http://feeds.twit.tv/hn.xml
@@ -31,7 +31,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/4597121/podcatchor/styles/podK.css">')
         self.response.write('</head>')
 
-        podcast_feed = self.request.get('podcast_feed' = DEFAULT_PODCAST_FEED_LIST)
+        podcast_feed = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         podcast_feed_query = PodcastFeed.query(
             ancestor = podcast_feed_key(podcast_feed)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
