@@ -21,6 +21,7 @@ def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
     return ndb.Key('podcast_feed', podcast_feed)
 
 class PodcastFeed(ndb.Model):
+    author = ndb.UserProperty()
     content = ndb.StringProperty(indexed=False)
     date = ndb.DateTimeProperty(auto_now_add=True)
 
