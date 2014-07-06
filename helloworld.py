@@ -83,7 +83,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderF</h1>')
+        self.response.write('<h1>HeaderG</h1>')
 
 
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
