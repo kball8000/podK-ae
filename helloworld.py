@@ -1,8 +1,8 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
-import cgi
 import webapp2
-import urllib
+# import cgi
+# import urllib
 
 FORM_HTML = """\
 podcast feed
@@ -44,7 +44,6 @@ MUSIC_CONTROLS_HTML = """\
     <div>
     	Current time is <span id='currentGibTime' style='height:2em;'></span><br>
     	Total time is <span id='durationGibTIme' style='height:2em;'></span><br>
-    	Gib paused? <span id='gibPaused' style='height:2em;'></span><br>
     </div>
 """
 
@@ -78,19 +77,16 @@ class MainPage(webapp2.RequestHandler):
             ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
         for feed in podcast_feeds:
-            self.response.write('%s added %s<br>' %(feed.content, feed.date))
-        
-        self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
+            self.response.write('%s added %s on %s<br>' %(feed.author, feed.content, feed.date))
+
+        # How to write to the javascript console log in the browser
+        # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderG</h1>')
-
-
+        self.response.write('<h1>HeaderA</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
-        self.response.write('http://feeds.twit.tv/hn.xml<br>')
-        self.response.write('http://feeds.twit.tv/mbw.xml<br>')
         self.response.write(FORM_HTML)
         self.response.write('</body></html>')
 
@@ -109,7 +105,7 @@ class Podcasts(webapp2.RequestHandler):
         self.response.write('podcast feed list = %s <br>' % podcast_feed_list)
         self.response.write('</pre></body></html>')
 
-        # podcast_feed.put()
+        podcast_feed.put()
 
 class Guestbook(webapp2.RequestHandler):
     def post(self):
@@ -143,6 +139,6 @@ class SecondPage(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/addpodcast', Podcasts),
-    ('/sign', Guestbook),
+    # ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
