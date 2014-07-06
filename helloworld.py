@@ -18,6 +18,36 @@ podcast feed
 # greetings         = podcast_feeds
 # greeting          = podcast_feed
 
+MUSIC_CONTROLS_HTML = """\
+    <div>
+        <audio controls id='myMusic1'>
+            <source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3'>
+        </audio>
+    </div>
+    <div>
+    	<button onclick='myAudio.playAudio()'>
+    		Play / Pause
+    	</button>
+    	<button onclick='myAudio.stopAudio()'>
+    		Stop
+    	</button>
+    	<button onclick='myAudio.displayTime()'>
+    		Get Time
+    	</button>
+    	<button onclick='myAudio.rewind()'>
+    		<
+    	</button>
+    	<button onclick='myAudio.fastForward()'>
+    		>
+    	</button>
+    </div>
+    <div>
+    	Current time is <span id='currentGibTime' style='height:2em;'></span><br>
+    	Total time is <span id='durationGibTIme' style='height:2em;'></span><br>
+    	Gib paused? <span id='gibPaused' style='height:2em;'></span><br>
+    </div>
+"""
+
 DEFAULT_PODCAST_FEED_LIST = 'default_podcast_feed_list'
 # http://feeds.twit.tv/twit.xml
 # http://feeds.twit.tv/sn.xml
@@ -50,7 +80,7 @@ class MainPage(webapp2.RequestHandler):
         for feed in podcast_feeds:
             self.response.write('%s added %s<br>' %(feed.content, feed.date))
         
-        self.response.write('<script>console.log("%s")</script>' % podcast_feed_list)
+        self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
         self.response.write('<h1>HeaderF</h1>')
@@ -89,7 +119,7 @@ class Guestbook(webapp2.RequestHandler):
 
 class SecondPage(webapp2.RequestHandler):
     def get(self):
-
+        
         user = users.get_current_user()
 
         self.response.headers['Content-Type'] = 'text/html'
@@ -106,7 +136,8 @@ class SecondPage(webapp2.RequestHandler):
             # self.response.write('You are not logged in <a href="%s">Click here to login</a>' % users.create_login_url(self.request.uri)
 
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
-        self.response.write("<audio controls><source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3'></audio>")
+        self.response.write(MUSIC_CONTROLS_HTML)
+        self.response.write('</script src="/scripts/podK.js"></script>')
         self.response.write('</body></html>')
 
 app = webapp2.WSGIApplication([
