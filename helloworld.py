@@ -137,7 +137,7 @@ class SecondPage(webapp2.RequestHandler):
 
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
         self.response.write(MUSIC_CONTROLS_HTML)
-        self.response.write('</script src="/scripts/podK.js"></script>')
+        self.response.write('<script src="/scripts/podK.js"></script>')
         self.response.write('</body></html>')
 
 app = webapp2.WSGIApplication([
