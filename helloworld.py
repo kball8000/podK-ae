@@ -73,7 +73,7 @@ class MainPage(webapp2.RequestHandler):
         if not user:
             self.response.write('<a href="%s">Sign In<br></a>' % users.create_login_url(self.request.uri))
         else:
-            self.response.write('Welcome %s!' % users.nickname())
+            self.response.write('Welcome %s!' % user.nickname())
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
 
@@ -97,7 +97,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderC</h1>')
+        self.response.write('<h1>HeaderD</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
