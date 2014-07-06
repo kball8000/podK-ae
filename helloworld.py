@@ -77,13 +77,13 @@ class MainPage(webapp2.RequestHandler):
             ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
         for feed in podcast_feeds:
-            self.response.write('%s added %s on %s<br>' %(feed.author, feed.content, feed.date))
+            self.response.write('%s added %s on %s<br>' %(feed.author.nickname(), feed.content, feed.date))
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderB</h1>')
+        self.response.write('<h1>HeaderD</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
