@@ -62,10 +62,18 @@ class PodcastFeed(ndb.Model):
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
+        
+        user = users.get_current_user()
+
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         self.response.write('</head>')
+
+        if not user:
+            self.response.write('<a href="%s">Sign In<br></a>' % users.create_login_url(self.request.uri))
+        else:
+            self.response.write('Welcome %s!' % users.nickname())
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
 
@@ -89,7 +97,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderA</h1>')
+        self.response.write('<h1>HeaderC</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
