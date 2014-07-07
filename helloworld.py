@@ -90,7 +90,9 @@ class MainPage(webapp2.RequestHandler):
         for feed in podcast_feeds:
             if feed.author:
                 self.response.write('%s added ' % feed.author.nickname())
-                self.response.write('feed key is %s ' % feed.key())
+                self.response.write(', with a feed key  %s ' % feed.key.id())
+                self.response.write(', the parent is %s ' % feed.key.parent())
+                self.response.write(', and the kind is %s ' % feed.key.kind())
                 
             else:
                 self.response.write('Annonymous added ')
@@ -101,7 +103,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderE</h1>')
+        self.response.write('<h1>HeaderF</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
