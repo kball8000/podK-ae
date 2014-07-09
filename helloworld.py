@@ -80,7 +80,7 @@ class MainPage(webapp2.RequestHandler):
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         
-        testFileKey = ndb.Key('podcast_feed', 'default_podcast_feed_list', 1)
+        testFileKey = ndb.Key('podcast_feed', 'default_podcast_feed_list', 1, parent=ndb.Key('Account', 'Sandy', 'Message', 'greetings'))
         testFile = testFileKey.get()
 
         podcast_feed_query = PodcastFeed.query(
