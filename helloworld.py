@@ -5,7 +5,6 @@ import urllib
 # import cgi
 
 FORM_HTML = """\
-podcast feed
 <form action="/addpodcast" method="post">
     <div><input type='text' name='formContent' style='width:50em'></input></div>
     <div><input type="submit" value = "Add podcast"></div>
@@ -70,36 +69,22 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         self.response.write('</head>')
 
-        if not user:
-            self.response.write('<a href="%s">Sign In<br></a>' % users.create_login_url(self.request.uri))
+        self.response.write('<h1>PodKatchor</h1>')
+        self.response.write('<h2>Pretty much the best online podcast player</h2>')
+
+        if user:
+            self.response.write('Welcome %s! (<a href="%s">Logout</a>) <br>' % (user.nickname(), users.create_logout_url()))
         else:
-            self.response.write('Welcome %s!<br>' % user.nickname())
-            self.response.write('Welcome %s!<br>' % user.user_id())
-            self.response.write('Welcome %s!<br>' % user.email())
+            self.response.write('<a href="%s">Sign In</a> with your Google account<br>' % users.create_login_url(self.request.uri))
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
-
-# Debug code
-        self.response.write('podcast_feed_list = %s <br>' % podcast_feed_list)
-        self.response.write('podcast_feed_key = %s <br>' % podcast_feed_key())
 
         podcast_feed_query = PodcastFeed.query(
             ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
-        self.response.write('<br><br>**Info from datastore:<br>')
+        self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         for feed in podcast_feeds:
-            if feed.author:
-                self.response.write('%s added ' %feed.author.nickname())
-                self.response.write(', with a feed key id %s ' % feed.key.id())
-                self.response.write(', the parent is %s ' % feed.key.parent())
-                self.response.write(', and the kind is %s ' % feed.key.kind())
-                self.response.write('... Now we are deleting this one<br> ')
-                feed.key.delete()
-                
-            else:
-                self.response.write('Annonymous added ')
-            self.response.write('%s on %s <br>' %(feed.content, feed.date))
-        self.response.write('**End info from datastore:<br><br>')
+            self.response.write('%s<br>' % feed.content)
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
