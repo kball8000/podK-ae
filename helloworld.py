@@ -10,6 +10,7 @@ FORM_HTML = """\
     <div><input type="submit" value = "Add podcast"></div>
 </form>
 """
+
 # In order to use guestbook example, this is a cross reference list
 # Greeting          = PodcastFeed
 # guestbook_name    = podcast_feed_list = default_podcast_feed_list
@@ -78,23 +79,27 @@ class MainPage(webapp2.RequestHandler):
             self.response.write('<a href="%s">Sign In</a> with your Google account<br>' % users.create_login_url(self.request.uri))
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
+        
+        testFileKey = ndb.Key('podcast_feed', 'default_podcast_feed_list', 1)
+        testFile = testFileKey.get()
 
         podcast_feed_query = PodcastFeed.query(
             ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         for feed in podcast_feeds:
-            self.response.write('%s<br>' % feed.content)
+            self.response.write('%s <button type="submit" fromaction="rempodcast?=%s" id="%s">x</button><br>' % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderC</h1>')
+        self.response.write('<h1>HeaderD</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
         self.response.write(FORM_HTML)
+        self.response.wrote('my directly retrieved url should be: %s', testFile)
         self.response.write('</body></html>')
 
 class Podcasts(webapp2.RequestHandler):
@@ -110,18 +115,19 @@ class Podcasts(webapp2.RequestHandler):
             
         podcast_feed.content = self.request.get('formContent')
 
-# Debubbing code
-        self.response.write('<html><body>You wrote<pre>')
-        self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
-        self.response.write('podcast feed content = %s <br>' % podcast_feed.content)
-        self.response.write('podcast feed date = %s <br>' % podcast_feed.date)
-        self.response.write('podcast feed author = %s <br>' % podcast_feed.author)
-        self.response.write('podcast feed = %s <br>' % podcast_feed)
-        self.response.write('podcast feed list = %s <br>' % podcast_feed_list)
-        self.response.write('</pre></body></html>')
-
         podcast_feed.put()
 
+        query_params = {'podcast_feed_list' : podcast_feed_list}
+        self.redirect('/?' + urllib.urlencode(query_params))
+
+class remPodcastFeed(webapp2.RequestHandler, feed_id):
+    def post(self):
+        podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
+    
+        podcast_feed = 
+
+        podcast_feed.key.delete()
+        
         query_params = {'podcast_feed_list' : podcast_feed_list}
         self.redirect('/?' + urllib.urlencode(query_params))
 
@@ -157,6 +163,7 @@ class SecondPage(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/addpodcast', Podcasts),
+    ('/rempodcast', remPodcastFeed),
     # ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
