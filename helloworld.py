@@ -88,7 +88,7 @@ class MainPage(webapp2.RequestHandler):
         podcast_feeds = podcast_feed_query.fetch(10)
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         for feed in podcast_feeds:
-            self.response.write('%s <button type="submit" fromaction="rempodcast?=%s" id="%s">x</button><br>' % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
+            self.response.write('%s <button type="submit" fromaction="rempodcast/%s" id="%s">x</button><br>' % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
@@ -120,15 +120,18 @@ class Podcasts(webapp2.RequestHandler):
         query_params = {'podcast_feed_list' : podcast_feed_list}
         self.redirect('/?' + urllib.urlencode(query_params))
 
-class remPodcastFeed(webapp2.RequestHandler, feed_id):
-    def post(self):
-        podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
+class remPodcastFeed(webapp2.RequestHandler):
+    def post(self, feed_id):
+        
+        self.response.write('The id of the feed I want to remove is %s.' % feed_id
+        
+        # podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
     
         # podcast_feed = 
         # podcast_feed.key.delete()
         
-        query_params = {'podcast_feed_list' : podcast_feed_list}
-        self.redirect('/?' + urllib.urlencode(query_params))
+        # query_params = {'podcast_feed_list' : podcast_feed_list}
+        # self.redirect('/?' + urllib.urlencode(query_params))
 
 class Guestbook(webapp2.RequestHandler):
     def post(self):
@@ -162,7 +165,7 @@ class SecondPage(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/addpodcast', Podcasts),
-    ('/rempodcast', remPodcastFeed(feed_id)),
+    (r'/rempodcast/(\d+)', remPodcastFeed),
     # ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
