@@ -123,7 +123,7 @@ class Podcasts(webapp2.RequestHandler):
 class remPodcastFeed(webapp2.RequestHandler):
     def post(self, feed_id):
         
-        self.response.write('The id of the feed I want to remove is %s.' % feed_id
+        self.response.write('The id of the feed I want to remove is %s.' % feed_id)
         
         # podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
     
