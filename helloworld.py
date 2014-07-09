@@ -74,7 +74,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<h2>Pretty much the best online podcast player</h2>')
 
         if user:
-            self.response.write('Welcome %s! (<a href="%s">Logout</a>) <br>' % (user.nickname(), users.create_logout_url()))
+            self.response.write('Welcome %s! (<a href="%s">Logout</a>) <br>' % (user.nickname(), users.create_logout_url('/')))
         else:
             self.response.write('<a href="%s">Sign In</a> with your Google account<br>' % users.create_login_url(self.request.uri))
 
