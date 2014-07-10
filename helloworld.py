@@ -168,8 +168,8 @@ class SecondPage(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     (r'/', MainPage),
     (r'/addpodcast', Podcasts),
-    # ('/rempodcast', remPodcastFeed),
-    (r'/rempodcast/(\d+)', remPodcastFeed),
+    ('/rempodcast/1', remPodcastFeed),
+    # (r'/rempodcast/(\d+)', remPodcastFeed),
     # ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
