@@ -83,6 +83,9 @@ class MainPage(webapp2.RequestHandler):
         testFileKey = ndb.Key(PodcastFeed, 1, parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
         testFile = testFileKey.get()
 
+        testFileKey2 = ndb.Key('podcast_feed', 'default_podcast_feed_list', 'PodcastFeed', 1)
+        testFile2 = testFileKey.get()
+
         podcast_feed_query = PodcastFeed.query(
             ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
@@ -94,12 +97,13 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderE</h1>')
+        self.response.write('<h1>HeaderF</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
         self.response.write(FORM_HTML)
         self.response.write('my directly retrieved url should be: %s<br> and the content is %s' % (testFile, testFile.content))
+        self.response.write('<br>my directly retrieved url should be: %s<br> and the content is %s' % (testFile2, testFile2.content))
         self.response.write('</body></html>')
 
 class Podcasts(webapp2.RequestHandler):
@@ -121,17 +125,18 @@ class Podcasts(webapp2.RequestHandler):
         self.redirect('/?' + urllib.urlencode(query_params))
 
 class remPodcastFeed(webapp2.RequestHandler):
-    def post(self, feed_id):
+    # def post(self, feed_id):
+    def post(self):
         
-        self.response.write('The id of the feed I want to remove is %s.' % feed_id)
+        # self.response.write('The id of the feed I want to remove is %s.' % feed_id)
         
         # podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
     
         # podcast_feed = 
         # podcast_feed.key.delete()
         
-        # query_params = {'podcast_feed_list' : podcast_feed_list}
-        # self.redirect('/?' + urllib.urlencode(query_params))
+        query_params = {'podcast_feed_list' : podcast_feed_list}
+        self.redirect('/?' + urllib.urlencode(query_params))
 
 class Guestbook(webapp2.RequestHandler):
     def post(self):
@@ -165,7 +170,8 @@ class SecondPage(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/addpodcast', Podcasts),
-    (r'/rempodcast/(\d+)', remPodcastFeed),
+    ('/rempodcast', remPodcastFeed),
+    # (r'/rempodcast/(\d+)', remPodcastFeed),
     # ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
