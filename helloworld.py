@@ -122,6 +122,7 @@ class remPodcastFeed(webapp2.RequestHandler):
     
         self.response.write('<html><body>You wrote: <pre>')
         self.response.write(feed_id)
+        self.response.write('<a href="/">Main page</a><br><br>')
         self.response.write('</pre></body></html>')
         
         
