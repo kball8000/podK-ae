@@ -99,7 +99,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
         self.response.write(FORM_HTML)
-        self.response.write('my directly retrieved url should be: %s', testFile)
+        self.response.write('my directly retrieved url should be: %s' % testFile)
         self.response.write('</body></html>')
 
 class Podcasts(webapp2.RequestHandler):
