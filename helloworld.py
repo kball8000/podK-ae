@@ -117,11 +117,11 @@ class Podcasts(webapp2.RequestHandler):
         self.redirect('/?' + urllib.urlencode(query_params))
 
 class remPodcastFeed(webapp2.RequestHandler):
-    def post(self, feed_id):
-    # def post(self):
+    # def post(self, feed_id):
+    def post(self):
     
         self.response.write('<html><body>You wrote: <pre>')
-        self.response.write(feed_id)
+        # self.response.write(feed_id)
         self.response.write('<a href="/">Main page</a><br><br>')
         self.response.write('</pre></body></html>')
         
@@ -166,8 +166,8 @@ class SecondPage(webapp2.RequestHandler):
         self.response.write('</body></html>')
 
 app = webapp2.WSGIApplication([
-    ('/', MainPage),
-    ('/addpodcast', Podcasts),
+    (r'/', MainPage),
+    (r'/addpodcast', Podcasts),
     # ('/rempodcast', remPodcastFeed),
     (r'/rempodcast/(\d+)', remPodcastFeed),
     # ('/sign', Guestbook),
