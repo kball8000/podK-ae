@@ -89,7 +89,7 @@ class MainPage(webapp2.RequestHandler):
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" value="x"></form>' % \
             (feed.content, feed.key.id()))
             # % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
-            self.response.write('<br>')
+            # self.response.write('<br>')
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
