@@ -139,8 +139,8 @@ class remPodcastFeed(webapp2.RequestHandler):
         
         # podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
     
-        podcast_feed = ndb.Key(PodcastFeed, int(feed_id), parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
-        podcast_feed_ent = ndb.get(podcast_feed)
+        # podcast_feed = ndb.Key(PodcastFeed, int(feed_id), parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
+        podcast_feed = ndb.Key(PodcastFeed, 1, parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
         podcast_feed.key.delete()
         
         # query_params = {'podcast_feed_list' : podcast_feed_list}
