@@ -93,7 +93,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderE</h1>')
+        self.response.write('<h1>HeaderF</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
@@ -139,8 +139,8 @@ class remPodcastFeed(webapp2.RequestHandler):
         
         # podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
     
-        # podcast_feed = 
-        # podcast_feed.key.delete()
+        podcast_feed = ndb.Key(PodcastFeed, feed_id, parent=ndb.Key('podcast_feed', 'default_podcast_feed_list')
+        podcast_feed.key.delete()
         
         # query_params = {'podcast_feed_list' : podcast_feed_list}
         # self.redirect('/?' + urllib.urlencode(query_params))
