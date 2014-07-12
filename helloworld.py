@@ -1,9 +1,9 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
 import webapp2
-import urllib
+import urllib2
 # import html
-import cgi
+# import cgi
 
 FORM_HTML = """\
 <form action="/addpodcast" method="post">
@@ -86,8 +86,10 @@ class MainPage(webapp2.RequestHandler):
         podcast_feeds = podcast_feed_query.fetch(10)
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         for feed in podcast_feeds:
-            self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" value="x"></form>' % \
-            (feed.content, feed.key.id()))
+            self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
+            value="x"></form>' % (feed.content, feed.key.id()))
+            self.response.write('<form action="/getfeed" method="post"><input type="hidden" name="getFeed" value="%s"><input type="submit" \
+            value="Refresh"></form>' % feed.content)
             # % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
             # self.response.write('<br>')
 
@@ -120,35 +122,40 @@ class Podcasts(webapp2.RequestHandler):
         query_params = {'podcast_feed_list' : podcast_feed_list}
         self.redirect('/?' + urllib.urlencode(query_params))
 
+class getFeed(webapp2.RequestHandler):
+    def post(self):
+        
+        self.response.headers['Content-Type'] = 'text/html'
+        self.response.write('<html><body><head>')
+        self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
+        self.response.write('</head>')
+
+        
+        url = self.request.get('getFeed')
+        
+        try:
+            url = urllib2.urlopen(url)
+
+        except urllib2.URLError, e:
+            self.response.write('could not refresh feed')
+            
+        for f in url:
+            self.response.write(f)
+
+        self.response.write('</body></html>')
+
+        # self.redirect('/')
+
 class remPodcastFeed(webapp2.RequestHandler):
-    # def post(self, feed_id):
     def post(self):
     
-        self.response.write('<html><body>You wrote: <pre>')
-
-        form = cgi.FieldStorage()
-        # feed_id = html.escape(form["del"].value)
-        # feed_id = 23
-        # feed_id = form["delRecord"].value
         feed_id = self.request.get('delRecord')
         
-        self.response.write(feed_id)
-
-        self.response.write('<a href="/">Main page</a><br><br>')
-        self.response.write('</pre></body></html>')
-        
-        
-        # self.response.write('The id of the feed I want to remove is %s.' % feed_id)
-        
-        # podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
-    
         podcast_feed = ndb.Key(PodcastFeed, int(feed_id), parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
-        # podcast_feed = ndb.Key(PodcastFeed, 1, parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
         podcast_feed.delete()
         
-        # query_params = {'podcast_feed_list' : podcast_feed_list}
-        # self.redirect('/?' + urllib.urlencode(query_params))
         self.redirect('/')
+        
 class Guestbook(webapp2.RequestHandler):
     def post(self):
         self.response.write('<html><body>You wrote<pre>')
@@ -183,6 +190,7 @@ app = webapp2.WSGIApplication([
     (r'/addpodcast', Podcasts),
     ('/rempodcast', remPodcastFeed),
     # (r'/rempodcast/(\d+)', remPodcastFeed),
+    ('/getfeed', getFeed),
     # ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
