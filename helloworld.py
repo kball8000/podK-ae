@@ -86,7 +86,7 @@ class MainPage(webapp2.RequestHandler):
         podcast_feeds = podcast_feed_query.fetch(10)
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         for feed in podcast_feeds:
-            self.response.write('%s <form action="/rempodcast" method="post"><input type="hidden" name="delRecord" value="%s"><input type="submit" value="x"></form>' % \
+            self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" value="x"></form>' % \
             (feed.content, feed.key.id()))
             # % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
             self.response.write('<br>')
@@ -95,7 +95,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderC</h1>')
+        self.response.write('<h1>HeaderD</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
