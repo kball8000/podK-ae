@@ -2,7 +2,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 import webapp2
 import urllib
-import html
+# import html
 import cgi
 
 FORM_HTML = """\
