@@ -124,9 +124,9 @@ class remPodcastFeed(webapp2.RequestHandler):
     
         self.response.write('<html><body>You wrote: <pre>')
 
-        form = cgi.FieldStorage()
-        feed_id = html.escape(form["del"].value)
-
+        # form = cgi.FieldStorage()
+        # feed_id = html.escape(form["del"].value)
+        feed_id = 23
         
         self.response.write(feed_id)
         self.response.write('<a href="/">Main page</a><br><br>')
