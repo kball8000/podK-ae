@@ -95,7 +95,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderE</h1>')
+        self.response.write('<h1>HeaderF</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
@@ -133,6 +133,7 @@ class remPodcastFeed(webapp2.RequestHandler):
         feed_id = self.request.get('delRecord')
         
         self.response.write(feed_id)
+
         self.response.write('<a href="/">Main page</a><br><br>')
         self.response.write('</pre></body></html>')
         
@@ -147,7 +148,7 @@ class remPodcastFeed(webapp2.RequestHandler):
         
         # query_params = {'podcast_feed_list' : podcast_feed_list}
         # self.redirect('/?' + urllib.urlencode(query_params))
-
+        self.redirect('/')
 class Guestbook(webapp2.RequestHandler):
     def post(self):
         self.response.write('<html><body>You wrote<pre>')
