@@ -86,14 +86,14 @@ class MainPage(webapp2.RequestHandler):
         podcast_feeds = podcast_feed_query.fetch(10)
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         for feed in podcast_feeds:
-            self.response.write('%s <form action="/rempodcast/1?feed_id=%s" method="post"><input name="del" value="1"><input type="submit" value="x"  id="%s"></form><br>' 
+            self.response.write('%s <form action="/rempodcast/1?feed_id=%s" method="post"><input name="delRecord" value="1"><input type="submit" value="x"  id="%s"></form><br>' 
             % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderB</h1>')
+        self.response.write('<h1>HeaderC</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
@@ -127,7 +127,7 @@ class remPodcastFeed(webapp2.RequestHandler):
         form = cgi.FieldStorage()
         # feed_id = html.escape(form["del"].value)
         # feed_id = 23
-        feed_id = form["del"].value
+        feed_id = form["delRecord"].value
         
         self.response.write(feed_id)
         self.response.write('<a href="/">Main page</a><br><br>')
