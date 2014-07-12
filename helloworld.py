@@ -85,7 +85,7 @@ class MainPage(webapp2.RequestHandler):
         podcast_feeds = podcast_feed_query.fetch(10)
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         for feed in podcast_feeds:
-            self.response.write('%s <form action="/rempodcast/1?feed_id=%s" method="post"><input type="submit" value="x"  id="%s"><input name='1' value='1'</form><br>' 
+            self.response.write('%s <form action="/rempodcast/1?feed_id=%s" method="post"><input type="submit" value="x"  id="%s"><input name="1" value="1"></form><br>' 
             % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
 
         # How to write to the javascript console log in the browser
