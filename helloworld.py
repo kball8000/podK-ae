@@ -115,7 +115,7 @@ class MainPage(webapp2.RequestHandler):
         shows = xrange(3)
 
         playerName = 'myMusic1'
-        defaultEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0462.mp3'
+        defaultEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'
         selectedEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/twig/twig0257/twig0257.mp3'
 
         for feed in podcast_feeds:
@@ -136,7 +136,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderE</h1>')
+        self.response.write('<h1>HeaderF</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
