@@ -3,6 +3,10 @@ var myAudio = function(){
 	var gibTime = document.getElementById('currentGibTime');
 	var gibTotalTime = document.getElementById('durationGibTIme');
 
+	function playSelectedEpisode(ep){
+        gib.href=ep;
+	}
+
 	function playAudio(){
 		if(gib.paused){
 			gib.play();
@@ -63,6 +67,7 @@ var myAudio = function(){
 	
 	return{
 		playAudio:playAudio,
+		playSelectedEpisode:playSelectedEpisode,
 		stopAudio:stopAudio,
 		rewind:rewind,
 		fastForward:fastForward,

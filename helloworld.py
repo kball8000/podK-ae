@@ -7,6 +7,10 @@ from xml.etree import ElementTree
 # import html
 # import cgi
 
+# TO DO:
+# Would like to make less queries, so all podcast feeds should be in a list
+# then all episode information for each show could be in 1 entity
+
 FORM_HTML = """\
 <form action="/addpodcast" method="post">
     <div><input type='text' name='formContent' style='width:50em'></input></div>
@@ -23,8 +27,8 @@ FORM_HTML = """\
 
 MUSIC_CONTROLS_HTML = """\
     <div>
-        <audio controls id='myMusic1'>
-            <source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3'>
+        <audio controls id='%s'>
+            <source src='%s'>
         </audio>
     </div>
     <div>
@@ -87,11 +91,20 @@ class MainPage(webapp2.RequestHandler):
             ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
+        shows = [1, 2, 3]
         for feed in podcast_feeds:
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
             value="x"></form>' % (feed.content, feed.key.id()))
             self.response.write('<form action="/getfeed" method="post"><input type="hidden" name="getFeed" value="%s"><input type="submit" \
             value="Refresh"></form>' % feed.content)
+            self.response.write('<ul>')
+            for show in shows:
+                self.response.write('<li>Episode %s \
+                <a onclick="myAudio.playSelectedEpisode(http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3)">Play</a> \
+                </li>' % (show))
+                # self.response.write('<li>%s %s %s <a onclick="myAudio.playSelectedEpisode(%s)>Play</a></li>') % (show.content, show.length, show.url)
+            self.response.write('</ul>')
+            
             # % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
             # self.response.write('<br>')
 
@@ -99,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderD</h1>')
+        self.response.write('<h1>HeaderF</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
@@ -186,7 +199,11 @@ class SecondPage(webapp2.RequestHandler):
             # self.response.write('You are not logged in <a href="%s">Click here to login</a>' % users.create_login_url(self.request.uri)
 
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
-        self.response.write(MUSIC_CONTROLS_HTML)
+        
+        x1 = 'myMusic1'
+        x2 = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3'
+
+        self.response.write(MUSIC_CONTROLS_HTML % (x1, x2))
         self.response.write('<script src="/scripts/podK.js"></script>')
         self.response.write('</body></html>')
 
