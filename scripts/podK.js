@@ -4,7 +4,7 @@ var myAudio = function(){
 	var gibTotalTime = document.getElementById('durationGibTIme');
 
 	function playSelectedEpisode(ep){
-        gib.href=ep;
+        gib.src=ep;
 	}
 
 	function playAudio(){
