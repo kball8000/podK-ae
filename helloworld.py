@@ -99,7 +99,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderB</h1>')
+        self.response.write('<h1>HeaderC</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
@@ -142,7 +142,7 @@ class getFeed(webapp2.RequestHandler):
             self.response.write('could not refresh feed')
             
         xml = ElementTree.fromstring(xmlFromWeb)
-        self.response.write(xml.findtext(".//gibson"))
+        self.response.write(xml.findtext("//.ttl"))
             
         # for f in url:
         #     self.response.write(f)
