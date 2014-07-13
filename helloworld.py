@@ -96,6 +96,7 @@ class MainPage(webapp2.RequestHandler):
 
         playerName = 'myMusic1'
         defaultEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3'
+        selectedEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/twig/twig0257/twig0257.mp3'
 
         for feed in podcast_feeds:
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
@@ -104,7 +105,7 @@ class MainPage(webapp2.RequestHandler):
             value="Refresh"></form>' % feed.content)
             self.response.write('<div class="podcastFeedList"><ul>')
             for show in shows:
-                self.response.write('<li>Episode %s <a onclick="myAudio.playSelectedEpisode(defaultEp)" class="playButton">Play</a> \
+                self.response.write('<li>Episode %s <a onclick="myAudio.playSelectedEpisode(selectedEp)" class="playButton">Play</a> \
                 </li>' % (show))
             self.response.write('</ul></div>')
             
