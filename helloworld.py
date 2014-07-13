@@ -142,7 +142,7 @@ class getFeed(webapp2.RequestHandler):
             self.response.write('could not refresh feed')
             
         xml = ElementTree.fromstring(xmlFromWeb)
-        self.response.write(xml.findtext(".//ttl"))
+        self.response.write(xml.findtext(".//title"))
             
         # for f in url:
         #     self.response.write(f)
