@@ -2,6 +2,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 import webapp2
 import urllib2
+from xmldom import minidom
 # import html
 # import cgi
 
@@ -97,7 +98,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderG</h1>')
+        self.response.write('<h1>HeaderB</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
@@ -134,13 +135,19 @@ class getFeed(webapp2.RequestHandler):
         url = self.request.get('getFeed')
         
         try:
-            url = urllib2.urlopen(url)
+            xmlFromWeb = urllib2.urlopen(url)
 
         except urllib2.URLError, e:
             self.response.write('could not refresh feed')
             
-        for f in url:
+
+        xmldoc = minidom.parse('xmlFromWeb')
+        itemlist = xmldoc.getElementsByTagName('Item')
+        for f in itemlist:
             self.response.write(f)
+            
+        # for f in url:
+        #     self.response.write(f)
 
         self.response.write('</body></html>')
 
