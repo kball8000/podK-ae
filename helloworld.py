@@ -178,7 +178,6 @@ class GetFeed(webapp2.RequestHandler):
         root = ET.fromstring(response)
         for child in root:
             self.response.write('child tag: %s, child attrib: %s' %(child.tag, child.attrib))
-        root = tree.getroot()
         self.response.write(xml.findtext(".//title"))
             
         self.response.write('</body></html>')
