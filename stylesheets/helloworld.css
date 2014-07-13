@@ -7,7 +7,7 @@ form{
     margin: 0;
 }
 
-.podcastFeedList playButton{
+.podcastFeedList .playButton{
     padding: 0 0.5em 0 0.5em;
     border: 1px solid black;
     border-radius: 0.25em;
