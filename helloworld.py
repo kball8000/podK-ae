@@ -90,29 +90,35 @@ class MainPage(webapp2.RequestHandler):
         podcast_feed_query = PodcastFeed.query(
             ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
         podcast_feeds = podcast_feed_query.fetch(10)
+
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         shows = [1, 2, 3]
+
+        playerName = 'myMusic1'
+        defaultEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3'
+
         for feed in podcast_feeds:
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
             value="x"></form>' % (feed.content, feed.key.id()))
             self.response.write('<form action="/getfeed" method="post"><input type="hidden" name="getFeed" value="%s"><input type="submit" \
             value="Refresh"></form>' % feed.content)
-            self.response.write('<ul>')
+            self.response.write('<div class="podcastFeedList"><ul>')
             for show in shows:
-                self.response.write('<li>Episode %s \
-                <a onclick="myAudio.playSelectedEpisode(http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3)">Play</a> \
+                self.response.write('<li>Episode %s <a onclick="myAudio.playSelectedEpisode(defaultEp)" class="playButton">Play</a> \
                 </li>' % (show))
-                # self.response.write('<li>%s %s %s <a onclick="myAudio.playSelectedEpisode(%s)>Play</a></li>') % (show.content, show.length, show.url)
-            self.response.write('</ul>')
+            self.response.write('</ul></div>')
             
             # % (feed.content, feed.key.id(), podcast_feeds.index(feed)))
             # self.response.write('<br>')
+
+        self.response.write(MUSIC_CONTROLS_HTML % (playerName, defaultEp))
+
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # For revving so I know when I"ve got a new page
-        self.response.write('<h1>HeaderG</h1>')
+        self.response.write('<h1>HeaderA</h1>')
         self.response.write('<h2><a href="http://kball-test-tools.appspot.com/second">Second page</a></h2>')
         self.response.write('http://feeds.twit.tv/twit.xml<br>')
         self.response.write('http://feeds.twit.tv/sn.xml<br>')
