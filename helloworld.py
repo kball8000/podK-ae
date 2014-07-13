@@ -2,7 +2,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 import webapp2
 import urllib2
-from xmldom import minidom
+from xml.etree import ElementTree
+# from xmldom import minidom
 # import html
 # import cgi
 
@@ -135,16 +136,13 @@ class getFeed(webapp2.RequestHandler):
         url = self.request.get('getFeed')
         
         try:
-            xmlFromWeb = urllib2.urlopen(url)
+            xmlFromWeb = urllib2.urlopen(url).read()
 
         except urllib2.URLError, e:
             self.response.write('could not refresh feed')
             
-
-        xmldoc = minidom.parse('xmlFromWeb')
-        itemlist = xmldoc.getElementsByTagName('Item')
-        for f in itemlist:
-            self.response.write(f)
+        xml = ElementTree.fromstring(xmlFromWeb)
+        self.response.write(xml.findtext(".//gibson"))
             
         # for f in url:
         #     self.response.write(f)
