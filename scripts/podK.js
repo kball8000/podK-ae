@@ -3,7 +3,8 @@ var myAudio = function(){
 	var gibTime = document.getElementById('currentGibTime');
 	var gibTotalTime = document.getElementById('durationGibTIme');
 
-	function playSelectedEpisode(ep){
+    function playSelectedEpisode(ep){
+        console.log('I will play ', ep);
         gib.src=ep;
 	}
 
