@@ -1,6 +1,7 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
 import webapp2
+import urllib
 import urllib2
 from xml.etree import ElementTree
 # from xmldom import minidom
@@ -143,7 +144,8 @@ class Podcasts(webapp2.RequestHandler):
         podcast_feed.put()
 
         query_params = {'podcast_feed_list' : podcast_feed_list}
-        self.redirect('/?' + urllib2.urlencode(query_params))
+        self.redirect('/?' + urllib.urlencode(query_params))
+        # self.redirect('/')
 
 class getFeed(webapp2.RequestHandler):
     def post(self):
