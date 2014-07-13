@@ -136,7 +136,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderG</h1>')
+        self.response.write('<h1>HeaderA</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
@@ -175,7 +175,7 @@ class GetFeed(webapp2.RequestHandler):
         except urllib2.URLError, e:
             self.response.write('could not refresh feed')
             
-        root = ET.fromstring(response.read())
+        root = ET.fromstring(response)
         for child in root:
             self.response.write('child tag: %s, child attrib: %s' %(child.tag, child.attrib))
         root = tree.getroot()
