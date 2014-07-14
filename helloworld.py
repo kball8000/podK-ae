@@ -11,6 +11,8 @@ import xml.etree.ElementTree as ET
 # TO DO:
 # Ask what is going on with fancy redirects.
 # Would like to make less queries, so all podcast feeds should be in a list
+# After hitting stop, it turns into an undo button... for a while.
+# Add keyboard shortcuts for controlling player. Probably need to add a click event to the body or html entity.
 # then all episode information for each show could be in 1 entity
 # Ask huber if how I"m handling controls is proper. Seems odd to have urls as 'controls', i.e. to remove feeds.
 # Put an are you sure / undo / store removed shows somewhere / maybe even a remove forever button once it's on the removed list.
@@ -135,12 +137,13 @@ class MainPage(webapp2.RequestHandler):
             
         self.response.write(MUSIC_CONTROLS_HTML % (playerName, defaultEp))
 
+        self.response.write('<form method="post" action="/searchITunes"><input type="text" name="searchITunes"><input type="submit" value="Search"></form>')
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderF</h1>')
+        self.response.write('<h1>HeaderG</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
@@ -163,6 +166,26 @@ class AddPodcasts(webapp2.RequestHandler):
         podcast_feed.put()
 
         self.redirect('/')
+
+class SearchITunes(webapp2.RequestHandler):
+    def post(self):
+
+        searchRequest = self.request.get('searchITunes')
+        url = 'https://itunes.apple.com/search'
+        queryArgs = {'term':searchRequest, 'entity':'podcast'}
+        searchRequestEnc = urllib.urlencode(url, queryArgs)
+        
+        # response = urllib2.urlopen(searchRequestEnc)
+
+        self.response.headers['Content-Type'] = 'text/html'
+        self.response.write('<html><body><head>')
+        self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
+        self.response.write('</head>')
+        self.response.write('Search Request: %s<br>' % searchRequest)
+        self.response.write('url: %s<br>' % url)
+        self.response.write('queryArgs: %s<br>' % searchRequestEnc)
+        # self.response.write('Searching for: %s, in iTunes' % searchRequest)
+
 
 class GetFeed(webapp2.RequestHandler):
     def post(self):
@@ -238,6 +261,7 @@ app = webapp2.WSGIApplication([
     (r'/', MainPage),
     (r'/addpodcast', AddPodcasts),
     ('/rempodcast', RemPodcastFeed),
+    ('/searchITunes', SearchITunes),
     # (r'/rempodcast/(\d+)', remPodcastFeed),
     ('/getfeed', GetFeed),
     # ('/sign', Guestbook),
