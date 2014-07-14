@@ -136,7 +136,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderC</h1>')
+        self.response.write('<h1>HeaderD</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
@@ -181,7 +181,7 @@ class GetFeed(webapp2.RequestHandler):
 
         self.response.write('</body></html>')
 
-        self.redirect('/')
+        # self.redirect('/')
 
 class RemPodcastFeed(webapp2.RequestHandler):
     def post(self):
