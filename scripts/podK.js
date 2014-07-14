@@ -37,6 +37,19 @@ var myAudio = function(){
 		gib.currentTime = t;
 	}
 	
+	function toggleSound(){
+	// For the icons visit: http://www.fileformat.info/info/unicode/char/search.htm?q=speaker&preview=entity
+	// For the uriencode bit, visit: http://www.the-art-of-web.com/javascript/escape/
+        var icon = document.getElementById('speakerIcon')
+		if(gib.muted){
+			gib.muted=false;
+			icon.innerHTML = decodeURI('%F0%9F%94%89');
+		}
+		else{
+			gib.muted=true;
+			icon.innerHTML = decodeURI("%F0%9F%94%87")
+	}
+
 	function readableTime(t0){
 		var hr = 0;			/* number values */
 		var min = 0;
@@ -72,6 +85,7 @@ var myAudio = function(){
 		stopAudio:stopAudio,
 		rewind:rewind,
 		fastForward:fastForward,
+		toggleSound:toggleSound,
 		displayTime:displayTime
 	};
 }();

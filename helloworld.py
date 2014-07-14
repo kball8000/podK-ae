@@ -67,6 +67,9 @@ MUSIC_CONTROLS_HTML = """\
     	<button onclick='myAudio.fastForward()'>
     		>
     	</button>
+    	<button onclick='myAudio.toggleSound()'>
+        	<a id='speadkerIcon'>&#128266</a>
+    	</button>
     </div>
     <div>
     	Current time is <span id='currentGibTime' style='height:2em;'></span><br>
