@@ -137,7 +137,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderB</h1>')
+        self.response.write('<h1>HeaderC</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
@@ -179,7 +179,7 @@ class GetFeed(webapp2.RequestHandler):
         root = ET.fromstring(response)
         self.response.write('Show title: <h2>%s</h2><br><br>' %(root.find('channel').find('title').text))
         for item in root.find('channel').findall('item'):
-            self.response.write('title: <h3>%s</h3>, published on: %s<br>' %(item.find('title').text, item.find('pubDate').text))
+            self.response.write('Episode title: <h3>%s</h3>, published on: %s<br>' %(item.find('title').text, item.find('pubDate').text))
 
         self.response.write('</body></html>')
 

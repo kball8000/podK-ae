@@ -2,6 +2,14 @@ h1{
     color: rgb(255,0,0);
 }
 
+h2{
+    display:inline;
+}
+
+h3{
+    display:inline;
+}
+
 form{
     display: inline;
     margin: 0;
