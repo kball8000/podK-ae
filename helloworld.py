@@ -176,8 +176,9 @@ class GetFeed(webapp2.RequestHandler):
             self.response.write('could not refresh feed')
             
         root = ET.fromstring(response)
-        for child in root:
-            self.response.write('child tag: %s, child attrib: %s' %(child.tag, child.attrib))
+        self.response.write('title: %s<br><br>' %(root.find('channel').get('title')))
+        for item in root.findall('item'):
+            self.response.write('title: %s, published on: %s' %(item.get('title'), item.get('pubDate')))
 
         self.response.write('</body></html>')
 
