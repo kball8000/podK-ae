@@ -175,7 +175,7 @@ class SearchITunes(webapp2.RequestHandler):
         queryArgs = {'term':searchRequest, 'entity':'podcast'}
         searchRequestEnc = urllib.urlencode(queryArgs)
         request = urllib2.Request(url, searchRequestEnc)
-        # response = urllib2.urlopen(request)
+        response = urllib2.urlopen(request)
 
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
@@ -186,8 +186,7 @@ class SearchITunes(webapp2.RequestHandler):
         self.response.write('queryArgs: %s<br>' % searchRequestEnc)
         self.response.write('Results:<br>')
 
-        # self.response.write('Searching for: %s, in iTunes' % searchRequest)
-        # self.response.write(response)
+        self.response.write(response)
 
         self.response.write('</body></html>')
 
