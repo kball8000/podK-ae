@@ -48,6 +48,7 @@ var myAudio = function(){
 		else{
 			gib.muted=true;
 			icon.innerHTML = decodeURI("%F0%9F%94%87")
+		}
 	}
 
 	function readableTime(t0){
