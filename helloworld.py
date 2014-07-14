@@ -121,8 +121,9 @@ class MainPage(webapp2.RequestHandler):
         for feed in podcast_feeds:
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
             value="x"></form>' % (feed.content, feed.key.id()))
+            self.response.write('&nbsp&nbsp')
             self.response.write('<form action="/getfeed" method="post"><input type="hidden" name="getFeed" value="%s"><input type="submit" \
-            value="&#8635 OR &#10227"></form>' % feed.content)
+            value="&#8635"></form>' % feed.content)
             self.response.write('<div class="podcastFeedList"><ul>')
             for show in shows:
                 self.response.write("""<li>Episode %s <a onclick="myAudio.playSelectedEpisode('%s')" class="playButton">&#9658</a> \
@@ -136,7 +137,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderD</h1>')
+        self.response.write('<h1>HeaderE</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
