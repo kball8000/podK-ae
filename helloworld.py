@@ -144,7 +144,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderA</h1>')
+        self.response.write('<h1>HeaderB</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
@@ -178,7 +178,8 @@ class SearchITunes(webapp2.RequestHandler):
         request = urllib2.Request(url, searchRequestEnc)
         response = urllib2.urlopen(request)
         readResponse = response.read()
-        data = json.load(readResponse)
+        # data = json.load(readResponse)
+        data = json.load(response)
         for a in data:
             self.response.write('<br>JSON line: %s' %a)
 
