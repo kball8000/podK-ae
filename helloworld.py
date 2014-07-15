@@ -177,12 +177,9 @@ class SearchITunes(webapp2.RequestHandler):
         searchRequestEnc = urllib.urlencode(queryArgs)
         request = urllib2.Request(url, searchRequestEnc)
         response = urllib2.urlopen(request)
-        readResponse = response.read()
-        # data = json.load(readResponse)
-        jsonData = json.open(response)
-        data = json.load(jsonData)
-        for a in data:
-            self.response.write('<br>JSON line: %s' %a)
+        data = json.loads(response.read())
+        for i in xrange(data['resultCount']):
+            self.response.write('<br>artist name: %s, collection name: %s' % (data['results'][i]['artistName'], data['results'][i]['collectionName']))
 
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
