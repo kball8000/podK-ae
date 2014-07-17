@@ -10,13 +10,17 @@ import json
 # import cgi
 
 # TO DO:
-# Ask what is going on with fancy redirects.
 # Would like to make less queries, so all podcast feeds should be in a list
-# After hitting stop, it turns into an undo button... for a while.
 # Add keyboard shortcuts for controlling player. Probably need to add a click event to the body or html entity.
 # then all episode information for each show could be in 1 entity
 # Ask huber if how I"m handling controls is proper. Seems odd to have urls as 'controls', i.e. to remove feeds.
 # Put an are you sure / undo / store removed shows somewhere / maybe even a remove forever button once it's on the removed list.
+# Create a current playing object. I'll write that to datastore often, but only update the episode object every so often.
+
+
+# Additional features
+# After hitting stop, it turns into an undo button... for a while.
+
 
 # **-- Need to store:  --**
 # 
@@ -88,10 +92,19 @@ DEFAULT_PODCAST_FEED_LIST = 'default_podcast_feed_list'
 def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
     return ndb.Key('podcast_feed', podcast_feed)
 
-class PodcastFeed(ndb.Model):
+class Podcast(ndb.Model):
     author = ndb.UserProperty()
-    content = ndb.StringProperty(indexed=False)
+    title = ndb.StringProperty(indexed=False)
+    feedUrl = ndb.StringProperty(indexed=False)
+    show = ndb.StructuredProperty(Episode, repeated=True, compressed=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
+
+class Episode(ndb.Model):
+    title = ndb.StringProperty(indexed=False)
+    listened = ndb.BooleanProperty()
+    episodeLength = ndb.IntegerProperty() # in milliseconds
+    playbackPosition = ndb.IntegerProperty() # in milliseconds
+    
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -113,8 +126,8 @@ class MainPage(webapp2.RequestHandler):
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         
-        podcast_feed_query = PodcastFeed.query(
-            ancestor = podcast_feed_key(podcast_feed_list)).order(-PodcastFeed.date)
+        podcast_feed_query = Podcast.query(
+            ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
         podcast_feeds = podcast_feed_query.fetch(10)
 
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
@@ -128,7 +141,7 @@ class MainPage(webapp2.RequestHandler):
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
             value="x"></form>' % (feed.content, feed.key.id()))
             self.response.write('&nbsp&nbsp')
-            self.response.write('<form action="/getfeed" method="post"><input type="hidden" name="getFeed" value="%s"><input type="submit" \
+            self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
             value="&#8635"></form>' % feed.content)
             self.response.write('<div class="podcastFeedList"><ul>')
             for show in shows:
@@ -151,20 +164,20 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<script src="/scripts/podK.js"></script>')
         self.response.write('</body></html>')
 
-class AddPodcasts(webapp2.RequestHandler):
+class AddPodcast(webapp2.RequestHandler):
     def post(self):
         podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
 
         # Create the constructor
-        podcast_feed = PodcastFeed(parent=podcast_feed_key(podcast_feed_list))
+        podcast = Podcast(parent=podcast_feed_key(podcast_feed_list))
 
         # Add parameters
         if users.get_current_user():
             podcast_feed.author = users.get_current_user()
             
-        podcast_feed.content = self.request.get('formContent')
+        podcast.content = self.request.get('formContent')
 
-        podcast_feed.put()
+        podcast.put()
 
         self.redirect('/')
 
@@ -174,12 +187,13 @@ class SearchITunes(webapp2.RequestHandler):
         searchRequest = self.request.get('searchITunes')
         url = 'https://itunes.apple.com/search'
         queryArgs = {'term':searchRequest, 'media':'podcast', 'limit':10}
-        searchRequestEnc = urllib.urlencode(queryArgs)
-        request = urllib2.Request(url, searchRequestEnc)
+        queryArgsEnc = urllib.urlencode(queryArgs)
+        request = urllib2.Request(url, queryArgsEnc)
         response = urllib2.urlopen(request)
         data = json.loads(response.read())
         for i in xrange(data['resultCount']):
             self.response.write('<br>artist name: %s, collection name: %s' % (data['results'][i]['artistName'], data['results'][i]['collectionName']))
+            self.response.write('<form action="/addpodcast" method="post"><input type="submit" value="add" name = "%s"></form>' % data['results'][i]['collectionName']) 
 
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
@@ -196,7 +210,7 @@ class SearchITunes(webapp2.RequestHandler):
 
         self.response.write('</body></html>')
 
-class GetFeed(webapp2.RequestHandler):
+class RefreshFeed(webapp2.RequestHandler):
     def post(self):
         
         self.response.headers['Content-Type'] = 'text/html'
@@ -204,7 +218,7 @@ class GetFeed(webapp2.RequestHandler):
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         self.response.write('</head>')
 
-        url = self.request.get('getFeed')
+        url = self.request.get('refreshFeed')
         request = urllib2.Request(url)
         try:
             response = urllib2.urlopen(request).read()
@@ -220,7 +234,7 @@ class GetFeed(webapp2.RequestHandler):
 
         # self.redirect('/')
 
-class RemPodcastFeed(webapp2.RequestHandler):
+class RemPodcast(webapp2.RequestHandler):
     def post(self):
         
         # Get id from post request and delete that show from list. 
@@ -228,7 +242,7 @@ class RemPodcastFeed(webapp2.RequestHandler):
     
         feed_id = self.request.get('delRecord')
         
-        podcast_feed = ndb.Key(PodcastFeed, int(feed_id), parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
+        podcast_feed = ndb.Key(Podcast, int(feed_id), parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
         podcast_feed.delete()
         
         self.redirect('/')
@@ -260,7 +274,7 @@ class SecondPage(webapp2.RequestHandler):
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
         
         x1 = 'myMusic1'
-        x2 = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0461/sn0461.mp3'
+        x2 = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'
 
         self.response.write(MUSIC_CONTROLS_HTML % (x1, x2))
         self.response.write('<script src="/scripts/podK.js"></script>')
@@ -268,11 +282,11 @@ class SecondPage(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     (r'/', MainPage),
-    (r'/addpodcast', AddPodcasts),
-    ('/rempodcast', RemPodcastFeed),
+    (r'/addpodcast', AddPodcast),
+    ('/rempodcast', RemPodcast),
     ('/searchITunes', SearchITunes),
     # (r'/rempodcast/(\d+)', remPodcastFeed),
-    ('/getfeed', GetFeed),
+    ('/refreshfeed', RefreshFeed),
     # ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
