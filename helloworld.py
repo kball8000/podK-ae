@@ -4,8 +4,7 @@ import webapp2
 import urllib
 import urllib2
 import xml.etree.ElementTree as ET
-# import json
-# from xmldom import minidom
+import json
 # import html
 # import cgi
 
@@ -173,9 +172,9 @@ class AddPodcast(webapp2.RequestHandler):
 
         # Add parameters
         if users.get_current_user():
-            podcast_feed.author = users.get_current_user()
+            podcast.author = users.get_current_user()
             
-        podcast.content = self.request.get('formContent')
+        podcast.feedUrl = self.request.get('formContent')
 
         podcast.put()
 
@@ -247,12 +246,6 @@ class RemPodcast(webapp2.RequestHandler):
         
         self.redirect('/')
         
-class Guestbook(webapp2.RequestHandler):
-    def post(self):
-        self.response.write('<html><body>You wrote<pre>')
-        self.response.write(cgi.escape(self.request.get('content')))
-        self.response.write('</pre></body></html>')
-
 class SecondPage(webapp2.RequestHandler):
     def get(self):
         
@@ -287,6 +280,5 @@ app = webapp2.WSGIApplication([
     ('/searchITunes', SearchITunes),
     # (r'/rempodcast/(\d+)', remPodcastFeed),
     ('/refreshfeed', RefreshFeed),
-    # ('/sign', Guestbook),
     ('/second', SecondPage),
 ], debug=True)
