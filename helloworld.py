@@ -3,8 +3,8 @@ from google.appengine.ext import ndb
 import webapp2
 import urllib
 import urllib2
-# import xml.etree.ElementTree as ET
-# import json
+import xml.etree.ElementTree as ET
+import json
 # import html
 # import cgi
 
@@ -94,17 +94,16 @@ def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
 class Podcast(ndb.Model):
     author = ndb.UserProperty()
     title = ndb.StringProperty(indexed=False)
-    # feedUrl = ndb.StringProperty(indexed=False)
-    # show = ndb.StructuredProperty(Episode, repeated=True, compressed=True)
+    feedUrl = ndb.StringProperty(indexed=False)
+    show = ndb.StructuredProperty(Episode, repeated=True, compressed=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
 
-# class Episode(ndb.Model):
-#     title = ndb.StringProperty(indexed=False)
-#     listened = ndb.BooleanProperty()
-#     episodeLength = ndb.IntegerProperty() # in milliseconds
-#     playbackPosition = ndb.IntegerProperty() # in milliseconds
+class Episode(ndb.Model):
+    title = ndb.StringProperty(indexed=False)
+    listened = ndb.BooleanProperty()
+    episodeLength = ndb.IntegerProperty() # in milliseconds
+    playbackPosition = ndb.IntegerProperty() # in milliseconds
     
-
 class MainPage(webapp2.RequestHandler):
     def get(self):
         

@@ -1,5 +1,10 @@
 indexes:
-- kind: PodcastFeed
+- kind: Podcast
+  ancestor: yes
+  properties:
+  - name: date
+    direction: desc
+- kind: Episode
   ancestor: yes
   properties:
   - name: date
