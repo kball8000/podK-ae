@@ -125,8 +125,7 @@ class MainPage(webapp2.RequestHandler):
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         
-        podcast_feed_query = Podcast.query(
-            ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
+        podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
         podcast_feeds = podcast_feed_query.fetch(10)
 
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
@@ -138,10 +137,10 @@ class MainPage(webapp2.RequestHandler):
 
         for feed in podcast_feeds:
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
-            value="x"></form>' % (feed.content, feed.key.id()))
+            value="x"></form>' % (feed.feedUrl, feed.key.id()))
             self.response.write('&nbsp&nbsp')
             self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
-            value="&#8635"></form>' % feed.content)
+            value="&#8635"></form>' % feed.feedUrl)
             self.response.write('<div class="podcastFeedList"><ul>')
             for show in shows:
                 self.response.write("""<li>Episode %s <a onclick="myAudio.playSelectedEpisode('%s')" class="playButton">&#9658</a> \
