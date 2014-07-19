@@ -59,7 +59,7 @@ MUSIC_CONTROLS_HTML = """\
     </div>
     <div>
     	<button onclick='myAudio.playAudio()'>
-    		Play / Pause B
+    		Play / Pause C 
     	</button>
     	<button onclick='myAudio.stopAudio()'>
     		Stop
@@ -94,8 +94,8 @@ def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
 class Episode(ndb.Model):
     title = ndb.StringProperty()
     listened = ndb.BooleanProperty()
-#     episodeLength = ndb.IntegerProperty() # in milliseconds
-#     playbackPosition = ndb.IntegerProperty() # in milliseconds
+    episodeLength = ndb.IntegerProperty() # in milliseconds
+    playbackPosition = ndb.IntegerProperty() # in milliseconds
 
 class Podcast(ndb.Model):
     author = ndb.UserProperty()
@@ -153,8 +153,6 @@ class MainPage(webapp2.RequestHandler):
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
-# ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderEs</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
