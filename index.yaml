@@ -7,7 +7,7 @@ indexes:
     direction: desc
 
 - kind: Episode
-  ancestor: no
+  ancestor: yes
   properties:
   - name: title
     direction: desc

@@ -99,7 +99,7 @@ class Podcast(ndb.Model):
     date = ndb.DateTimeProperty(auto_now_add=True)
 
 class Episode(ndb.Model):
-    title = ndb.StringProperty(indexed=False)
+    title = ndb.StringProperty(indexed=True)
     listened = ndb.BooleanProperty()
     episodeLength = ndb.IntegerProperty() # in milliseconds
     playbackPosition = ndb.IntegerProperty() # in milliseconds
