@@ -1,4 +1,5 @@
 indexes:
+
 - kind: Podcast
   ancestor: yes
   properties:
@@ -6,7 +7,7 @@ indexes:
     direction: desc
 
 - kind: Episode
-  ancestor: yes
+  ancestor: no
   properties:
   - name: title
     direction: desc
