@@ -4,3 +4,9 @@ indexes:
   properties:
   - name: date
     direction: desc
+
+- kind: Episode
+  ancestor: yes
+  properties:
+  - name: title
+    direction: desc
