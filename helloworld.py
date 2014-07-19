@@ -98,11 +98,11 @@ class Podcast(ndb.Model):
     # show = ndb.StructuredProperty(Episode, repeated=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
 
-class Episode(ndb.Model):
-    title = ndb.StringProperty(indexed=True)
-    listened = ndb.BooleanProperty()
-    episodeLength = ndb.IntegerProperty() # in milliseconds
-    playbackPosition = ndb.IntegerProperty() # in milliseconds
+# class Episode(ndb.Model):
+#     title = ndb.StringProperty(indexed=True)
+#     listened = ndb.BooleanProperty()
+#     episodeLength = ndb.IntegerProperty() # in milliseconds
+#     playbackPosition = ndb.IntegerProperty() # in milliseconds
     
 class MainPage(webapp2.RequestHandler):
     def get(self):
