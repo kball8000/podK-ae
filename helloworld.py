@@ -95,7 +95,7 @@ class Podcast(ndb.Model):
     author = ndb.UserProperty()
     title = ndb.StringProperty(indexed=False)
     feedUrl = ndb.StringProperty(indexed=False)
-    show = ndb.StructuredProperty(Episode, repeated=True)
+    # show = ndb.StructuredProperty(Episode, repeated=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
 
 class Episode(ndb.Model):
