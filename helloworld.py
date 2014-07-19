@@ -59,7 +59,7 @@ MUSIC_CONTROLS_HTML = """\
     </div>
     <div>
     	<button onclick='myAudio.playAudio()'>
-    		Play / Pause
+    		Play / Pause A
     	</button>
     	<button onclick='myAudio.stopAudio()'>
     		Stop
@@ -173,7 +173,7 @@ class AddPodcast(webapp2.RequestHandler):
             podcast.author = users.get_current_user()
             
         podcast.feedUrl = self.request.get('formContent')
-        podcast.show = Episode(title = 'today')
+        podcast.show = [Episode(title = 'today')]
 
         podcast.put()
 
