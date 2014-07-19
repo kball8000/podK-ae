@@ -42,6 +42,7 @@ FORM_HTML = """\
     <div><input type='text' name='formContent' style='width:50em'></input></div>
     <div><input type="submit" value = "Add podcast"></div>
 </form>
+<div id='searchResultHtml'></div>
 """
 
 # In order to use guestbook example, this is a cross reference list
@@ -112,6 +113,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
+        self.response.write('<script src="/scripts/podKTop.js"></script>')
         self.response.write('</head>')
 
         self.response.write('<h1>PodKatchor</h1>')
@@ -148,7 +150,9 @@ class MainPage(webapp2.RequestHandler):
             
         self.response.write(MUSIC_CONTROLS_HTML % (playerName, defaultEp))
 
-        self.response.write('<form method="post" action="/searchITunes"><input type="text" name="searchITunes"><input type="submit" value="Search"></form>')
+        # self.response.write('<form method="post" action="/searchITunes"><input type="text" name="searchITunes"><input type="submit" value="Search"></form>')
+        self.response.write('<form method="post" name="itunesSearchForm" action="#"><input type="text" name="iTunesSearchValue">
+        <input type="submit" onclick="sendITunesSearchRequest()" value="Search"></form>')
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
