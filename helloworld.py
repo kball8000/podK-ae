@@ -93,7 +93,7 @@ def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
 
 class Episode(ndb.Model):
     title = ndb.StringProperty()
-#     listened = ndb.BooleanProperty()
+    listened = ndb.BooleanProperty()
 #     episodeLength = ndb.IntegerProperty() # in milliseconds
 #     playbackPosition = ndb.IntegerProperty() # in milliseconds
 
@@ -173,7 +173,7 @@ class AddPodcast(webapp2.RequestHandler):
             podcast.author = users.get_current_user()
             
         podcast.feedUrl = self.request.get('formContent')
-        podcast.show = [Episode(title='year'),]
+        podcast.show = [Episode(title='year', listened=False),]
 
         podcast.put()
 
