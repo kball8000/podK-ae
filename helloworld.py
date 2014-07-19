@@ -60,7 +60,7 @@ MUSIC_CONTROLS_HTML = """\
     </div>
     <div>
     	<button onclick='myAudio.playAudio()'>
-    		Play / Pause D 
+    		Play / Pause E
     	</button>
     	<button onclick='myAudio.stopAudio()'>
     		Stop
