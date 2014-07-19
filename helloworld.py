@@ -91,19 +91,19 @@ DEFAULT_PODCAST_FEED_LIST = 'default_podcast_feed_list'
 def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
     return ndb.Key('podcast_feed', podcast_feed)
 
-class Podcast(ndb.Model):
-    author = ndb.UserProperty()
-    title = ndb.StringProperty(indexed=False)
-    feedUrl = ndb.StringProperty(indexed=False)
-    # show = ndb.StructuredProperty(Episode, repeated=True)
-    date = ndb.DateTimeProperty(auto_now_add=True)
-
 class Episode(ndb.Model):
     title = ndb.StringProperty()
 #     listened = ndb.BooleanProperty()
 #     episodeLength = ndb.IntegerProperty() # in milliseconds
 #     playbackPosition = ndb.IntegerProperty() # in milliseconds
-    
+
+class Podcast(ndb.Model):
+    author = ndb.UserProperty()
+    title = ndb.StringProperty(indexed=False)
+    feedUrl = ndb.StringProperty(indexed=False)
+    show = ndb.StructuredProperty(Episode, repeated=True)
+    date = ndb.DateTimeProperty(auto_now_add=True)
+
 class MainPage(webapp2.RequestHandler):
     def get(self):
         
@@ -154,7 +154,7 @@ class MainPage(webapp2.RequestHandler):
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
 # ****-----  For revving so I know when I"ve got a new page  ----****
-        self.response.write('<h1>HeaderC</h1>')
+        self.response.write('<h1>HeaderD</h1>')
         self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
         self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
         self.response.write(FORM_HTML)
@@ -173,6 +173,7 @@ class AddPodcast(webapp2.RequestHandler):
             podcast.author = users.get_current_user()
             
         podcast.feedUrl = self.request.get('formContent')
+        podcast.
 
         podcast.put()
 
