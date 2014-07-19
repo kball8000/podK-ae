@@ -60,7 +60,7 @@ MUSIC_CONTROLS_HTML = """\
     </div>
     <div>
     	<button onclick='myAudio.playAudio()'>
-    		Play / Pause C 
+    		Play / Pause D 
     	</button>
     	<button onclick='myAudio.stopAudio()'>
     		Stop
@@ -151,8 +151,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write(MUSIC_CONTROLS_HTML % (playerName, defaultEp))
 
         # self.response.write('<form method="post" action="/searchITunes"><input type="text" name="searchITunes"><input type="submit" value="Search"></form>')
-        self.response.write('<form method="post" name="itunesSearchForm" action="#"><input type="text" name="iTunesSearchValue">
-        <input type="submit" onclick="sendITunesSearchRequest()" value="Search"></form>')
+        # self.response.write('<form method="post" name="itunesSearchForm" action="#"><input type="text" name="iTunesSearchValue"><input type="submit" onclick="sendITunesSearchRequest()" value="Search"></form>')
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
