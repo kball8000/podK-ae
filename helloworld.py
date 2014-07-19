@@ -173,7 +173,7 @@ class AddPodcast(webapp2.RequestHandler):
             podcast.author = users.get_current_user()
             
         podcast.feedUrl = self.request.get('formContent')
-        podcast.show = [Episode(title='year'),
+        podcast.show = [Episode(title='year'),]
 
         podcast.put()
 
