@@ -9,6 +9,7 @@ import json
 # import cgi
 
 # TO DO:
+# Redo buttons so jQuery adds an event listener.
 # Would like to make less queries, so all podcast feeds should be in a list
 # Add keyboard shortcuts for controlling player. Probably need to add a click event to the body or html entity.
 # then all episode information for each show could be in 1 entity
@@ -59,10 +60,8 @@ MUSIC_CONTROLS_HTML = """\
         </audio>
     </div>
     <div>
-    	<button onclick='myAudio.playAudio()'>
-    		Play / Pause C
-    	</button>
-    	<button onclick='myAudio.stopAudio()'>
+    	<input type="button" data-inline="true" onclick="myAudio.playAudio()" value="Play / Pause D">
+    	<input type="button" data-inline="true" onclick="myAudio.stopAudio()">
     		Stop
     	</button>
     	<button onclick='myAudio.displayTime()'>
