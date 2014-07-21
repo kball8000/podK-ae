@@ -60,7 +60,7 @@ MUSIC_CONTROLS_HTML = """\
     </div>
     <div>
     	<button onclick='myAudio.playAudio()'>
-    		Play / Pause A
+    		Play / Pause C
     	</button>
     	<button onclick='myAudio.stopAudio()'>
     		Stop
@@ -112,13 +112,20 @@ class MainPage(webapp2.RequestHandler):
 
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
+
+        # HTML header 
+        self.response.write('<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />')
+        self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>')
+        self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         self.response.write('<script src="/scripts/podKTop.js"></script>')
         self.response.write('</head>')
 
+        # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
         self.response.write('<h2>Pretty much the best online podcast player</h2>')
 
+        #Have user log in and show their current subscriptions.
         if user:
             self.response.write('Welcome %s! (<a href="%s">Logout</a>) <br>' % (user.nickname(), users.create_logout_url(self.request.uri)))
         else:
@@ -148,10 +155,15 @@ class MainPage(webapp2.RequestHandler):
                 </li>""" % (show, selectedEp))
             self.response.write('</ul></div>')
             
+        # Music player, move player vars down once I have above feed for loop not requiring it.
         self.response.write(MUSIC_CONTROLS_HTML % (playerName, defaultEp))
 
+        # Search iTunes for podcast
+        self.response.write('<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/>')
+        self.response.write('<button id="iTunesSearchButton">Go</button>')
+        self.response.write('<div id="iTunesSearchResultsHtml"></div>')
         # self.response.write('<form method="post" action="/searchITunes"><input type="text" name="searchITunes"><input type="submit" value="Search"></form>')
-        self.response.write('<form method="get" name="itunesSearchForm" action="#"><input type="text" name="iTunesSearchValue"><input type="submit" onclick="sendITunesSearchRequest()" value="Search"></form>')
+        # self.response.write('<form method="get" name="itunesSearchForm" action="#"><input type="text" name="iTunesSearchValue"><input type="submit" onclick="sendITunesSearchRequest()" value="Search"></form>')
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
