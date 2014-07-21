@@ -60,19 +60,11 @@ MUSIC_CONTROLS_HTML = """\
         </audio>
     </div>
     <div>
-    	<input type="button" data-inline="true" onclick="myAudio.playAudio()" value="Play / Pause D">
-    	<input type="button" data-inline="true" onclick="myAudio.stopAudio()">
-    		Stop
-    	</button>
-    	<button onclick='myAudio.displayTime()'>
-    		Get Time
-    	</button>
-    	<button onclick='myAudio.rewind()'>
-    		<
-    	</button>
-    	<button onclick='myAudio.fastForward()'>
-    		>
-    	</button>
+    	<input type="button" data-inline="true" onclick="myAudio.playAudio();" value="Play / Pause D">
+    	<input type="button" data-inline="true" onclick="myAudio.stopAudio();" value="Stop">
+    	<input type="button" data-inline="true" onclick="myAudio.displayTime();" value="Get Time">
+    	<input type="button" data-inline="true" onclick="myAudio.rewind();" value="<" >
+    	<input type="button" data-inline="true" onclick="myAudio.fastForward();" value=">" >
     	<button onclick='myAudio.toggleSound()'>
         	<a id='speakerIcon'>&#128266</a>
     	</button>
