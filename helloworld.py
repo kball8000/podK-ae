@@ -60,14 +60,12 @@ MUSIC_CONTROLS_HTML = """\
         </audio>
     </div>
     <div>
-    	<input type="button" data-inline="true" onclick="myAudio.playAudio();" value="Play / Pause D">
-    	<input type="button" data-inline="true" onclick="myAudio.stopAudio();" value="Stop">
-    	<input type="button" data-inline="true" onclick="myAudio.displayTime();" value="Get Time">
-    	<input type="button" data-inline="true" onclick="myAudio.rewind();" value="<" >
-    	<input type="button" data-inline="true" onclick="myAudio.fastForward();" value=">" >
-    	<button onclick='myAudio.toggleSound()'>
-        	<a id='speakerIcon'>&#128266</a>
-    	</button>
+    	<button class="ui-btn ui-btn-inline" onclick="myAudio.playAudio();">Play / Pause D</button>
+    	<button class="ui-btn ui-btn-inline" onclick="myAudio.stopAudio();">Stop</button>
+    	<button class="ui-btn ui-btn-inline" onclick="myAudio.displayTime();">Get Time</button>
+    	<button class="ui-btn ui-btn-inline" onclick="myAudio.rewind();"><</button>
+    	<button class="ui-btn ui-btn-inline" onclick="myAudio.fastForward();">></button>
+    	<button class="ui-btn ui-btn-inline" onclick='myAudio.toggleSound()' id='speakerIcon'>&#128266</button>
     </div>
     <div>
     	Current time is <span id='currentGibTime' style='height:2em;'></span><br>
