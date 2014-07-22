@@ -135,7 +135,6 @@ class MainPage(webapp2.RequestHandler):
         for feed in podcast_feeds:
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
             value="x" data-inline="true"></form>' % (feed.feedUrl, feed.key.id()))
-            self.response.write('&nbsp&nbsp')
             self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
             value="&#8635" data-inline="true"></form>' % feed.feedUrl)
             self.response.write('<div class="podcastFeedList"><ul>')
@@ -148,8 +147,8 @@ class MainPage(webapp2.RequestHandler):
         self.response.write(MUSIC_CONTROLS_HTML % (playerName, defaultEp))
 
         # Search iTunes for podcast
-        self.response.write('<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/>')
-        self.response.write('<button id="iTunesSearchButton">Go</button>')
+        self.response.write('<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store" data-inline="true"/>')
+        self.response.write('<button id="iTunesSearchButton" data-inline="true">Go</button>')
         self.response.write('<div id="iTunesSearchResultsHtml"></div>')
         # self.response.write('<form method="post" action="/searchITunes"><input type="text" name="searchITunes"><input type="submit" value="Search"></form>')
         # self.response.write('<form method="get" name="itunesSearchForm" action="#"><input type="text" name="iTunesSearchValue"><input type="submit" onclick="sendITunesSearchRequest()" value="Search"></form>')
