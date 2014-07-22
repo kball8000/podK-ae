@@ -60,8 +60,8 @@ MUSIC_CONTROLS_HTML = """\
         </audio>
     </div>
     <div>
-    # 	<button class="ui-btn ui-btn-inline" onclick="myAudio.playAudio();">&#9654 / &#8214 A</button>
-    	<button class="ui-btn ui-btn-inline" onclick="myAudio.stopAudio();">&#9632</button>
+     	<button class="ui-btn ui-btn-inline" onclick="myAudio.playAudio();">&#9654 / &#8214 A</button>
+    	<button class="ui-btn ui-btn-inline" onclick="myAudio.stopAudio();">&#11305</button>
     	<button class="ui-btn ui-btn-inline" onclick="myAudio.displayTime();">Get Time</button>
     	<button class="ui-btn ui-btn-inline" onclick="myAudio.rewind();"><</button>
     	<button class="ui-btn ui-btn-inline" onclick="myAudio.fastForward();">></button>
