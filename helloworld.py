@@ -134,7 +134,7 @@ class MainPage(webapp2.RequestHandler):
 
         for feed in podcast_feeds:
             self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
-            value="x data-type="inline""></form>' % (feed.feedUrl, feed.key.id()))
+            value="x" data-type="inline"></form>' % (feed.feedUrl, feed.key.id()))
             self.response.write('&nbsp&nbsp')
             self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
             value="&#8635" data-type="inline"></form>' % feed.feedUrl)
