@@ -165,7 +165,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('</body></html>')
 
 class TestPageLink(webapp2.RequestHandler):
-    
+    def get(self):
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
         podcast_feeds = podcast_feed_query.fetch(10)
