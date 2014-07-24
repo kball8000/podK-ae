@@ -140,7 +140,7 @@ class MainPage(webapp2.RequestHandler):
             self.response.write('<div class="podcastFeedList"><ul>')
             for show in shows:
                 self.response.write("""<li>Episode %s <a onclick="myAudio.playSelectedEpisode('%s')" class="playButton">&#9658</a> \
-                </li>""" % (show, selectedEp))
+                </li>""" % (feed.title, selectedEp))
             self.response.write('</ul></div>')
             
         # Music player, move player vars down once I have above feed for loop not requiring it.
@@ -161,6 +161,22 @@ class MainPage(webapp2.RequestHandler):
         self.response.write(FORM_HTML)
         self.response.write('<script src="/scripts/podK.js"></script>')
         self.response.write('</body></html>')
+
+class TestLinkPage(webapp2.RequestHandler):
+    
+        podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
+        podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
+        podcast_feeds = podcast_feed_query.fetch(10)
+
+        # shows = xrange(3)
+
+        selectedEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/twig/twig0257/twig0257.mp3'
+
+        for feed in podcast_feeds:
+            feed.title = 'junk'
+        
+        self.redirect('/')
+
 
 class AddPodcast(webapp2.RequestHandler):
     def post(self):
@@ -281,4 +297,5 @@ app = webapp2.WSGIApplication([
     # (r'/rempodcast/(\d+)', remPodcastFeed),
     ('/refreshfeed', RefreshFeed),
     ('/second', SecondPage),
+    ('/testpagelink', TestPageLink)
 ], debug=True)
