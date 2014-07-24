@@ -176,6 +176,7 @@ class TestPageLink(webapp2.RequestHandler):
 
         for feed in podcast_feeds:
             feed.title = 'junk'
+            feed.put()
         
         self.redirect('/')
 
