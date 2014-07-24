@@ -125,6 +125,8 @@ class MainPage(webapp2.RequestHandler):
         podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
         podcast_feeds = podcast_feed_query.fetch(10)
 
+        self.response.write('<br><a href="/testpagelink">Run test link page</a><br>')
+
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         shows = xrange(3)
 
@@ -162,7 +164,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<script src="/scripts/podK.js"></script>')
         self.response.write('</body></html>')
 
-class TestLinkPage(webapp2.RequestHandler):
+class TestPageLink(webapp2.RequestHandler):
     
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
@@ -297,5 +299,5 @@ app = webapp2.WSGIApplication([
     # (r'/rempodcast/(\d+)', remPodcastFeed),
     ('/refreshfeed', RefreshFeed),
     ('/second', SecondPage),
-    ('/testpagelink', TestPageLink)
+    ('/testpagelink', TestPageLink),
 ], debug=True)
