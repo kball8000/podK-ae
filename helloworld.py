@@ -278,7 +278,7 @@ class SecondPage(webapp2.RequestHandler):
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
-        self.response.write('podcast feed list var = %s <br>' % podcast_feed_list
+        self.response.write('podcast feed list var = %s <br><br>' % podcast_feed_list)
         # podcast_feed_list = {'podcastA', 'podcastVar'}
         # podcast_feed_list = 'podcastVar'
  
