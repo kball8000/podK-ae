@@ -290,7 +290,6 @@ class SecondPage(webapp2.RequestHandler):
         podcast_feed_query = Podcast.query(ancestor = ndb.Key('podcast_feed', podcast_feed_list).order(-Podcast.date)
         # podcast_feed_query = Podcast.query()
         podcast_feeds = podcast_feed_query.fetch()
-        self.response.write('blah')
 
         self.response.write('<br><br>**Current saved feeds from datastore ** D ** :<br>')
         # shows = xrange(3)
