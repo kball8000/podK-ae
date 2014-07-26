@@ -291,12 +291,13 @@ class SecondPage(webapp2.RequestHandler):
         # podcast_feed_query = Podcast.query()
         podcast_feeds = podcast_feed_query.fetch()
 
-        self.response.write('<br><br>**Current saved feeds from datastore ** A ** :<br>')
+        self.response.write('<br><br>**Current saved feeds from datastore ** B ** :<br>')
         # shows = xrange(3)
 
         for feed in podcast_feeds:
             self.response.write('feed url: %s and feed id: %s <br>' % (feed.feedUrl, feed.key.id()))
-            self.response.write('show: %s <br>' % (feed.show))
+            for show in feed.show:
+                self.response.write('show: %s <br>' % (show.title))
             # self.response.write('show title: %s <br>' % (feed.show['title']))
 
         # if user:
