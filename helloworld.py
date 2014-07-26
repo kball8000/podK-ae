@@ -16,7 +16,7 @@ import json
 # Ask huber if how I"m handling controls is proper. Seems odd to have urls as 'controls', i.e. to remove feeds.
 # Put an are you sure / undo / store removed shows somewhere / maybe even a remove forever button once it's on the removed list.
 # Create a current playing object. I'll write that to datastore often, but only update the episode object every so often.
-
+# Keeps adding add podcast after I submit. Refreshes to just one on page reload
 
 # Additional features
 # After hitting stop, it turns into an undo button... for a while.
@@ -279,11 +279,11 @@ class SecondPage(webapp2.RequestHandler):
 
         # podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         
-        # podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
-        podcast_feed_query = Podcast.query()
+        podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
+        # podcast_feed_query = Podcast.query()
         podcast_feeds = podcast_feed_query.fetch(10)
 
-        self.response.write('<br><br>**Current saved feeds from datastore:<br>')
+        self.response.write('<br><br>**Current saved feeds from datastore ** A ** :<br>')
         # shows = xrange(3)
 
         for feed in podcast_feeds:
