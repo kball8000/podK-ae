@@ -300,7 +300,7 @@ class SecondPage(webapp2.RequestHandler):
             self.response.write('feed url: %s and feed id: %s <br>' % (feed.feedUrl, feed.key.id()))
             for show in feed.show:
                 self.response.write('show: %s <br>' % (show.title))
-            self.response.write('show listened: %s <br>' % (feed.show.listened))
+            # self.response.write('show listened: %s <br>' % (feed.show.listened))
 
         # if user:
         #     self.response.write('<h1>Hello, %s, you are logged in!B</h1>' % user.nickname())
