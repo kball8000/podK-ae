@@ -195,12 +195,12 @@ class AddPodcast(webapp2.RequestHandler):
             podcast.author = users.get_current_user()
             
         podcast.feedUrl = self.request.get('formContent')
-        for x in xrange(3):
-            podcast.show = [Episode(title='year %s', listened=False),] % x
-            podcast.put()
+        # for x in xrange(3):
+        #     podcast.show = [Episode(title='year %s', listened=False),] % x
+        #     podcast.put()
 
-        # podcast.show = [Episode(title='year', listened=False),]
-        # podcast.put()
+        podcast.show = [Episode(title='year', listened=False),]
+        podcast.put()
 
 
         self.redirect('/')
