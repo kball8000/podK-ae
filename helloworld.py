@@ -181,7 +181,6 @@ class TestPageLink(webapp2.RequestHandler):
         
         self.redirect('/')
 
-
 class AddPodcast(webapp2.RequestHandler):
     def post(self):
         podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
@@ -269,27 +268,38 @@ class RemPodcast(webapp2.RequestHandler):
 class SecondPage(webapp2.RequestHandler):
     def get(self):
         
-        user = users.get_current_user()
+        # user = users.get_current_user()
 
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         # self.response.write('<link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/4597121/podcatchor/styles/podK.css">')
         self.response.write('</head>')
-
-        if user:
-            self.response.write('<h1>Hello, %s, you are logged in!B</h1>' % user.nickname())
-            # self.response.write('Hello, %s (<a href="%s">Sign out</a>)' % (user.nickname(), users.create_logout_url('/'))
-        else:
-            self.redirect(users.create_login_url(self.request.uri))
-            # self.response.write('You are not logged in <a href="%s">Click here to login</a>' % users.create_login_url(self.request.uri)
-
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
-        
-        x1 = 'myMusic1'
-        x2 = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'
 
-        self.response.write(MUSIC_CONTROLS_HTML % (x1, x2))
+        # podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
+        
+        # podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
+        podcast_feed_query = Podcast.query()
+        podcast_feeds = podcast_feed_query.fetch(10)
+
+        self.response.write('<br><br>**Current saved feeds from datastore:<br>')
+        # shows = xrange(3)
+
+        for feed in podcast_feeds:
+            self.response.write('feed url: %s and feed id: %s <br>' % (feed.feedUrl, feed.key.id()))
+
+        # if user:
+        #     self.response.write('<h1>Hello, %s, you are logged in!B</h1>' % user.nickname())
+        #     # self.response.write('Hello, %s (<a href="%s">Sign out</a>)' % (user.nickname(), users.create_logout_url('/'))
+        # else:
+        #     self.redirect(users.create_login_url(self.request.uri))
+        #     # self.response.write('You are not logged in <a href="%s">Click here to login</a>' % users.create_login_url(self.request.uri)
+
+        # x1 = 'myMusic1'
+        # x2 = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'
+        # self.response.write(MUSIC_CONTROLS_HTML % (x1, x2))
+
         self.response.write('<script src="/scripts/podK.js"></script>')
         self.response.write('</body></html>')
 
