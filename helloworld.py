@@ -126,6 +126,7 @@ class MainPage(webapp2.RequestHandler):
         podcast_feeds = podcast_feed_query.fetch(10)
 
         self.response.write('<br><a href="/testpagelink">Run test link page</a><br>')
+        self.response.write('<br><a href="/second">Go to page to for testing datastore</a><br>')
 
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
         shows = xrange(3)
