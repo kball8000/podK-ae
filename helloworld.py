@@ -279,8 +279,8 @@ class SecondPage(webapp2.RequestHandler):
 
         # podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
         # podcast_feed_list = {'podcastA', 'podcastVar'}
-        # podcast_feed_list = 'podcastVar'
-        # 
+        podcast_feed_list = 'podcastVar'
+ 
         podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
         # podcast_feed_query = Podcast.query()
         podcast_feeds = podcast_feed_query.fetch(10)
