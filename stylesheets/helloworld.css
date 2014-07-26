@@ -1,6 +1,11 @@
 
 /*Not using much of this now that I have jQuery mobile css.*/
 
+body{
+    margin: 0 auto;
+    width: 80%;
+}
+
 h1{
     color: rgb(255,0,0);
 }

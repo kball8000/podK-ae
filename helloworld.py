@@ -196,7 +196,7 @@ class AddPodcast(webapp2.RequestHandler):
             
         podcast.feedUrl = self.request.get('formContent')
         for x in range(3):
-            podcast.show = [Episode(title='year', listened=False)]
+            podcast.show = [Episode(title='year %s', listened=False)] % x
 
         # podcast.show = [Episode(title='year', listened=False),]
         podcast.put()
@@ -302,7 +302,7 @@ class SecondPage(webapp2.RequestHandler):
         for feed in podcast_feeds:
             self.response.write('feed url: %s and feed id: %s and number of items = <b>%s</b><br>' % (feed.feedUrl, feed.key.id(), len(podcast_feeds)))
             for show in feed.show:
-                self.response.write('show: %s and length = %s <br>' % (show.listened, len(feed.show)))
+                self.response.write('show: %s and number of episodes = %s <br>' % (show.listened, len(feed.show)))
             # self.response.write('show listened: %s <br>' % (feed.show.listened))
 
         # if user:
