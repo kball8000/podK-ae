@@ -278,7 +278,7 @@ class SecondPage(webapp2.RequestHandler):
         self.response.write('<a href="http://kball-test-tools.appspot.com/">Main page</a><br><br>')
 
         # podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
-        podcast_feed_list = 'podcastVar'
+        podcast_feed_list = 'default_podcast_feed_list'
         self.response.write('podcast feed list var = %s <br><br>' % podcast_feed_list)
         # podcast_feed_list = {'podcastA', 'podcastVar'}
  
@@ -286,7 +286,7 @@ class SecondPage(webapp2.RequestHandler):
         # podcast_feed_query = Podcast.query()
         podcast_feeds = podcast_feed_query.fetch(10)
 
-        self.response.write('<br><br>**Current saved feeds from datastore ** A ** :<br>')
+        self.response.write('<br><br>**Current saved feeds from datastore ** B ** :<br>')
         # shows = xrange(3)
 
         for feed in podcast_feeds:
