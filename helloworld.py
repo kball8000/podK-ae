@@ -112,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** A **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** B **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
@@ -197,7 +197,7 @@ class AddPodcast(webapp2.RequestHandler):
         podcast.feedUrl = self.request.get('formContent')
         showsLi = []
         for x in range(3):
-            showLi.append(Episode(title='year %s', listened=False) % x)
+            showsLi.append(Episode(title='year %s', listened=False) % x)
             
         podcast.show = showsLi
 
