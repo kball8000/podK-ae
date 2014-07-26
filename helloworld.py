@@ -177,6 +177,8 @@ class TestPageLink(webapp2.RequestHandler):
 
         for feed in podcast_feeds:
             feed.title = 'junk'
+            feed.show.listened = True
+            feed.show.episodeLength = 134
             feed.put()
         
         self.redirect('/')
@@ -291,14 +293,14 @@ class SecondPage(webapp2.RequestHandler):
         # podcast_feed_query = Podcast.query()
         podcast_feeds = podcast_feed_query.fetch()
 
-        self.response.write('<br><br>**Current saved feeds from datastore ** B ** :<br>')
+        self.response.write('<br><br>**Current saved feeds from datastore ** A ** :<br>')
         # shows = xrange(3)
 
         for feed in podcast_feeds:
             self.response.write('feed url: %s and feed id: %s <br>' % (feed.feedUrl, feed.key.id()))
             for show in feed.show:
                 self.response.write('show: %s <br>' % (show.title))
-            # self.response.write('show title: %s <br>' % (feed.show['title']))
+            self.response.write('show listened: %s <br>' % (feed.show.listened))
 
         # if user:
         #     self.response.write('<h1>Hello, %s, you are logged in!B</h1>' % user.nickname())
