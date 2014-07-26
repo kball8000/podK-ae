@@ -300,9 +300,9 @@ class SecondPage(webapp2.RequestHandler):
         # shows = xrange(3)
 
         for feed in podcast_feeds:
-            self.response.write('feed url: %s and feed id: %s <br>' % (feed.feedUrl, feed.key.id()))
+            self.response.write('feed url: %s and feed id: %s and number of items = <b>%s</b><br>' % (feed.feedUrl, feed.key.id(), len(podcast_feeds))
             for show in feed.show:
-                self.response.write('show: %s <br>' % (show.listened))
+                self.response.write('show: %s and length = %s <br>' % (show.listened, len(feed.show)))
             # self.response.write('show listened: %s <br>' % (feed.show.listened))
 
         # if user:
@@ -320,8 +320,8 @@ class SecondPage(webapp2.RequestHandler):
         self.response.write('</body></html>')
 
 app = webapp2.WSGIApplication([
-    (r'/', MainPage),
-    (r'/addpodcast', AddPodcast),
+    ('/', MainPage),
+    ('/addpodcast', AddPodcast),
     ('/rempodcast', RemPodcast),
     ('/searchITunes', SearchITunes),
     # (r'/rempodcast/(\d+)', remPodcastFeed),
