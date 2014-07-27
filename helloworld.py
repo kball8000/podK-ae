@@ -146,8 +146,8 @@ class MainPage(webapp2.RequestHandler):
                 %(show.title, show.listened, show.episodeLength, show.playbackPosition))
 
 
-                # if feed.show.index(show) == 3:
-                #     feed.show.remove(3)
+                if feed.show.index(show) == 3:
+                    feed.show.pop(3)
 
 
             # for show in shows:
