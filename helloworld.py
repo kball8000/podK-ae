@@ -142,7 +142,7 @@ class MainPage(webapp2.RequestHandler):
             value="&#8635" data-inline="true"></form>' % feed.feedUrl)
             self.response.write('<div class="podcastFeedList"><ul>')
             for show in feed.shows:
-                self.response.write('show title: <b>%s</b>, listened: <b>%s</b>, length and position: <b>%s, %s</b>' ,\
+                self.response.write('show title: <b>%s</b>, listened: <b>%s</b>, length and position: <b>%s, %s</b>' \
                 %(show.title, show.listened, show.episodeLength, show.playbackPosition))
                 if feed.shows.index(show) == 3:
                     show.key.delete()
