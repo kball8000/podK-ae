@@ -205,7 +205,7 @@ class AddPodcast(webapp2.RequestHandler):
         podcast.show = [Episode(title='year', listened=False), Episode(title='year 1', listened=False)]
         podcast.put()
 
-        self.redirect('/')
+        self.redirect('/', True)
 
         # return self.redirect('/', True)
 
