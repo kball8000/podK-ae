@@ -141,7 +141,7 @@ class MainPage(webapp2.RequestHandler):
             self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
             value="&#8635" data-inline="true"></form>' % feed.feedUrl)
             self.response.write('<div class="podcastFeedList"><ul>')
-            for show in feed.shows:
+            for show in feed.show:
                 self.response.write('show title: <b>%s</b>, listened: <b>%s</b>, length and position: <b>%s, %s</b>' \
                 %(show.title, show.listened, show.episodeLength, show.playbackPosition))
                 if feed.shows.index(show) == 3:
