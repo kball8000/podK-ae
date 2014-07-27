@@ -112,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b> C </b> **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** <b> D </b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
@@ -193,6 +193,8 @@ class AddPodcast(webapp2.RequestHandler):
         # Add parameters
         if users.get_current_user():
             podcast.author = users.get_current_user()
+
+        self.response.write('<html><body>')
             
         podcast.feedUrl = self.request.get('formContent')
         li = []
@@ -205,8 +207,10 @@ class AddPodcast(webapp2.RequestHandler):
         podcast.show = [Episode(title='year', listened=False), Episode(title='year 1', listened=False)]
         podcast.put()
 
+        self.response.write('</body></html>')
+
         # Something is going on with jQuery where it leaves the post url in the url bar and only on refresh does it disappear.
-        self.redirect('/')
+        # self.redirect('/')
 
 class SearchITunes(webapp2.RequestHandler):
     def post(self):
