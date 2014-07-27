@@ -112,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b>A</b> **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** <b>B</b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
@@ -205,9 +205,9 @@ class AddPodcast(webapp2.RequestHandler):
         podcast.show = [Episode(title='year', listened=False), Episode(title='year 1', listened=False)]
         podcast.put()
 
-        self.redirect('/')
+        # self.redirect('/')
 
-        # return self.redirect('/')
+        return self.redirect('/')
 
 class SearchITunes(webapp2.RequestHandler):
     def post(self):
