@@ -112,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b> C </b> **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** <b> A </b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
