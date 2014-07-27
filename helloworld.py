@@ -222,7 +222,7 @@ class AddPodcast(webapp2.RequestHandler):
         self.response.write('</body></html>')
 
         # Something is going on with jQuery where it leaves the post url in the url bar and only on refresh does it disappear.
-        self.redirect('/')
+        # self.redirect('/')
 
 class SearchITunes(webapp2.RequestHandler):
     def post(self):
