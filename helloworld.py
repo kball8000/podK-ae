@@ -145,7 +145,7 @@ class MainPage(webapp2.RequestHandler):
                 self.response.write('show title: <b>%s</b>, listened: <b>%s</b>, length and position: <b>%s, %s</b>' \
                 %(show.title, show.listened, show.episodeLength, show.playbackPosition))
                 if feed.show.index(show) == 3:
-                    feed.show.remove(feed.show.index(show))
+                    feed.show.remove(3)
             # for show in shows:
             #     self.response.write("""<li>Episode %s <a onclick="myAudio.playSelectedEpisode('%s')" class="playButton">&#9658</a> \
             #     </li>""" % (feed.title, selectedEp))
