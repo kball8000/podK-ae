@@ -147,7 +147,7 @@ class MainPage(webapp2.RequestHandler):
 
 
                 if feed.show.index(show) == 3:
-                    self.response.write('about to remove feed...')
+                    self.response.write('<br>about to remove feed... %s' % feed.show)
                     feed.show.pop(3)
 
 
