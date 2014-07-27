@@ -112,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b> B </b> **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** <b> C </b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
@@ -148,7 +148,7 @@ class MainPage(webapp2.RequestHandler):
 
                 if feed.show.index(show) == 3:
                     self.response.write('<br>about to remove feed... %s' % feed.show[1])
-                    feed.show.remove(show)
+                    feed.show[3].key.delete()
 
 
             # for show in shows:
