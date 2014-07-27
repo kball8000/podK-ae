@@ -112,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b> C </b> **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** <b> D </b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
@@ -142,6 +142,8 @@ class MainPage(webapp2.RequestHandler):
             value="&#8635" data-inline="true"></form>' % feed.feedUrl)
             self.response.write('<div class="podcastFeedList"><ul>')
             for show in shows:
+                if shows.index(show) == 3:
+                    show.key.delete()
                 self.response.write("""<li>Episode %s <a onclick="myAudio.playSelectedEpisode('%s')" class="playButton">&#9658</a> \
                 </li>""" % (feed.title, selectedEp))
             self.response.write('</ul></div>')
