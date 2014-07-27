@@ -104,7 +104,7 @@ class MainPage(webapp2.RequestHandler):
 
         # HTML header 
         # self.response.write('<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />')
-        # self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>')
+        self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>')
         # self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         self.response.write('<script src="/scripts/podKTop.js"></script>')
@@ -112,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b> D </b> **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** <b> A </b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
@@ -201,6 +201,8 @@ class AddPodcast(webapp2.RequestHandler):
         for x in range(3):
             li.append(Episode(title='year %s' % x, listened=False))
             self.response.write('%s' % li)
+
+        self.response.write('<br><br>%s<br>' % li)
             
         # podcast.show = li
 
