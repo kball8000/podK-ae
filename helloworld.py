@@ -103,7 +103,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<html><body><head>')
 
         # HTML header 
-        self.response.write('<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />')
+        # self.response.write('<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />')
         self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>')
         self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
@@ -112,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b>A</b> **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** <b> C </b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
@@ -195,19 +195,18 @@ class AddPodcast(webapp2.RequestHandler):
             podcast.author = users.get_current_user()
             
         podcast.feedUrl = self.request.get('formContent')
-        # showsLi = []
-        # for x in range(3):
-        #     showsLi.append(Episode(title='year %s', listened=False) % x)
-        #     self.response.write('%s' % li)
+        li = []
+        for x in range(3):
+            li.append(Episode(title='year %s', listened=False) % x)
+            self.response.write('%s' % li)
             
-        # podcast.show = showsLi
+        # podcast.show = li
 
         podcast.show = [Episode(title='year', listened=False), Episode(title='year 1', listened=False)]
         podcast.put()
 
-        self.redirect('/', True)
-
-        # return self.redirect('/', True)
+        self.redirect('/')
+        # Something is going on with jQuery where it leaves the post url in the url bar and only on refresh does it disappear.
 
 class SearchITunes(webapp2.RequestHandler):
     def post(self):
