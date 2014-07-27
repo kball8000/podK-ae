@@ -148,7 +148,7 @@ class MainPage(webapp2.RequestHandler):
 
                 if feed.show.index(show) == 3:
                     self.response.write('<br>about to remove feed... %s' % feed.show[1])
-                    feed.show[3].key.delete()
+                    feed.show[3].delete()
 
 
             # for show in shows:
