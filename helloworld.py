@@ -129,7 +129,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<br><a href="/second">Go to page to for testing datastore</a><br>')
 
         self.response.write('<br><br>**Current saved feeds from datastore:<br>')
-        shows = xrange(3)
+        # shows = xrange(3)
 
         playerName = 'myMusic1'
         defaultEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'
@@ -141,11 +141,14 @@ class MainPage(webapp2.RequestHandler):
             self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
             value="&#8635" data-inline="true"></form>' % feed.feedUrl)
             self.response.write('<div class="podcastFeedList"><ul>')
-            for show in shows:
-                if shows.index(show) == 3:
+            for show in feed.shows:
+                self.response.write('show title: <b>%s</b>, listened: <b>%s</b>, length and position: <b>%s, %s</b>' ,\
+                %(show.title, show.listened, show.episodeLength, show.playbackPosition))
+                if feed.shows.index(show) == 3:
                     show.key.delete()
-                self.response.write("""<li>Episode %s <a onclick="myAudio.playSelectedEpisode('%s')" class="playButton">&#9658</a> \
-                </li>""" % (feed.title, selectedEp))
+            # for show in shows:
+            #     self.response.write("""<li>Episode %s <a onclick="myAudio.playSelectedEpisode('%s')" class="playButton">&#9658</a> \
+            #     </li>""" % (feed.title, selectedEp))
             self.response.write('</ul></div>')
             
         # Music player, move player vars down once I have above feed for loop not requiring it.
