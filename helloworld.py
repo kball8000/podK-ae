@@ -201,7 +201,7 @@ class AddPodcast(webapp2.RequestHandler):
             
         # podcast.show = showsLi
 
-        podcast.show = [Episode(title='year', listened=False)]
+        podcast.show = [Episode(title='year', listened=False),]
         podcast.put()
 
 
