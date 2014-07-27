@@ -198,6 +198,7 @@ class AddPodcast(webapp2.RequestHandler):
         # showsLi = []
         # for x in range(3):
         #     showsLi.append(Episode(title='year %s', listened=False) % x)
+        #     self.response.write('%s' % li)
             
         # podcast.show = showsLi
 
@@ -205,7 +206,7 @@ class AddPodcast(webapp2.RequestHandler):
         podcast.put()
 
 
-        self.redirect('/')
+        return self.redirect('/')
 
 class SearchITunes(webapp2.RequestHandler):
     def post(self):
