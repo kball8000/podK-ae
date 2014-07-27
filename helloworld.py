@@ -146,8 +146,8 @@ class MainPage(webapp2.RequestHandler):
                 self.response.write('show title: <b>%s</b>, listened: <b>%s</b>, length and position: <b>%s, %s</b>' \
                 %(show.title, show.listened, show.episodeLength, show.playbackPosition))
 
-            self.response.write('<br>about to remove feed... %s' % feed.show[1])
             if len(feed.show) > 2:
+                self.response.write('<br>about to remove feed... %s' % feed.show[1])
                 feed.show.pop(1)
             feed.put()
 
