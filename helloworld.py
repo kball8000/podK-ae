@@ -39,7 +39,7 @@ import json
 #     episode length???
 
 FORM_HTML = """\
-<form action="/addpodcast" method="post">
+<form action="/addpodcast" method="post" data-ajax="false">
     <div><input type='text' name='formContent' style='width:50em'></input></div>
     <div><input type="submit" value = "Add podcast"></div>
 </form>
@@ -103,16 +103,16 @@ class MainPage(webapp2.RequestHandler):
         self.response.write('<html><body><head>')
 
         # HTML header 
-        # self.response.write('<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />')
+        self.response.write('<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />')
         self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>')
-        # self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>')
+        self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
         self.response.write('<script src="/scripts/podKTop.js"></script>')
         self.response.write('</head>')
 
         # Heading 1
         self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b> B </b> **** </h2>')
+        self.response.write('<h2>Pretty much the best online podcast player **** <b> D </b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
         if user:
