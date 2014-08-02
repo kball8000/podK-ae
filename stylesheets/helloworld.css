@@ -1,35 +1,3 @@
-
-/*Not using much of this now that I have jQuery mobile css.*/
-
-body{
-    margin: 0 auto;
-    width: 80%;
-}
-
 h1{
     color: rgb(255,0,0);
-}
-
-h2{
-    display:inline;
-}
-
-h3{
-    display:inline;
-}
-
-form{
-    display: inline;
-    margin: 0;
-}
-
-.podcastFeedList li{
-    margin: 0.4em 0;
-}
-
-.podcastFeedList .playButton{
-    padding: 0 0.5em 0 0.5em;
-    border: 1px solid black;
-    border-radius: 0.25em;
-    background-color: orange;
 }
