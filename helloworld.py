@@ -5,6 +5,8 @@ import urllib
 import urllib2
 import xml.etree.ElementTree as ET
 import json
+import os
+import jinja2
 # import html
 # import cgi
 
@@ -23,10 +25,10 @@ import json
 
 
 # **-- Need to store:  --**
-# 
+#
 # podcast rss feeds in array (i'm not clear why i'm storing them separately, will probably move to show object
 #   (maybe there will be a speed advantage, but at the moment, I can't think of one.)
-# 
+#
 # object of each show including (on average probably 5 - 10 of these) - This is what we will store in datastore
 #   rss feed
 #   show name
@@ -38,13 +40,17 @@ import json
 #     last listened location
 #     episode length???
 
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions = ['jinja2.ext.autoescape'],
+    autoescape = True)
+
 FORM_HTML = """\
 <form action="/addpodcast" method="post" data-ajax="false">
     <div><input type='text' name='formContent' style='width:50em'></input></div>
     <div><input type="submit" value = "Add podcast"></div>
 </form>
-<div id='searchResultHtml'></div>
-"""
+<div id='searchResultHtml'></div>"""
 
 # In order to use guestbook example, this is a cross reference list
 # Greeting          = PodcastFeed
@@ -96,84 +102,95 @@ class Podcast(ndb.Model):
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
-        
+
         user = users.get_current_user()
 
-        self.response.headers['Content-Type'] = 'text/html'
-        self.response.write('<html><body><head>')
+##        self.response.headers['Content-Type'] = 'text/html'
+##        self.response.write('<html><body><head>')
 
-        # HTML header 
-        self.response.write('<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />')
-        self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>')
-        self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>')
-        self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
-        self.response.write('<script src="/scripts/podKTop.js"></script>')
-        self.response.write('</head>')
+        # HTML header
+##        self.response.write('<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />')
+##        self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>')
+##        self.response.write('<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>')
+##        self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
+##        self.response.write('<script src="/scripts/podKTop.js"></script>')
+##        self.response.write('</head>')
 
         # Heading 1
-        self.response.write('<h1>PodKatchor</h1>')
-        self.response.write('<h2>Pretty much the best online podcast player **** <b> A </b> **** </h2>')
+##        self.response.write('<h1>PodKatchor</h1>')
+##        self.response.write('<h2>Pretty much the best online podcast player **** <b> A </b> **** </h2>')
 
         #Have user log in and show their current subscriptions.
-        if user:
-            self.response.write('Welcome %s! (<a href="%s">Logout</a>) <br>' % (user.nickname(), users.create_logout_url(self.request.uri)))
-        else:
-            self.response.write('<a href="%s">Sign In</a> with your Google account<br>' % users.create_login_url(self.request.uri))
+
+##        if user:
+##            self.response.write('Welcome %s! (<a href="%s">Logout</a>) <br>' % (user.nickname(), users.create_logout_url(self.request.uri)))
+##        else:
+##            self.response.write('<a href="%s">Sign In</a> with your Google account<br>' % users.create_login_url(self.request.uri))
 
         podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
-        
+
         podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
         podcast_feeds = podcast_feed_query.fetch(10)
 
-        self.response.write('<br><a href="/testpagelink">Run test link page</a>')
-        self.response.write('<br><a href="/second">Go to page to for testing datastore</a>')
+##        self.response.write('<br><a href="/testpagelink">Run test link page</a>')
+##        self.response.write('<br><a href="/second">Go to page to for testing datastore</a>')
 
-        self.response.write('<br>**Current saved feeds from datastore:<br>')
+##        self.response.write('<br>**Current saved feeds from datastore:<br>')
         # shows = xrange(3)
 
-        playerName = 'myMusic1'
+        playerId = 'myMusic1'
         defaultEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'
         selectedEp = 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/twig/twig0257/twig0257.mp3'
 
-        for feed in podcast_feeds:
-            self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
-            value="x" data-inline="true"></form>' % (feed.feedUrl, feed.key.id()))
-            self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
-            value="&#8635" data-inline="true"></form>' % feed.feedUrl)
-            self.response.write('<div class="podcastFeedList"><ul>')
+##        for feed in podcast_feeds:
+##            self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
+##            value="x" data-inline="true"></form>' % (feed.feedUrl, feed.key.id()))
+##            self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
+##            value="&#8635" data-inline="true"></form>' % feed.feedUrl)
+##            self.response.write('<div class="podcastFeedList"><ul>')
 
-            for show in feed.show:
-                self.response.write('show title: <b>%s</b>, listened: <b>%s</b>, length and position: <b>%s, %s</b>' \
-                %(show.title, show.listened, show.episodeLength, show.playbackPosition))
+##            for show in feed.show:
+##                self.response.write('show title: <b>%s</b>, listened: <b>%s</b>, length and position: <b>%s, %s</b>' \
+##                %(show.title, show.listened, show.episodeLength, show.playbackPosition))
 
-            if len(feed.show) > 2:
-                self.response.write('<br>about to remove feed... %s' % feed.show[1])
-                feed.show.pop(1)
-            feed.put()
+##            if len(feed.show) > 2:
+##                feed.show.pop(1)
+##                self.response.write('<br>about to remove feed... %s' % feed.show[1])    
+
+##            feed.put()
 
             # for show in shows:
             #     self.response.write("""<li>Episode %s <a onclick="myAudio.playSelectedEpisode('%s')" class="playButton">&#9658</a> \
             #     </li>""" % (feed.title, selectedEp))
-            self.response.write('</ul></div>')
-            
-        # Music player, move player vars down once I have above feed for loop not requiring it.
-        self.response.write(MUSIC_CONTROLS_HTML % (playerName, defaultEp))
+##            self.response.write('</ul></div>')
 
-        # Search iTunes for podcast
-        self.response.write('<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store" data-inline="true"/>')
-        self.response.write('<button id="iTunesSearchButton" data-inline="true">Go</button>')
-        self.response.write('<div id="iTunesSearchResultsHtml"></div>')
+        # Music player, move player vars down once I have above feed for loop not requiring it.
+##        self.response.write(MUSIC_CONTROLS_HTML % (playerId, defaultEp))
+
+##        # Search iTunes for podcast
+##        self.response.write('<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store" data-inline="true"/>')
+##        self.response.write('<button id="iTunesSearchButton" data-inline="true">Go</button>')
+##        self.response.write('<div id="iTunesSearchResultsHtml"></div>')
         # self.response.write('<form method="post" action="/searchITunes"><input type="text" name="searchITunes"><input type="submit" value="Search"></form>')
         # self.response.write('<form method="get" name="itunesSearchForm" action="#"><input type="text" name="iTunesSearchValue"><input type="submit" onclick="sendITunesSearchRequest()" value="Search"></form>')
 
         # How to write to the javascript console log in the browser
         # self.response.write('<script>console.log("Logging is working: %s")</script>' % podcast_feed_list)
 
-        self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
-        self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
-        self.response.write(FORM_HTML)
-        self.response.write('<script src="/scripts/podK.js"></script>')
-        self.response.write('</body></html>')
+##        self.response.write('http://feeds.twit.tv/sn.xml ep 456 at 12 min<br>')
+##        self.response.write('Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds<br>')
+##        self.response.write(FORM_HTML)
+##        self.response.write('<script src="/scripts/podK.js"></script>')
+##        self.response.write('</body></html>')
+
+##""" Write Page"""
+        template_values = {
+            'playerId': playerId,
+            'defaultEp': defaultEp,
+            'podcast_feeds': podcast_feeds,
+        }
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        self.response.write(template.render(template_values))
 
 class TestPageLink(webapp2.RequestHandler):
     def get(self):
@@ -190,7 +207,7 @@ class TestPageLink(webapp2.RequestHandler):
             feed.show.listened = True
             feed.show.episodeLength = 134
             feed.put()
-        
+
         self.redirect('/')
 
 class AddPodcast(webapp2.RequestHandler):
@@ -205,7 +222,7 @@ class AddPodcast(webapp2.RequestHandler):
             podcast.author = users.get_current_user()
 
         self.response.write('<html><body>')
-            
+
         podcast.feedUrl = self.request.get('formContent')
         li = []
         for x in range(4):
@@ -213,7 +230,7 @@ class AddPodcast(webapp2.RequestHandler):
             self.response.write('%s' % li)
 
         self.response.write('<br><br>%s<br>' % li)
-            
+
         podcast.show = li
 
         # podcast.show = [Episode(title='year', listened=False), Episode(title='year 1', listened=False)]
@@ -236,7 +253,7 @@ class SearchITunes(webapp2.RequestHandler):
         data = json.loads(response.read())
         for i in xrange(data['resultCount']):
             self.response.write('<br>artist name: %s, collection name: %s' % (data['results'][i]['artistName'], data['results'][i]['collectionName']))
-            self.response.write('<form action="/addpodcast" method="post"><input type="submit" value="add" name = "%s"></form>' % data['results'][i]['collectionName']) 
+            self.response.write('<form action="/addpodcast" method="post"><input type="submit" value="add" name = "%s"></form>' % data['results'][i]['collectionName'])
 
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
@@ -255,7 +272,7 @@ class SearchITunes(webapp2.RequestHandler):
 
 class RefreshFeed(webapp2.RequestHandler):
     def post(self):
-        
+
         self.response.headers['Content-Type'] = 'text/html'
         self.response.write('<html><body><head>')
         self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
@@ -267,7 +284,7 @@ class RefreshFeed(webapp2.RequestHandler):
             response = urllib2.urlopen(request).read()
         except urllib2.URLError, e:
             self.response.write('could not refresh feed')
-            
+
         root = ET.fromstring(response)
         self.response.write('Show title: <h2>%s</h2><br><br>' %(root.find('channel').find('title').text))
         for item in root.find('channel').findall('item'):
@@ -279,20 +296,20 @@ class RefreshFeed(webapp2.RequestHandler):
 
 class RemPodcast(webapp2.RequestHandler):
     def post(self):
-        
-        # Get id from post request and delete that show from list. 
+
+        # Get id from post request and delete that show from list.
         # Also double checks with user,  by way of javascript that they really want to do this.
-    
+
         feed_id = self.request.get('delRecord')
-        
+
         podcast_feed = ndb.Key(Podcast, int(feed_id), parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
         podcast_feed.delete()
-        
+
         self.redirect('/')
-        
+
 class SecondPage(webapp2.RequestHandler):
     def get(self):
-        
+
         # user = users.get_current_user()
 
         self.response.headers['Content-Type'] = 'text/html'
@@ -310,7 +327,7 @@ class SecondPage(webapp2.RequestHandler):
         podcast_feed_list = 'default_podcast_feed_list'
         self.response.write('podcast feed list var = %s <br><br>' % podcast_feed_list)
         # podcast_feed_list = {'podcastA', 'podcastVar'}
- 
+
         # podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
         podcast_feed_query = Podcast.query(ancestor = ndb.Key('podcast_feed', podcast_feed_list)).order(-Podcast.date)
         # podcast_feed_query = Podcast.query()

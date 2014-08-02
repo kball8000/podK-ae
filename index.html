@@ -1,0 +1,80 @@
+<!-- 
+-Last 2 elements require passing variables to html template:
+-Add user info to login at top of page
+-Add rest of information from results from podcast subscription list
+-->
+
+
+<!-- Page Begins -->
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+	<head>
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
+		<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">
+		<script src="/scripts/podKTop.js"></script>
+	</head>
+	<body>
+		<h1>PodKatchor</h1>
+		<h2>Pretty much the best online podcast player **** <b> A </b> **** </h2>
+		<br><a href="/testpagelink">Run test link page</a>
+		<br><a href="/second">Go to page to for testing datastore</a>
+		<br>**Current saved feeds from datastore:<br>		
+
+		<!-- Display user's podcast subscription list -->
+		<div>
+			<ul>
+				{% for feed in podcast_feeds %}
+					<li>{{ feed.feedUrl }}</li>
+					<ul>
+						{% for show in feed.show %}
+							<li>{{ show.title }}</li>
+						{% endfor %}
+					</ul>
+				{% endfor %}
+			</ul>			
+		</div>
+			
+		<!-- Display player -->
+		<div>
+			<audio controls id='{{ playerId }}'>
+				<source src='{{ defaultEp }}'>
+			</audio>
+		</div>
+		 <div>
+			<button class="ui-btn ui-btn-inline" onclick="myAudio.playAudio();">&#9654; / &#8214;</button>
+			<button class="ui-btn ui-btn-inline" onclick="myAudio.stopAudio();">&#11035;</button>
+			<button class="ui-btn ui-btn-inline" onclick="myAudio.displayTime();">Get Time</button>
+			<button class="ui-btn ui-btn-inline" onclick="myAudio.rewind();"><</button>
+			<button class="ui-btn ui-btn-inline" onclick="myAudio.fastForward();">></button>
+			<button class="ui-btn ui-btn-inline" onclick='myAudio.toggleSound()' id='speakerIcon'>&#128266;</button>
+		</div>
+		<div>
+			<p>
+				Current time is <span id='currentGibTime' style='height:2em;'></span>
+			</p>
+			<p>
+				Total time is <span id='durationGibTIme' style='height:2em;'></span>				
+			</p>
+		</div>
+
+		<!-- Search iTunes for podcast -->
+		<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store" data-inline="true"/>
+		<button id="iTunesSearchButton" data-inline="true">Go</button>
+		<div id="iTunesSearchResultsHtml"></div>
+		<p>Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds</p><br>
+
+		<!-- Add a podcast with a url -->
+		<form action="/addpodcast" method="post" data-ajax="false">
+			<div><input type='text' name='formContent' style='width:50em'></div>
+			<div><input type="submit" value = "Add podcast"></div>
+		</form>
+			 
+		<div id='searchResultHtml'></div>
+
+		<script src="/scripts/podK.js"></script>
+	</body>
+</html>
+{% endautoescape %}
