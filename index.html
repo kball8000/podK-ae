@@ -4,6 +4,7 @@
 -Add rest of information from results from podcast subscription list
 -Need custom button icons, not sure where to go with that yet.
 -big black square svg file in images wasn't working
+-group results when they are the same podcast just different format.
 -->
 
 
@@ -41,8 +42,8 @@
 			
 		<!-- Display player -->
 		<div>
-			<audio controls id='{{ playerId }}'>
-				<source src='{{ defaultEp }}'>
+			<audio controls id='myMusic1'>
+				<source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'>
 			</audio>
 		</div>
 		<div>
@@ -50,7 +51,7 @@
 			<button class="ui-btn ui-btn-inline" onclick="myAudio.stopAudio();">&#9632;</button>
 			<button class="ui-btn ui-btn-inline" onclick="myAudio.rewind();"><</button>
 			<button class="ui-btn ui-btn-inline" onclick="myAudio.fastForward();">></button>
-			<button class="ui-btn ui-btn-inline" onclick='myAudio.toggleSound()' id='speakerIcon'>A</button>
+			<button data-role="none" onclick='myAudio.toggleSound()' id='speakerIcon'>A</button>
 		</div>
 		<div>
 			<button class="ui-btn ui-btn-inline" onclick="myAudio.displayTime();">Get Time</button>			
