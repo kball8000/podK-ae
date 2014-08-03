@@ -1,3 +1,17 @@
 h1{
     color: rgb(255,0,0);
 }
+
+.podcastSearchResults .ui-block-a{
+	width: 20%;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.podcastSearchResults .ui-block-b{
+	width: 80%;
+}
+
+.podcastSearchResults .ui-block-b ul{
+	list-style-type: none;
+}

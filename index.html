@@ -21,10 +21,16 @@
 	</head>
 	<body>
 		<h1>PodKatchor</h1>
-		<h2>Pretty much the best online podcast player **** <b> A </b> **** </h2>
-		<br><a href="/testpagelink">Run test link page</a>
-		<br><a href="/second">Go to page to for testing datastore</a>
-		<br>**Current saved feeds from datastore:<br>		
+		<h2>Pretty much the best online podcast player </h2>
+		<!-- Search iTunes for podcast -->
+		<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store" data-inline="true"/>
+		<button id="iTunesSearchButton" data-inline="true">Go</button>
+		<div id="iTunesSearchResultsHtml"></div>
+		<p>Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds</p>
+
+		<p>
+			**Current saved feeds from datastore:
+		</p>
 
 		<!-- Display user's podcast subscription list -->
 		<div>
@@ -65,11 +71,6 @@
 			</p>
 		</div>
 
-		<!-- Search iTunes for podcast -->
-		<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store" data-inline="true"/>
-		<button id="iTunesSearchButton" data-inline="true">Go</button>
-		<div id="iTunesSearchResultsHtml"></div>
-		<p>Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds</p><br>
 
 		<!-- Add a podcast with a url -->
 		<form action="/addpodcast" method="post" data-ajax="false">
