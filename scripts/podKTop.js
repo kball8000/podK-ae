@@ -50,7 +50,9 @@ function getBasePodcast(longName){
 function createPodcastListItem (result){
 	var html = '<li>' +
 		result.collectionCensoredName + 
-		'<a href="' + result.feedUrl + '">Subscribe<\/a>' + 
+		'<form action="/addpodcast" method="post" data-ajax="false"><input type="hidden" name="' + result.feedUrl + '"\/> \
+		<input type="submit" value="Subscribe" + \/></form>' +
+//		'<a href="' + result.feedUrl + '">Subscribe<\/a>' + 
 		'<\/li>';
 
 	return html;
@@ -67,6 +69,7 @@ function showITunesSearchResults(arg){
 	var isGridOpen = false;
 	var isNextPodcastSameTitle = false;
 	
+	// Sort results based on the 'collection name', iTunes term, in genral the title of the show.	
 	function compareResultsObjects(a,b){
 		if (a.collectionName > b.collectionName){
 			return 1;

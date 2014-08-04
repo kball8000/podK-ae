@@ -104,7 +104,7 @@ class AddPodcast(webapp2.RequestHandler):
         if users.get_current_user():
             podcast.author = users.get_current_user()
 
-        podcast.feedUrl = self.request.get('formContent')
+        podcast.feedUrl = self.request.get('podcastSubscription')
         li = []
         for x in range(4):
             li.append(Episode(title='year %s' % x, listened=False))
