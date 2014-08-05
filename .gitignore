@@ -218,4 +218,4 @@ pip-log.txt
 ## Cloud 9
 #############
 
-.c9/metadata/
+.c9/metadata/*
