@@ -15,3 +15,11 @@ h1{
 .podcastSearchResults .ui-block-b ul{
 	list-style-type: none;
 }
+
+.podcastSearchResults form{
+	display: inline;
+}
+
+.podcastSearchResults input{
+	margin-left: 1em;
+}
