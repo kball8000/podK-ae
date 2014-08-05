@@ -213,3 +213,9 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+#############
+## Cloud 9
+#############
+
+.c9/*
