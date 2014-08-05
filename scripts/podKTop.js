@@ -51,8 +51,7 @@ function createPodcastListItem (result){
 	var html = '<li>' +
 		result.collectionCensoredName + 
 		'<form action="/addpodcast" method="post" data-ajax="false"><input type="hidden" name="' + result.feedUrl + '"\/> \
-		<input type="submit" value="Subscribe" + \/></form>' +
-//		'<a href="' + result.feedUrl + '">Subscribe<\/a>' + 
+		<input type="submit" data-inline="true" value="Subscribe" + \/></form>' +
 		'<\/li>';
 
 	return html;
