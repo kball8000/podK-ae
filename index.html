@@ -24,7 +24,7 @@
 		<h2>Pretty much the best online podcast player </h2>
 		{% if user_welcome_nickname %}
 		<p>
-			Welcome {{ user_welcome_nickname }}! (<a data-ajax="false" href="{{ user_welcome_href }}">Logout</a> )
+			Welcome {{ user_welcome_nickname }}! (<a rel="external" href="{{ user_welcome_href }}">Logout</a> )
 		</p>
 		{% else %}
 		<p>
