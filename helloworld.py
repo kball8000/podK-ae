@@ -68,7 +68,7 @@ class MainPage(webapp2.RequestHandler):
 		# Have user log in and show their current subscriptions.
 		if user:
 			user_welcome_nickname = user.nickname()
-			user_welcome_href = users.create_logout_url(self.request.uri)
+			user_welcome_href = users.create_logout_url('/')
 			
 		else:
 			user_welcome_nickname = None
