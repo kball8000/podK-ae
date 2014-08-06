@@ -63,20 +63,26 @@ class Podcast(ndb.Model):
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
+		user = users.get_current_user()
+		# Have user log in and show their current subscriptions.
+		if user:
+			user_welcome_text = 'Welcome %s! (<a href="%s">Logout</a>)' % (user.nickname(), users.create_logout_url(self.request.uri))
+		else:
+			user_welcome_text = '<a href="%s">Sign In</a> with your Google account' % users.create_login_url(self.request.uri)
+		
+		podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
+		podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
+		podcast_feeds = podcast_feed_query.fetch(10)
+		
+		template_values = {
+			'podcast_feeds': podcast_feeds,
+			'user_welcome_text': user_welcome_text
+		}
+		template = JINJA_ENVIRONMENT.get_template('index.html')
+		self.response.write(template.render(template_values))
 
-        user = users.get_current_user()
 
-        #Have user log in and show their current subscriptions.
 
-##        if user:
-##            self.response.write('Welcome %s! (<a href="%s">Logout</a>) <br>' % (user.nickname(), users.create_logout_url(self.request.uri)))
-##        else:
-##            self.response.write('<a href="%s">Sign In</a> with your Google account<br>' % users.create_login_url(self.request.uri))
-
-        podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
-
-        podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
-        podcast_feeds = podcast_feed_query.fetch(10)
 
 ##        for feed in podcast_feeds:
 ##            self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
@@ -86,12 +92,7 @@ class MainPage(webapp2.RequestHandler):
 ##            self.response.write('<div class="podcastFeedList"><ul>')
 
 
-## Write Page
-        template_values = {
-            'podcast_feeds': podcast_feeds,
-        }
-        template = JINJA_ENVIRONMENT.get_template('index.html')
-        self.response.write(template.render(template_values))
+# Write Page
 
 class AddPodcast(webapp2.RequestHandler):
     def post(self):

@@ -48,11 +48,13 @@ function getBasePodcast(longName){
 }
 
 function createPodcastListItem (result){
-	var html = '<li>' +
+	var html = '<li> \
+		<form action="/addpodcast" method="post" data-ajax="false"> \
+		<input type="hidden" name="' + result.feedUrl + '"> \
+		<input type="Submit" class="ui-btn ui-input-btn" value="Subscribe"\/>' +
 		result.collectionCensoredName + 
-		'<form action="/addpodcast" method="post" data-ajax="false"><input type="hidden" name="' + result.feedUrl + '"\/> \
-		<input type="submit" data-inline="true" value="Subscribe" + \/></form>' +
-		'<\/li>';
+		'<\/form> \
+		<\/li>';
 
 	return html;
 }
