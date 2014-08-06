@@ -8,14 +8,7 @@ import json
 import os
 import jinja2
 
-# TO DO:
-# Redo buttons so jQuery adds an event listener.
-# Add keyboard shortcuts for controlling player. Probably need to add a click event to the body or html entity.
-# then all episode information for each show could be in 1 entity
-# Ask huber if how I"m handling controls is proper. Seems odd to have urls as 'controls', i.e. to remove feeds.
-# Put an are you sure / undo / store removed shows somewhere / maybe even a remove forever button once it's on the removed list.
-# Create a current playing object. I'll write that to datastore often, but only update the episode object every so often.
-
+# Working on refresh function and refresh class. Want function so that I can call it from multiple classes.
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
