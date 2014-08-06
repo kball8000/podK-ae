@@ -16,26 +16,6 @@ import jinja2
 # Put an are you sure / undo / store removed shows somewhere / maybe even a remove forever button once it's on the removed list.
 # Create a current playing object. I'll write that to datastore often, but only update the episode object every so often.
 
-# Additional features
-# After hitting stop, it turns into an undo button... for a while.
-# 
-
-
-# **-- Need to store:  --**
-#
-# podcast rss feeds in array (i'm not clear why i'm storing them separately, will probably move to show object
-#   (maybe there will be a speed advantage, but at the moment, I can't think of one.)
-#
-# object of each show including (on average probably 5 - 10 of these) - This is what we will store in datastore
-#   rss feed
-#   show name
-#   show hosts???
-#   episode object (1 - 100)
-#     episode name
-#     episode url
-#     listened boolean
-#     last listened location
-#     episode length???
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -64,7 +44,7 @@ class Podcast(ndb.Model):
 class MainPage(webapp2.RequestHandler):
     def get(self):
 		user = users.get_current_user()
-		user_welcome_text = []
+
 		# Have user log in and show their current subscriptions.
 		if user:
 			user_welcome_nickname = user.nickname()
@@ -85,19 +65,6 @@ class MainPage(webapp2.RequestHandler):
 		}
 		template = JINJA_ENVIRONMENT.get_template('index.html')
 		self.response.write(template.render(template_values))
-
-
-
-
-##        for feed in podcast_feeds:
-##            self.response.write('<form action="/rempodcast" method="post"> %s <input type="hidden" name="delRecord" value="%s"><input type="submit" \
-##            value="x" data-inline="true"></form>' % (feed.feedUrl, feed.key.id()))
-##            self.response.write('<form action="/refreshfeed" method="post"><input type="hidden" name="refreshFeed" value="%s"><input type="submit" \
-##            value="&#8635" data-inline="true"></form>' % feed.feedUrl)
-##            self.response.write('<div class="podcastFeedList"><ul>')
-
-
-# Write Page
 
 class AddPodcast(webapp2.RequestHandler):
     def post(self):
@@ -121,7 +88,6 @@ class AddPodcast(webapp2.RequestHandler):
         podcast.put()
 
         self.redirect('/')
-
 
 class RefreshFeed(webapp2.RequestHandler):
     def post(self):
