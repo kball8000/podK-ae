@@ -64,19 +64,24 @@ class Podcast(ndb.Model):
 class MainPage(webapp2.RequestHandler):
     def get(self):
 		user = users.get_current_user()
+		user_welcome_text = []
 		# Have user log in and show their current subscriptions.
 		if user:
-			user_welcome_text = 'Welcome %s! (<a href="%s">Logout</a>)' % (user.nickname(), users.create_logout_url(self.request.uri))
+			user_welcome_nickname = user.nickname()
+			user_welcome_href = users.create_logout_url(self.request.uri)
+			
 		else:
-			user_welcome_text = '<a href="%s">Sign In</a> with your Google account' % users.create_login_url(self.request.uri)
-		
+			user_welcome_nickname = None
+			user_welcome_href = users.create_login_url(self.request.uri)
+				
 		podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
 		podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
 		podcast_feeds = podcast_feed_query.fetch(10)
 		
 		template_values = {
 			'podcast_feeds': podcast_feeds,
-			'user_welcome_text': user_welcome_text
+			'user_welcome_nickname': user_welcome_nickname,
+			'user_welcome_href': user_welcome_href
 		}
 		template = JINJA_ENVIRONMENT.get_template('index.html')
 		self.response.write(template.render(template_values))

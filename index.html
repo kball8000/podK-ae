@@ -22,9 +22,16 @@
 	<body>
 		<h1>PodKatchor</h1>
 		<h2>Pretty much the best online podcast player </h2>
+		{% if user_welcome_nickname %}
 		<p>
-			{{ user_welcome_text }}
+			Welcome {{ user_welcome_nickname }}! (<a href="{{ user_welcome_href }}">Logout</a> )
 		</p>
+		{% else %}
+		<p>
+			<a href="{{ user_welcome_href }}">Sign In</a> to your Google account
+		</p>
+		{% endif %}
+
 		<!-- Search iTunes for podcast -->
 		<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store" data-inline="true"/>
 		<button id="iTunesSearchButton" data-inline="true">Go</button>
