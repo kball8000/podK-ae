@@ -5,8 +5,3 @@ indexes:
   properties:
   - name: date
     direction: desc
-
-- kind: Episode
-  properties:
-  - name: title
-    direction: desc
