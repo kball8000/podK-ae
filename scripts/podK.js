@@ -17,11 +17,6 @@ var myAudio = function(){
 		}
 	}
 
-	function stopAudio(){
-		gib.currentTime = 0;
-		gib.pause();
-	}
-
 	function displayTime(){
 		gibTime.innerHTML = readableTime(gib.currentTime);
 		gibTotalTime.innerHTML = readableTime(gib.duration);
@@ -83,7 +78,6 @@ var myAudio = function(){
 	return{
 		playAudio:playAudio,
 		playSelectedEpisode:playSelectedEpisode,
-		stopAudio:stopAudio,
 		rewind:rewind,
 		fastForward:fastForward,
 		toggleSound:toggleSound,

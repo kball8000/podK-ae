@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 import json
 import os
 import jinja2
+import logging
 
 # Working on refresh function and refresh class. Want function so that I can call it from multiple classes.
 
@@ -22,17 +23,21 @@ def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
     return ndb.Key('podcast_feed', podcast_feed)
 
 class Episode(ndb.Model):
-    title = ndb.StringProperty()
-    listened = ndb.BooleanProperty()
-    episodeLength = ndb.IntegerProperty() # in milliseconds
-    playbackPosition = ndb.IntegerProperty() # in milliseconds
+	# ADD: save in datastore or link to image url
+	episode_title = ndb.StringProperty(indexed=False)
+	episode_url = ndb.StringProperty(indexed=False)
+	listened = ndb.BooleanProperty()
+	pubDate = ndb.StringProperty(indexed=False)
+	dateAdded = ndb.DateTimeProperty(auto_now_add=True) # date added
+	episodeLength = ndb.StringProperty(indexed=False) # string format, not date
+	playbackPosition = ndb.IntegerProperty() # in milliseconds
 
 class Podcast(ndb.Model):
-    author = ndb.UserProperty()
-    title = ndb.StringProperty(indexed=False)
-    feedUrl = ndb.StringProperty(indexed=False)
-    show = ndb.StructuredProperty(Episode, repeated=True)
-    date = ndb.DateTimeProperty(auto_now_add=True)
+	author = ndb.UserProperty()
+	title = ndb.StringProperty(indexed=False)
+	feedUrl = ndb.StringProperty()
+	show = ndb.StructuredProperty(Episode, repeated=True)
+	date = ndb.DateTimeProperty(auto_now_add=True)
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -59,69 +64,92 @@ class MainPage(webapp2.RequestHandler):
 		template = JINJA_ENVIRONMENT.get_template('index.html')
 		self.response.write(template.render(template_values))
 
+def getFeedInfo(url):
+
+	request = urllib2.Request(url)
+	try:
+		response = urllib2.urlopen(request).read()
+	except urllib2.URLError, e:
+		return False
+	
+	return response
+
 class AddPodcast(webapp2.RequestHandler):
-    def post(self):
-        podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
+	def post(self):
+		episode_list = []
+		
+		# Create the constructor
+		podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
+		podcast = Podcast(parent=podcast_feed_key(podcast_feed_list))
 
-        # Create the constructor
-        podcast = Podcast(parent=podcast_feed_key(podcast_feed_list))
+		# Add parameters
+		if users.get_current_user():
+			podcast.author = users.get_current_user()
 
-        # Add parameters
-        if users.get_current_user():
-            podcast.author = users.get_current_user()
+		url = self.request.get('podcastSubscription')
+		
+		# May want to do an if(getFeedInfo) and write something to the screen if it returns false.
+		response = getFeedInfo(url)
+		
+		# parse xml response from rss feed URI
+		root = ET.fromstring(response)
 
-        podcast.feedUrl = self.request.get('podcastSubscription')
-        li = []
-        for x in range(4):
-            li.append(Episode(title='year %s' % x, listened=False))
+		podcast.title = root.find('channel').find('title').text
+		podcast.feedUrl = url
+
+		for item in root.find('channel').findall('item'):
+			episode_list.append(Episode( episode_title = item.find('title').text,
+										episode_url = item.find('link').text,
+										listened = False,
+										pubDate = item.find('pubDate').text,
+		# I'm able to hardcode in the namespace for itunes:, using xmlns:media, not sure how I'd do that programmatically
+		#								episodeLength = item.find('{http://search.yahoo.com/mrss/}duration').text,
+										playbackPosition = 0))
+
+		podcast.show = episode_list
 			
-        podcast.show = li
+		podcast.put()
 
-        # podcast.show = [Episode(title='year', listened=False), Episode(title='year 1', listened=False)]
-        podcast.put()
-
-        self.redirect('/')
+		self.redirect('/')
 
 class RefreshFeed(webapp2.RequestHandler):
     def post(self):
-
-        self.response.headers['Content-Type'] = 'text/html'
-        self.response.write('<html><body><head>')
-        self.response.write('<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">')
-        self.response.write('</head>')
-
-        url = self.request.get('refreshFeed')
-        request = urllib2.Request(url)
-        try:
-            response = urllib2.urlopen(request).read()
-        except urllib2.URLError, e:
-            self.response.write('could not refresh feed')
-
-        root = ET.fromstring(response)
-        self.response.write('Show title: <h2>%s</h2><br><br>' %(root.find('channel').find('title').text))
-        for item in root.find('channel').findall('item'):
-            self.response.write('Episode title: <h3>%s</h3>, published on: %s<br>' %(item.find('title').text, item.find('pubDate').text))
-
-        self.response.write('</body></html>')
-
-        # self.redirect('/')
+		url = self.request.get('refreshFeed')
+		feed_info = getFeedInfo(url)
+		
+		# Need to do something with feed_info, unless I just want to do a full page refresh.
+		# If I want to do ajax, may need jQuery
+		
+		self.redirect('/')
 
 class RemPodcast(webapp2.RequestHandler):
     def post(self):
+		
+		# Get id from post request and delete that show from list.
+		# Also double checks with user,  by way of javascript that they really want to do this.
 
-        # Get id from post request and delete that show from list.
-        # Also double checks with user,  by way of javascript that they really want to do this.
+		feed_id = self.request.get('delRecord')
 
-        feed_id = self.request.get('delRecord')
+		qry = Podcast.query(Podcast.feedUrl == feed_id)
+		result = qry.fetch(1)
+		# self.response.write('<html><body>')
+		# self.response.write('feed_id = <b>%s</b>' % feed_id)
+		# self.response.write('<br>qry = <b>%s</b>' % qry)
+		# self.response.write('<br>result = <b>%s</b>' % result)
+		# self.response.write('</body></html>')
+		
+		# logging.info('result = adklfjasjflkajfldkajf;ajd;adfj')
 
-        podcast_feed = ndb.Key(Podcast, int(feed_id), parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
-        podcast_feed.delete()
-
-        self.redirect('/')
+		result[0].key.delete()
+		
+		# podcast_feed = ndb.Key(Podcast, parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
+		# podcast_feed.delete()
+		
+		self.redirect('/')
 
 app = webapp2.WSGIApplication([
-    ('/', MainPage),
-    ('/addpodcast', AddPodcast),
-    ('/rempodcast', RemPodcast),
-    ('/refreshfeed', RefreshFeed),
+	('/', MainPage),
+	('/addpodcast', AddPodcast),
+	('/removepodcast', RemPodcast),
+	('/refreshfeed', RefreshFeed),
 ], debug=True)

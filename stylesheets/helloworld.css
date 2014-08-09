@@ -1,7 +1,12 @@
 h1{
     color: rgb(255,0,0);
 }
-/* ------   Podcast Search Results   ------ */
+/* ------   iTunes Search and Results   ------ */
+.iTunesSearch button{
+	padding-top:0.5em;
+	padding-bottom:0.5em;
+}
+
 .podcastSearchResults .ui-block-a{
 	width: 15%;
 	margin: 0 auto;
@@ -22,7 +27,16 @@ h1{
 	display: inline;
 }
 
-.podcastSearchResults input{
+.podcastSearchResults input{ 
 	display: inline;
 	margin-right: 1em;
 }
+
+.subscriptionList form{
+	display: inline;
+}
+.subscriptionList ul{
+	margin-left: 0;
+	list-style-type: none;
+}
+

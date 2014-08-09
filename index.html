@@ -20,8 +20,7 @@
 		<script src="/scripts/podKTop.js"></script>
 	</head>
 	<body>
-		<h1>PodKatchor A</h1>
-		<h2>Pretty much the best online podcast player </h2>
+		<h1>PodKatchor</h1>
 		{% if user_welcome_nickname %}
 		<p>
 			Welcome {{ user_welcome_nickname }}! (<a rel="external" href="{{ user_welcome_href }}">Logout</a> )
@@ -33,29 +32,22 @@
 		{% endif %}
 
 		<!-- Search iTunes for podcast -->
-		<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store" data-inline="true"/>
-		<button id="iTunesSearchButton" data-inline="true">Go</button>
-		<div id="iTunesSearchResultsHtml"></div>
-		<p>Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds</p>
-
-		<p>
-			**Current saved feeds from datastore:
-		</p>
-
-		<!-- Display user's podcast subscription list -->
-		<div>
-			<ul>
-				{% for feed in podcast_feeds %}
-					<li>{{ feed.feedUrl }}</li>
-					<ul>
-						{% for show in feed.show %}
-							<li>{{ show.title }}</li>
-						{% endfor %}
-					</ul>
-				{% endfor %}
-			</ul>			
+		<div class="iTunesSearch ui-grid-a">
+			<div class="ui-block-a"><input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/></div>
+			<div class="ui-block-b"><button id="iTunesSearchButton" data-inline="true">Go</button></div>
 		</div>
-			
+		<div id="iTunesSearchResultsHtml"></div>
+
+		<p>http://feeds.twit.tv/sn.xml - Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds</p>
+
+		<!-- Add a podcast with a url -->
+		<form action="/addpodcast" method="post" data-ajax='false'>
+			<div class='ui-grid-a'>
+				<div class='ui-block-a'><input type='text' name='podcastSubscription' placeholder="Add url of RSS feed"/></div>
+				<div class='ui-block-b'><input type="submit" data-inline='true' value="Add podcast"/></div>
+			</div>
+		</form>
+
 		<!-- Display player -->
 		<div>
 			<audio controls id='myMusic1'>
@@ -64,11 +56,42 @@
 		</div>
 		<div>
 			<button class="ui-btn ui-btn-inline" onclick="myAudio.playAudio();">&#9654; / &#8214;</button>
-			<button class="ui-btn ui-btn-inline" onclick="myAudio.stopAudio();">&#9632;</button>
 			<button class="ui-btn ui-btn-inline" onclick="myAudio.rewind();"><</button>
 			<button class="ui-btn ui-btn-inline" onclick="myAudio.fastForward();">></button>
 			<button data-role="none" onclick='myAudio.toggleSound()' id='speakerIcon'>A</button>
 		</div>
+			 
+		<div id='searchResultHtml'></div>
+			
+		<p>
+			**Current saved feeds from datastore:
+		</p>
+
+		<!-- Display user's podcast subscription list -->
+		<div class='subscriptionList'>
+			<ul>
+				{% for feed in podcast_feeds %}
+					<li>
+						<form action='/removepodcast' method='post' data-ajax='false'>
+							<input type='hidden' name='delRecord' value='{{ feed.feedUrl }}' />
+							<input type='submit' value='X' data-inline='true' rel="external"/>
+						</form>
+						<form action='/refreshpodcast' method='post' data-ajax='false'>
+							<input type='hidden' name='refreshPodcast' value='{{ feed.feedUrl }}' />
+							<input type='submit' value='&#x21bb;' data-inline='true'/>
+						</form>
+						{{ feed.title }} at {{ feed.feedUrl }}
+					</li>
+					<ul>
+						{% for show in feed.show %}
+							<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
+								Play</button> {{ show.episode_title }}
+						{% endfor %}
+					</ul>
+				{% endfor %}
+			</ul>			
+		</div>
+			
 		<div>
 			<button class="ui-btn ui-btn-inline" onclick="myAudio.displayTime();">Get Time</button>			
 		</div>
@@ -80,16 +103,6 @@
 				Total time is <span id='durationGibTIme' style='height:2em;'></span>				
 			</p>
 		</div>
-
-
-		<!-- Add a podcast with a url -->
-		<form action="/addpodcast" method="post" data-ajax="false">
-			<div><input type='text' name='formContent' style='width:50em'></div>
-			<div><input type="submit" value = "Add podcast"></div>
-		</form>
-			 
-		<div id='searchResultHtml'></div>
-
 		<script src="/scripts/podK.js"></script>
 	</body>
 </html>

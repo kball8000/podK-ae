@@ -50,7 +50,7 @@ function getBasePodcast(longName){
 function createPodcastListItem (result){
 	var html = '<li> \
 		<form action="/addpodcast" method="post" data-ajax="false"> \
-		<input type="hidden" name="' + result.feedUrl + '"> \
+		<input type="hidden" name="podcastSubscription" value = "' + result.feedUrl + '"> \
 		<input type="Submit" class="ui-btn ui-input-btn" value="Subscribe"\/>' +
 		result.collectionCensoredName + 
 		'<\/form> \
