@@ -54,11 +54,11 @@
 				<source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'>
 			</audio>
 		</div>
-		<div>
-			<button class="ui-btn ui-btn-inline" onclick="myAudio.playAudio();">&#9654; / &#8214;</button>
-			<button class="ui-btn ui-btn-inline" onclick="myAudio.rewind();"><</button>
-			<button class="ui-btn ui-btn-inline" onclick="myAudio.fastForward();">></button>
-			<button data-role="none" onclick='myAudio.toggleSound()' id='speakerIcon'>A</button>
+		<div>			
+			<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; / &#8214;</a>
+			<a class="ui-btn ui-btn-inline" id="rewindBtn"><</a>
+			<a class="ui-btn ui-btn-inline" id="fastForwardBtn">></a>
+			<a class="ui-btn ui-btn-inline" id="muteBtn">Mute</a>
 		</div>
 			 
 		<div id='searchResultHtml'></div>
@@ -69,10 +69,14 @@
 
 		<!-- Display user's podcast subscription list -->
 		<div class='subscriptionList'>
-			<ul>
+			<ul id='subscriptionList'>
 				{% for feed in podcast_feeds %}
-					<li>
-						<form action='/removepodcast' method='post' data-ajax='false'>
+<!-- 					<li id='listItem_{{feed.feedUrl}}'>-->
+						<li id='listItem_{{ loop.index }}'>
+						<a href="javascript:removePodcast('{{ feed.feedUrl }}', '{{ loop.index }}')" class="ui-btn ui-btn-inline">X</a>
+						<a href='javascript:refreshPodcast("{{ feed.feedUrl }}")' class='ui-btn ui-btn-inline'>&#x21bb;</a>
+
+<!--						<form action='/removepodcast' method='post' data-ajax='false'>
 							<input type='hidden' name='delRecord' value='{{ feed.feedUrl }}' />
 							<input type='submit' value='X' data-inline='true' rel="external"/>
 						</form>
@@ -80,14 +84,15 @@
 							<input type='hidden' name='refreshPodcast' value='{{ feed.feedUrl }}' />
 							<input type='submit' value='&#x21bb;' data-inline='true'/>
 						</form>
+-->
 						{{ feed.title }} at {{ feed.feedUrl }}
+						<ul>
+							{% for show in feed.show %}
+								<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
+									Play</button> {{ show.episode_title }}
+							{% endfor %}
+						</ul>
 					</li>
-					<ul>
-						{% for show in feed.show %}
-							<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
-								Play</button> {{ show.episode_title }}
-						{% endfor %}
-					</ul>
 				{% endfor %}
 			</ul>			
 		</div>

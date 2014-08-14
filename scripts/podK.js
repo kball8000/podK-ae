@@ -1,48 +1,53 @@
+$( function(){
+	//Audio controls click event handlers
+	$( '#playBtn' ).click(myAudio.playEpisode);
+	$( '#rewindBtn' ).click(myAudio.rewindEpisode);
+	$( '#fastForwardBtn' ).click(myAudio.fastForwardEpisode);
+	$( '#muteBtn' ).click(myAudio.toggleSound);
+});
+
 var myAudio = function(){
-	var gib = document.getElementsByTagName('audio')[0];
-	var gibTime = document.getElementById('currentGibTime');
-	var gibTotalTime = document.getElementById('durationGibTIme');
+	var episode = document.getElementsByTagName('audio')[0];
+	var episodeCurrentPlaybackPosition = document.getElementById('episodeCurrentPlaybackPosition');
+	var episodeTotalTime = document.getElementById('durationepisodeCurrentPlaybackPosition');
 
-    function playSelectedEpisode(ep){
-        gib.src=ep;
-        playAudio();
-	}
-
-	function playAudio(){
-		if(gib.paused){
-			gib.play();
+	function playEpisode(){
+		if(episode.paused){
+			episode.play();
 		}
 		else{
-			gib.pause();
+			episode.pause();
 		}
 	}
 
 	function displayTime(){
-		gibTime.innerHTML = readableTime(gib.currentTime);
-		gibTotalTime.innerHTML = readableTime(gib.duration);
+		episodeCurrentPlaybackPosition.innerHTML = readableTime(episode.currentTime);
+		episodeTotalTime.innerHTML = readableTime(episode.duration);
 	}
 
-	function fastForward(){
-		var t = gib.currentTime + 30;
-		gib.currentTime = t;
+	function fastForwardEpisode(){
+		var t = episode.currentTime + 30;
+		episode.currentTime = t;
 	}
 
-	function rewind(){
-		var t = gib.currentTime - 15;
-		gib.currentTime = t;
+	function rewindEpisode(){
+		var t = episode.currentTime - 15;
+		episode.currentTime = t;
 	}
 	
 	function toggleSound(){
 	// For the icons visit: http://www.fileformat.info/info/unicode/char/search.htm?q=speaker&preview=entity
 	// For the uriencode bit, visit: http://www.the-art-of-web.com/javascript/escape/
-        var icon = document.getElementById('speakerIcon');
-		if(gib.muted){
-			gib.muted=false;
-			icon.innerHTML = decodeURI('%F0%9F%94%89');
+        var icon = document.getElementById('muteBtn');
+		if(episode.muted){
+			episode.muted=false;
+			icon.innerHTML = 'Mute';
+//			icon.innerHTML = decodeURI('%F0%9F%94%89');
 		}
 		else{
-			gib.muted=true;
-			icon.innerHTML = decodeURI("%F0%9F%94%87");
+			episode.muted=true;
+			icon.innerHTML = 'Unmute';
+//			icon.innerHTML = decodeURI("%F0%9F%94%87");
 		}
 	}
 
@@ -76,10 +81,9 @@ var myAudio = function(){
 	}
 	
 	return{
-		playAudio:playAudio,
-		playSelectedEpisode:playSelectedEpisode,
-		rewind:rewind,
-		fastForward:fastForward,
+		playEpisode:playEpisode,
+		rewindEpisode:rewindEpisode,
+		fastForwardEpisode:fastForwardEpisode,
 		toggleSound:toggleSound,
 		displayTime:displayTime
 	};

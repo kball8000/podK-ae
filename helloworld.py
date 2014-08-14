@@ -127,8 +127,13 @@ class RemPodcast(webapp2.RequestHandler):
 		
 		# Get id from post request and delete that show from list.
 		# Also double checks with user,  by way of javascript that they really want to do this.
-
-		feed_id = self.request.get('delRecord')
+		# Should use key to delete instead of retrieving entire entity.
+		# http://stackoverflow.com/questions/22052013/how-to-use-ajax-with-google-app-engine-python 
+		
+		logging.info('self - request - body: %s' % self.request.body )
+		# feed_id = self.request.get('delRecord')
+		data = json.loads(self.request.body)
+		feed_id = data['podcast']
 
 		qry = Podcast.query(Podcast.feedUrl == feed_id)
 		result = qry.fetch(1)

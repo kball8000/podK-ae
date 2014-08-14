@@ -9,11 +9,12 @@ $( function(){
 	});
 				
 	function removePreviousSearchResults(){
-		// Finish this by removing old search queries.
+		// Finish this by removing old search queries to iTunes store in head. Otherwise, you've got all these request to iTunes, 
+		//  but only showing reults from last search.
 		var scriptVal = document.getElementsByTagName('head');
 
 	}
-	
+		
 	function sendITunesSearchRequest(){
 		//Search iTunes API with a dynamically loaded script from user input
 
@@ -26,12 +27,35 @@ $( function(){
 		$( "head" ).append(html);
 	}
 
+	//Event listener for iTunes search handler
 	$('#iTunesSearchButton').click(function(){
 		(sendITunesSearchRequest());
 	});
 });
 
+function removePodcast(podcast, loopIndex){
+	// Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
+	// Would like to maintain a history of inactive subscriptions.
+	// Would like an 'are you sure button', maybe stop asking if they do more than 2 in a row.
+
+	$.ajax({
+		type: "POST",
+		url: "/removepodcast",
+		datatype: "JSON",
+		data: JSON.stringify({ "podcast" : podcast })
+	})
+	.done(function(data){
+		// Incomplete, want to select ID that is passed to the function, i.e. data.
+		// $( '#listItem_' + podcast ).remove();
+		$( '#listItem_'+loopIndex).remove();
+	});
+}
+
+
+
 function getBasePodcast(longName){
+// Used this to avoid showing same picture again and again in search results when the only difference is the media
+// format, i.e. mp3 / video-hi / video-low... etc.
 	var shortName = '';
 	var nameLength = longName.length;
 	var i = 0;
@@ -58,7 +82,6 @@ function createPodcastListItem (result){
 
 	return html;
 }
-
 
 
 function showITunesSearchResults(arg){
