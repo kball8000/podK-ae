@@ -20,6 +20,11 @@ var myAudio = function(){
 		}
 	}
 
+	function playSelectedEpisode(ep){
+		episode.src = ep;
+		episode.play();
+	}
+	
 	function displayTime(){
 		episodeCurrentPlaybackPosition.innerHTML = readableTime(episode.currentTime);
 		episodeTotalTime.innerHTML = readableTime(episode.duration);
@@ -82,6 +87,7 @@ var myAudio = function(){
 	
 	return{
 		playEpisode:playEpisode,
+		playSelectedEpisode:playSelectedEpisode,
 		rewindEpisode:rewindEpisode,
 		fastForwardEpisode:fastForwardEpisode,
 		toggleSound:toggleSound,
