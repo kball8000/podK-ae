@@ -9,7 +9,7 @@ $( function(){
 var myAudio = function(){
 	var episode = document.getElementsByTagName('audio')[0];
 	var episodeCurrentPlaybackPosition = document.getElementById('episodeCurrentPlaybackPosition');
-	var episodeTotalTime = document.getElementById('durationepisodeCurrentPlaybackPosition');
+	var episodeDuration = document.getElementById('episodeDuration');
 
 	function playEpisode(){
 		if(episode.paused){
@@ -25,11 +25,6 @@ var myAudio = function(){
 		episode.play();
 	}
 	
-	function displayTime(){
-		episodeCurrentPlaybackPosition.innerHTML = readableTime(episode.currentTime);
-		episodeTotalTime.innerHTML = readableTime(episode.duration);
-	}
-
 	function fastForwardEpisode(){
 		var t = episode.currentTime + 30;
 		episode.currentTime = t;
@@ -91,6 +86,5 @@ var myAudio = function(){
 		rewindEpisode:rewindEpisode,
 		fastForwardEpisode:fastForwardEpisode,
 		toggleSound:toggleSound,
-		displayTime:displayTime
 	};
 }();

@@ -23,7 +23,7 @@
 	<body>
 		<div data-role='page'>
 			<div data-role='header'>
-				<h1>PodKatchor</h1>				
+				<h1>PodKatchor</h1>
 			</div>
 			<div data-role='main' class='ui-content'>
 				{% if user_welcome_nickname %}
@@ -60,7 +60,7 @@
 					</audio>
 				</div>
 				<div>			
-					<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; / &#8214;</a>
+					<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
 					<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
 					<a class="ui-btn ui-btn-inline" id="fastForwardBtn">&gt;</a>
 					<a class="ui-btn ui-btn-inline" id="muteBtn">Mute</a>
@@ -72,41 +72,32 @@
 					**Current saved feeds from datastore:
 				</p>
 
+				<!-- Either do list dividers or nested lists -->
 				<!-- Display user's podcast subscription list -->
 				<div class='subscriptionList'>
-					<ul id='subscriptionList'>
+					<ul id='subscriptionList' data-role='listview' data-inset='true'>
 						{% for feed in podcast_feeds %}
-								<li id='listItem_{{ loop.index }}'>
-								<a href="javascript:removePodcast('{{ feed.feedUrl }}', '{{ loop.index }}')" class="ui-btn ui-btn-inline">X</a>
-								<a href='javascript:refreshPodcast("{{ feed.feedUrl }}")' class='ui-btn ui-btn-inline'>&#x21bb;</a>
-
+							<li id='listItem_{{ loop.index }}' data-role='list-divider'>
+								<a href="javascript:removePodcast('{{ feed.feedUrl }}', '{{ loop.index }}')" class="ui-btn ui-btn-inline" style='display:inline;'>X</a>
+								<a href='javascript:refreshPodcast("{{ feed.feedUrl }}")' class='ui-btn ui-btn-inline' style='display:inline;'>&#x21bb;</a>
 								{{ feed.title }} at {{ feed.feedUrl }}
-								<ul>
+							</li>
 									{% for show in feed.show %}
 										<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
 											Play</button> {{ show.episode_title }}
+										</li>
 									{% endfor %}
-								</ul>
-							</li>
 						{% endfor %}
 					</ul>			
 				</div>
-
-				<div>
-					<button class="ui-btn ui-btn-inline" onclick="myAudio.displayTime();">Get Time</button>			
-				</div>
-				<div>
-					<p>
-						Current time is <span id='currentGibTime' style='height:2em;'></span>
-					</p>
-					<p>
-						Total time is <span id='durationGibTIme' style='height:2em;'></span>				
-					</p>
-				</div>
-				<div data-role='footer'>
-					Podkatchor by kball
-				</div>
 			</div> <!-- End data-role-main -->
+
+			<div data-role='footer'>
+				<h2>
+					Podkatchor by kball
+				</h2>
+			</div>
+
 		</div> <!-- End data-role-page -->
 		<script src="/scripts/podK.js"></script>
 	</body>
