@@ -35,22 +35,21 @@
 					<a rel="external" href="{{ user_welcome_href }}">Sign In</a> to your Google account
 				</p>
 				{% endif %}
-
+				
 				<!-- Search iTunes for podcast -->
-				<div class="iTunesSearch ui-grid-a">
-					<div class="ui-block-a"><input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/></div>
-					<div class="ui-block-b"><button id="iTunesSearchButton" data-inline="true">Go</button></div>
-				</div>
+				<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/>
+				<button id="iTunesSearchButton" data-inline="true">Go</button>
+
+				<!-- Display the search results with javascript -->
 				<div id="iTunesSearchResultsHtml"></div>
 
 				<p>http://feeds.twit.tv/sn.xml - Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds</p>
 
 				<!-- Add a podcast with a url -->
-				<form action="/addpodcast" method="post" data-ajax='false'>
-					<div class='ui-grid-a'>
-						<div class='ui-block-a'><input type='text' name='podcastSubscription' placeholder="Add url of RSS feed"/></div>
-						<div class='ui-block-b'><input type="submit" data-inline='true' value="Add podcast"/></div>
-					</div>
+				<form id='podcastSubscriptionForm'>
+					<label for='podcastSubscriptionSearch' class='ui-hidden-accessible' style='text-align:right;'>URL</label>
+					<input type='search' id='podcastSubscriptionSearch' name='podcastSubscriptionSearch' placeholder="Add url of RSS feed" data-clear-btn='true'>
+					<input type="submit" value='Add Podcast' data-inline='true'>
 				</form>
 
 				<!-- Display player -->
@@ -72,23 +71,30 @@
 					**Current saved feeds from datastore:
 				</p>
 
-				<!-- Either do list dividers or nested lists -->
+				<!-- I think I want to do a collapsible, maybe nested, with inline, so they are small, remove and refresh buttons in the h1 area-->
+				<!-- Either do list dividers or set of collapsible lists, this allows multiple to be open at once vs collapsible set-->
 				<!-- Display user's podcast subscription list -->
-				<div class='subscriptionList'>
-					<ul id='subscriptionList' data-role='listview' data-inset='true'>
-						{% for feed in podcast_feeds %}
-							<li id='listItem_{{ loop.index }}' data-role='list-divider'>
-								<a href="javascript:removePodcast('{{ feed.feedUrl }}', '{{ loop.index }}')" class="ui-btn ui-btn-inline" style='display:inline;'>X</a>
-								<a href='javascript:refreshPodcast("{{ feed.feedUrl }}")' class='ui-btn ui-btn-inline' style='display:inline;'>&#x21bb;</a>
-								{{ feed.title }} at {{ feed.feedUrl }}
+				<div id='subscriptionList'>
+					{% for feed in podcast_feeds %}
+					<div data-role='collapsible' id='subscriptionItem_{{ loop.index }}'>
+						<h3>
+							{{ feed.title }}
+						</h3>
+						<ul data-role='listview'>
+							<li style='display:inline;'>
+								<a href="javascript:removePodcast( '{{ feed.feedUrl }}', '{{ loop.index }}', '{{ feed.title }}' )" 
+									class='ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline' style='display:inline-block; padding:0.5em 2em;'></a>
+								<a href="javascript:refreshPodcast('{{ feed.feedUrl }}')" class='ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline' 
+									style='display:inline-block; padding:0.5em 2em;'></a>
 							</li>
-									{% for show in feed.show %}
-										<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
-											Play</button> {{ show.episode_title }}
-										</li>
-									{% endfor %}
-						{% endfor %}
-					</ul>			
+							{% for show in feed.show %}
+							<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
+								Play</button> {{ show.episode_title }}
+							</li>
+							{% endfor %}
+						</ul>
+					</div>
+					{% endfor %}
 				</div>
 			</div> <!-- End data-role-main -->
 

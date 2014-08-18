@@ -9,7 +9,7 @@ import os
 import jinja2
 import logging
 
-# Working on refresh function and refresh class. Want function so that I can call it from multiple classes.
+# Should probably add back in json dataType to ajax request, that's what I should be using.
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -77,25 +77,26 @@ def getFeedInfo(url):
 class AddPodcast(webapp2.RequestHandler):
 	def post(self):
 		episode_list = []
+		returnInfo = {}
+		# returnInfo = ''
+		url = self.request.get('podcastUrl')
 		
-		# Create the constructor
+		# Create the podcast constructor for datastore entity.
 		podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
 		podcast = Podcast(parent=podcast_feed_key(podcast_feed_list))
 
-		# Add parameters
+		# Add a couple basic podcast parameters
 		if users.get_current_user():
 			podcast.author = users.get_current_user()
-
-		url = self.request.get('podcastSubscription')
+		podcast.feedUrl = url
 		
+		""" Get the rss feed and parse it to save information I want to keep."""
 		# May want to do an if(getFeedInfo) and write something to the screen if it returns false.
 		response = getFeedInfo(url)
-		
 		# parse xml response from rss feed URI
 		root = ET.fromstring(response)
 
 		podcast.title = root.find('channel').find('title').text
-		podcast.feedUrl = url
 
 		for item in root.find('channel').findall('item'):
 			episode_list.append(Episode( episode_title = item.find('title').text,
@@ -109,8 +110,18 @@ class AddPodcast(webapp2.RequestHandler):
 		podcast.show = episode_list
 			
 		podcast.put()
+		
+		# need to return a ditionary with some basic podcast info and episode info in a list, not true.
+		
+		returnInfo = { 'title' : 'my podcast title', 'episodes': ['firstEp', 'secondEp'] }
+		# returnInfo = 'blobberino'
 
-		self.redirect('/')
+		logging.info('return info from add podcast, i.e. from search = %s' % returnInfo )
+		returnInfoJson = json.dumps(returnInfo)
+		logging.info('return info from add podcast after json.dumps, i.e. from search = %s' % returnInfoJson )
+		self.response.out.write(returnInfoJson)
+#		return returnInfoJson
+		# self.redirect('/')
 
 class RefreshFeed(webapp2.RequestHandler):
     def post(self):
@@ -125,32 +136,19 @@ class RefreshFeed(webapp2.RequestHandler):
 class RemPodcast(webapp2.RequestHandler):
     def post(self):
 		
-		# Get id from post request and delete that show from list.
-		# Also double checks with user,  by way of javascript that they really want to do this.
+		""" Get id from post request and delete that show from list. """
 		# Should use key to delete instead of retrieving entire entity.
 		# http://stackoverflow.com/questions/22052013/how-to-use-ajax-with-google-app-engine-python 
-		
-		logging.info('self - request - body: %s' % self.request.body )
-		# feed_id = self.request.get('delRecord')
-		data = json.loads(self.request.body)
-		feed_id = data['podcast']
+
+		logging.info('podcast url body in remove = %s' %self.request.body)
+		feed_id = self.request.get('podcast')
 
 		qry = Podcast.query(Podcast.feedUrl == feed_id)
 		result = qry.fetch(1)
-		# self.response.write('<html><body>')
-		# self.response.write('feed_id = <b>%s</b>' % feed_id)
-		# self.response.write('<br>qry = <b>%s</b>' % qry)
-		# self.response.write('<br>result = <b>%s</b>' % result)
-		# self.response.write('</body></html>')
-		
-		# logging.info('result = adklfjasjflkajfldkajf;ajd;adfj')
 
 		result[0].key.delete()
-		
-		# podcast_feed = ndb.Key(Podcast, parent=ndb.Key('podcast_feed', 'default_podcast_feed_list'))
-		# podcast_feed.delete()
-		
-		self.redirect('/')
+				
+		# self.redirect('/')
 
 app = webapp2.WSGIApplication([
 	('/', MainPage),
