@@ -78,9 +78,12 @@ class AddPodcast(webapp2.RequestHandler):
 	def post(self):
 		episode_list = []
 		returnInfo = {}
-		# returnInfo = ''
-		url = self.request.get('podcastUrl')
-		
+
+		# Get podcast feed url
+		podcast_json = self.request.body
+		podcast_dict = json.loads(podcast_json)
+		url = podcast_dict['podcastUrl']
+
 		# Create the podcast constructor for datastore entity.
 		podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
 		podcast = Podcast(parent=podcast_feed_key(podcast_feed_list))
@@ -89,7 +92,7 @@ class AddPodcast(webapp2.RequestHandler):
 		if users.get_current_user():
 			podcast.author = users.get_current_user()
 		podcast.feedUrl = url
-		
+
 		""" Get the rss feed and parse it to save information I want to keep."""
 		# May want to do an if(getFeedInfo) and write something to the screen if it returns false.
 		response = getFeedInfo(url)
@@ -110,17 +113,13 @@ class AddPodcast(webapp2.RequestHandler):
 		podcast.show = episode_list
 			
 		podcast.put()
-		
-		# need to return a ditionary with some basic podcast info and episode info in a list, not true.
-		
-		returnInfo = { 'title' : 'my podcast title', 'episodes': ['firstEp', 'secondEp'] }
-		# returnInfo = 'blobberino'
+				
+		returnInfo = { 'title' : 'myPodcastTitle', 'episodes': ['firstEp', 'secondEp'], }
 
-		logging.info('return info from add podcast, i.e. from search = %s' % returnInfo )
-		returnInfoJson = json.dumps(returnInfo)
-		logging.info('return info from add podcast after json.dumps, i.e. from search = %s' % returnInfoJson )
-		self.response.out.write(returnInfoJson)
-#		return returnInfoJson
+		self.response.headers['Content-Type'] = 'application/json'
+		self.response.out.write(json.dumps(returnInfo))
+
+		# return True
 		# self.redirect('/')
 
 class RefreshFeed(webapp2.RequestHandler):

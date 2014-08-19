@@ -8,18 +8,14 @@ function addPodcastSubscription( podcast ){
 	
 	var html = '';
 	var counter = 0;
-	var podcastDecode;
-	console.log('raw podcast from python in js' + podcast);
-	podcastDecode = JSON.parse(podcast);
-	console.log('decoded podcast from python in js' + podcastDecode);
 	
 	html += '<div data-role="collapsible" id="addedSubscriptionItem_' + counter + '">';
-	html += '<h3>' + podcastDecode.title + '<\/h3>';
+	html += '<h3>' + podcast.title + '<\/h3>';
 	html += '<ul data-role="listview">';
 	html += '<li>Temporary list item<\/li>';
 	var i = 0;
-	while( i < podcastDecode.episodes.length ){
-		html += '<li>' + podcastDecode.episodes[i] + '<\/li>';
+	while( i < podcast.episodes.length ){
+		html += '<li>' + podcast.episodes[i] + '<\/li>';
 		i += 1;
 	}
 	html += '<\/ul>';
@@ -47,10 +43,10 @@ function addPodcast( podcastUrl ){
 	$.ajax({
 		url: "/addpodcast",
 		type: "POST",
-		data: { podcastUrl: podcastUrl }
+		dataType: "json",
+		data: JSON.stringify({ podcastUrl: podcastUrl })
 	})
 	.done(function(podcast){
-		//$( '#podcastSubscriptionForm').remove();
 		addPodcastSubscription(podcast);
 	});
 }
