@@ -1,7 +1,5 @@
-// Need a layer of functions. One for post from direct input of feed in input fiels and that calls
-// the same function that the subscribe button does.
-// The layer just teases out the variables from input / hidden fields.
-// Subsribe from search field will be like delete, just an a element with javascript in href.
+// Get image from xml feed, not itunes store, or backup from xml, as direct input of xml will not have an iTunes image to show.
+// Figure out why screen is unresponsive in chrome. something is bogging things down.
 
 function addPodcastSubscription( podcast ){
 /* Need some sort of global counter to increment div id */
@@ -14,14 +12,15 @@ function addPodcastSubscription( podcast ){
 	html += '<ul data-role="listview">';
 	html += '<li>Temporary list item<\/li>';
 	var i = 0;
+	console.log('type of podcast in addPodcastSubscription = ' + typeof podcast);
 	while( i < podcast.episodes.length ){
-		html += '<li>' + podcast.episodes[i] + '<\/li>';
+		html += '<li>' + podcast.episodes[i].title + '<\/li>';
 		i += 1;
 	}
 	html += '<\/ul>';
 	html += '<\/div>';
 	$( '#iTunesSearchResultsHtml' ).empty();
-	$( '#subscriptionList' ).append(html);
+	$( '#subscriptionList' ).prepend(html);
 /* 						
 							<li style='display:inline;'>
 								<a href="javascript:removePodcast( '{{ feed.feedUrl }}', '{{ loop.index }}', '{{ feed.title }}' )" 
@@ -39,14 +38,20 @@ function addPodcastSubscription( podcast ){
 */
 }
 
-function addPodcast( podcastUrl ){
+function addPodcast( podcastUrl, imageUrl ){
+	console.log('--podcastrl and imageurl = ' + podcastUrl + ', a ' + imageUrl + ', z' );
+	var test = JSON.stringify({ podcastUrl: podcastUrl });
+	imageUrl = typeof imageUrl !== 'undefined' ? imageUrl : '';
+	console.log('type of podcastrl in addPodcast = ' + typeof podcastUrl);
+	console.log('type of podcastrl in addPodcast = ' + typeof test);
 	$.ajax({
 		url: "/addpodcast",
 		type: "POST",
 		dataType: "json",
-		data: JSON.stringify({ podcastUrl: podcastUrl })
+		data: JSON.stringify({ podcastUrl: podcastUrl, imageUrl : imageUrl })
 	})
 	.done(function(podcast){
+		console.log('type of podcast in done addPodcast = ' + typeof podcast);
 		addPodcastSubscription(podcast);
 	});
 }
@@ -58,9 +63,12 @@ function addPodcastFromUrl( event ){
 	addPodcast(podcastUrl);
 }
 
-function addPodcastITunesSearch(encPodcastUrl){
+function addPodcastITunesSearch(encPodcastUrl, encImageUrl){
 	var podcastUrl = decodeURIComponent(encPodcastUrl);
-	addPodcast(podcastUrl);		
+	var imageUrl = decodeURIComponent(encImageUrl);
+	console.log('aa podcastUrl = ' + podcastUrl);
+	console.log('bb imageUrl = ' + imageUrl);
+	addPodcast(podcastUrl, imageUrl);	
 }
 function removePodcast(podcast, loopIndex, title){
 	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
@@ -110,9 +118,15 @@ function showITunesSearchResults(arg){
 		return true;
 	}
 	html += '<ul data-role="listview" data-inset="true">';
+	var myFeed;
+	var myImage;
 	for(var i=0; i<arg.resultCount; i++){
 		/* Using jQuery mobile listiew with thumbnails to display iTunes search results. */
-		html += '<li><a href="javascript:addPodcastITunesSearch(\'' + encodeURIComponent(results[i].feedUrl) + '\')">';
+		myFeed = encodeURIComponent(results[i].feedUrl);
+		myImage = encodeURIComponent(results[i].artworkUrl60);
+		console.log('feed = ' + myFeed);
+		console.log('images feed = ' + myImage);
+		html += '<li><a href="javascript:addPodcastITunesSearch(\'' + myFeed + '\', \'' + myImage + '\')">';
 		html += '<img src="' + results[i].artworkUrl60 + '">';
 		html += '<h2>' + results[i].collectionCensoredName + '</h2>';
 		html += '<p>' + results[i].artistName + '</p>';
@@ -152,7 +166,9 @@ $( function(){
 	}
 
 	//Event listener for search handlers
-	$( '#iTunesSearchButton' ).click( sendITunesSearchRequest );
-	$( '#podcastSubscriptionForm' ).submit( addPodcastFromUrl );
+	$( '#iTunesSearchButton' ).click( function(){
+		sendITunesSearchRequest(); });
+	$( '#podcastSubscriptionForm' ).submit( function(){
+		addPodcastFromUrl(); });
 });
 

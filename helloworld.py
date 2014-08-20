@@ -39,6 +39,14 @@ class Podcast(ndb.Model):
 	show = ndb.StructuredProperty(Episode, repeated=True)
 	date = ndb.DateTimeProperty(auto_now_add=True)
 
+class EpisodeSubscription:
+	# This will get returned to ajax request to website as opposed to datatore for reg Podcast class.
+	def __init__(self, title, url):
+		self.title = title
+		self.url = url
+		# listened = False
+		# percent listened = 0
+	
 class MainPage(webapp2.RequestHandler):
     def get(self):
 		user = users.get_current_user()
@@ -77,12 +85,17 @@ def getFeedInfo(url):
 class AddPodcast(webapp2.RequestHandler):
 	def post(self):
 		episode_list = []
+		episode_list_return = []
+		episode = {}
 		returnInfo = {}
 
 		# Get podcast feed url
 		podcast_json = self.request.body
 		podcast_dict = json.loads(podcast_json)
+		logging.info('podcast_json = %s' % podcast_json)
+		logging.info('podcast_dict = %s' % podcast_dict)
 		url = podcast_dict['podcastUrl']
+		imageUrl = podcast_dict['imageUrl']
 
 		# Create the podcast constructor for datastore entity.
 		podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
@@ -102,19 +115,30 @@ class AddPodcast(webapp2.RequestHandler):
 		podcast.title = root.find('channel').find('title').text
 
 		for item in root.find('channel').findall('item'):
-			episode_list.append(Episode( episode_title = item.find('title').text,
-										episode_url = item.find('link').text,
+			ep_title = item.find('title').text
+			ep_url = item.find('link').text
+			episode = {'title': ep_title, 'url': ep_url}
+			episode_list_return.append(episode)
+
+			episode_list.append(Episode( episode_title = ep_title,
+										episode_url = ep_url,
 										listened = False,
 										pubDate = item.find('pubDate').text,
 		# I'm able to hardcode in the namespace for itunes:, using xmlns:media, not sure how I'd do that programmatically
 		#								episodeLength = item.find('{http://search.yahoo.com/mrss/}duration').text,
 										playbackPosition = 0))
-
-		podcast.show = episode_list
 			
+			# episode_url = item.find('link').text,
+			# listened = False))
+
+			
+		podcast.show = episode_list
+		
 		podcast.put()
 				
-		returnInfo = { 'title' : 'myPodcastTitle', 'episodes': ['firstEp', 'secondEp'], }
+		returnInfo = { 'title' : podcast.title, 'episodes': episode_list_return }
+		logging.info( 'Return info is = %s ' % type(returnInfo))
+		logging.info( 'Return dumps info is = %s ' % type(json.dumps(returnInfo)))
 
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(json.dumps(returnInfo))
