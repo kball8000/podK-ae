@@ -76,23 +76,29 @@
 				<!-- Display user's podcast subscription list -->
 				<div id='subscriptionList'>
 					{% for feed in podcast_feeds %}
-					<div data-role='collapsible' id='subscriptionItem_{{ loop.index }}'>
-						<h3>
-							{{ feed.title }}
-						</h3>
-						<ul data-role='listview'>
-							<li style='display:inline;'>
-								<a href="javascript:removePodcast( '{{ feed.feedUrl }}', '{{ loop.index }}', '{{ feed.title }}' )" 
-									class='ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline' style='display:inline-block; padding:0.5em 2em;'></a>
-								<a href="javascript:refreshPodcast('{{ feed.feedUrl }}')" class='ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline' 
-									style='display:inline-block; padding:0.5em 2em;'></a>
-							</li>
-							{% for show in feed.show %}
-							<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
-								Play</button> {{ show.episode_title }}
-							</li>
-							{% endfor %}
-						</ul>
+					<div style='position:relative;'>
+						<div style='position:absolute; top:0.3em; right:0.5em; z-index:1;'>
+							<a href="javascript:removePodcast( '{{ feed.feedUrl }}', '{{ loop.index }}', '{{ feed.title }}' )" 
+							   class='ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline' style='display:inline-block; padding:0.2em 1em;'></a>
+							<a href="javascript:refreshPodcast('{{ feed.feedUrl }}')" class='ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline' 
+							   style='display:inline-block; padding:0.2em 1em;'></a>
+						</div>
+						<div data-role='collapsible' id='subscriptionItem_{{ loop.index }}'>
+							<h3>
+								<img src='http://feeds.twit.tv/coverart/sn144audio.jpg' alt='podcast logo' height='45' width='45' 
+									 style='border-radius:0.3em;'>
+								<span style='padding-left:1em;'> {{ feed.title }} </span>
+							</h3>
+							<ul data-role='listview'>
+								<li style='display:inline;'>
+								</li>
+								{% for show in feed.show %}
+								<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
+									Play</button> {{ show.episode_title }}
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
 					</div>
 					{% endfor %}
 				</div>

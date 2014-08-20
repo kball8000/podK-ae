@@ -38,17 +38,15 @@ function addPodcastSubscription( podcast ){
 */
 }
 
-function addPodcast( podcastUrl, imageUrl ){
-	console.log('--podcastrl and imageurl = ' + podcastUrl + ', a ' + imageUrl + ', z' );
+function addPodcast( podcastUrl ){
 	var test = JSON.stringify({ podcastUrl: podcastUrl });
-	imageUrl = typeof imageUrl !== 'undefined' ? imageUrl : '';
 	console.log('type of podcastrl in addPodcast = ' + typeof podcastUrl);
 	console.log('type of podcastrl in addPodcast = ' + typeof test);
 	$.ajax({
 		url: "/addpodcast",
 		type: "POST",
 		dataType: "json",
-		data: JSON.stringify({ podcastUrl: podcastUrl, imageUrl : imageUrl })
+		data: JSON.stringify({ podcastUrl: podcastUrl})
 	})
 	.done(function(podcast){
 		console.log('type of podcast in done addPodcast = ' + typeof podcast);
@@ -63,12 +61,9 @@ function addPodcastFromUrl( event ){
 	addPodcast(podcastUrl);
 }
 
-function addPodcastITunesSearch(encPodcastUrl, encImageUrl){
+function addPodcastITunesSearch(encPodcastUrl){
 	var podcastUrl = decodeURIComponent(encPodcastUrl);
-	var imageUrl = decodeURIComponent(encImageUrl);
-	console.log('aa podcastUrl = ' + podcastUrl);
-	console.log('bb imageUrl = ' + imageUrl);
-	addPodcast(podcastUrl, imageUrl);	
+	addPodcast(podcastUrl);	
 }
 function removePodcast(podcast, loopIndex, title){
 	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
@@ -166,9 +161,7 @@ $( function(){
 	}
 
 	//Event listener for search handlers
-	$( '#iTunesSearchButton' ).click( function(){
-		sendITunesSearchRequest(); });
-	$( '#podcastSubscriptionForm' ).submit( function(){
-		addPodcastFromUrl(); });
+	$( '#iTunesSearchButton' ).on( 'click', sendITunesSearchRequest );
+	$( '#podcastSubscriptionForm' ).on('submit', addPodcastFromUrl );
 });
 

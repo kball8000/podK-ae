@@ -36,6 +36,7 @@ class Podcast(ndb.Model):
 	author = ndb.UserProperty()
 	title = ndb.StringProperty(indexed=False)
 	feedUrl = ndb.StringProperty()
+	imageUrl = ndb.StringProperty(indexed=False)
 	show = ndb.StructuredProperty(Episode, repeated=True)
 	date = ndb.DateTimeProperty(auto_now_add=True)
 
@@ -95,7 +96,6 @@ class AddPodcast(webapp2.RequestHandler):
 		logging.info('podcast_json = %s' % podcast_json)
 		logging.info('podcast_dict = %s' % podcast_dict)
 		url = podcast_dict['podcastUrl']
-		imageUrl = podcast_dict['imageUrl']
 
 		# Create the podcast constructor for datastore entity.
 		podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
@@ -113,11 +113,12 @@ class AddPodcast(webapp2.RequestHandler):
 		root = ET.fromstring(response)
 
 		podcast.title = root.find('channel').find('title').text
+		podcast.imageUrl = root.find('channel').find('image').find('url').text
 
 		for item in root.find('channel').findall('item'):
 			ep_title = item.find('title').text
 			ep_url = item.find('link').text
-			episode = {'title': ep_title, 'url': ep_url}
+			episode = {'title': ep_title, 'url': ep_url }
 			episode_list_return.append(episode)
 
 			episode_list.append(Episode( episode_title = ep_title,
@@ -136,7 +137,7 @@ class AddPodcast(webapp2.RequestHandler):
 		
 		podcast.put()
 				
-		returnInfo = { 'title' : podcast.title, 'episodes': episode_list_return }
+		returnInfo = { 'title': podcast.title, 'imageUrl': podcast.imageUrl, 'episodes': episode_list_return }
 		logging.info( 'Return info is = %s ' % type(returnInfo))
 		logging.info( 'Return dumps info is = %s ' % type(json.dumps(returnInfo)))
 
