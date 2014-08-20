@@ -46,19 +46,19 @@
 				<p>http://feeds.twit.tv/sn.xml - Swap out the "sn" with "twig" / "twit" / "mbw" or any other twit show to try out other feeds</p>
 
 				<!-- Add a podcast with a url -->
-				<form id='podcastSubscriptionForm'>
+				<form id='podcastSubscriptionForm' style='display:none;'>
 					<label for='podcastSubscriptionSearch' class='ui-hidden-accessible' style='text-align:right;'>URL</label>
 					<input type='search' id='podcastSubscriptionSearch' name='podcastSubscriptionSearch' placeholder="Add url of RSS feed" data-clear-btn='true'>
 					<input type="submit" value='Add Podcast' data-inline='true'>
 				</form>
 
 				<!-- Display player -->
-				<div>
+				<div style='display:none;'>
 					<audio controls id='myMusic1'>
 						<source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'>
 					</audio>
 				</div>
-				<div>			
+				<div style='display:none;'>
 					<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
 					<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
 					<a class="ui-btn ui-btn-inline" id="fastForwardBtn">&gt;</a>
@@ -84,10 +84,10 @@
 							   style='display:inline-block; padding:0.2em 1em;'></a>
 						</div>
 						<div data-role='collapsible' id='subscriptionItem_{{ loop.index }}'>
-							<h3>
+							<h3 >
 								<img src='http://feeds.twit.tv/coverart/sn144audio.jpg' alt='podcast logo' height='45' width='45' 
-									 style='border-radius:0.3em;'>
-								<span style='padding-left:1em;'> {{ feed.title }} </span>
+									 style='border-radius:0.3em; margin: 0 0.7em 0 0.5em; vertical-align: middle;'>	
+								<span style='height:2em;'>{{ feed.title }} </span>
 							</h3>
 							<ul data-role='listview'>
 								<li style='display:inline;'>
