@@ -6,28 +6,34 @@ function addPodcastSubscription( podcast ){
 	
 	var html = '';
 	var counter = 0;
-	
+/*
+	html += '<div style="position:relative;">';
+	html += '<div style="position:absolute; top:0.3em; right:0.5em; z-index:1;">';
+	html += '<a href="javascript:removePodcast( \'' + podcast.feedUrl + ', ' + counter + ', ' + podcast.title + '\' )" ';
+	html += 'class="ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline" style="display:inline-block; padding:0.2em 1em;"></a>';
+	html += '<a href="javascript:refreshPodcast(\'' + podcast.title + '\')" class="ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline"';
+	html += 'style="display:inline-block; padding:0.2em 1em;"></a>';
+	html += '</div>';
+*/
 	html += '<div data-role="collapsible" id="addedSubscriptionItem_' + counter + '">';
 	html += '<h3>' + podcast.title + '<\/h3>';
 	html += '<ul data-role="listview">';
-	html += '<li>Temporary list item<\/li>';
 	var i = 0;
-	console.log('type of podcast in addPodcastSubscription = ' + typeof podcast);
+	console.log('length of episodes = ' + podcast.episodes.length);
+	console.log('title = ' + podcast.title);
+	console.log('first ep = ' + podcast.episodes[1].title + ', ' +  podcast.episodes[1].url );
 	while( i < podcast.episodes.length ){
-		html += '<li>' + podcast.episodes[i].title + '<\/li>';
+		html += '<li><button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode(\'';
+		html += podcast.episodes[i].url + '\')">Play</button><\/li>';
 		i += 1;
 	}
 	html += '<\/ul>';
 	html += '<\/div>';
 	$( '#iTunesSearchResultsHtml' ).empty();
-	$( '#subscriptionList' ).prepend(html);
+	console.log('html =' );
+	console.log( html );
+	$( '#subscriptionList' ).prepend(html).trigger('create');
 /* 						
-							<li style='display:inline;'>
-								<a href="javascript:removePodcast( '{{ feed.feedUrl }}', '{{ loop.index }}', '{{ feed.title }}' )" 
-									class='ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline' style='display:inline-block; padding:0.5em 2em;'></a>
-								<a href="javascript:refreshPodcast('{{ feed.feedUrl }}')" class='ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline' 
-									style='display:inline-block; padding:0.5em 2em;'></a>
-							</li>
 							{% for show in feed.show %}
 							<li> <button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
 								Play</button> {{ show.episode_title }}
@@ -40,8 +46,6 @@ function addPodcastSubscription( podcast ){
 
 function addPodcast( podcastUrl ){
 	var test = JSON.stringify({ podcastUrl: podcastUrl });
-	console.log('type of podcastrl in addPodcast = ' + typeof podcastUrl);
-	console.log('type of podcastrl in addPodcast = ' + typeof test);
 	$.ajax({
 		url: "/addpodcast",
 		type: "POST",
@@ -49,7 +53,6 @@ function addPodcast( podcastUrl ){
 		data: JSON.stringify({ podcastUrl: podcastUrl})
 	})
 	.done(function(podcast){
-		console.log('type of podcast in done addPodcast = ' + typeof podcast);
 		addPodcastSubscription(podcast);
 	});
 }
@@ -119,8 +122,6 @@ function showITunesSearchResults(arg){
 		/* Using jQuery mobile listiew with thumbnails to display iTunes search results. */
 		myFeed = encodeURIComponent(results[i].feedUrl);
 		myImage = encodeURIComponent(results[i].artworkUrl60);
-		console.log('feed = ' + myFeed);
-		console.log('images feed = ' + myImage);
 		html += '<li><a href="javascript:addPodcastITunesSearch(\'' + myFeed + '\', \'' + myImage + '\')">';
 		html += '<img src="' + results[i].artworkUrl60 + '">';
 		html += '<h2>' + results[i].collectionCensoredName + '</h2>';
