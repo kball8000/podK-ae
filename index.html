@@ -37,9 +37,16 @@
 				{% endif %}
 				
 				<!-- Search iTunes for podcast -->
-				<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/>
-				<button id="iTunesSearchButton" data-inline="true">Go</button>
+				<!-- <input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/>
+				<button id="iTunesSearchButton" data-inline="true">Go</button> -->
 
+				<form>
+					<label for='iTunesSearchValue'>Search iTunes Podcast Library:</label>
+					<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/>
+					<button id="iTunesSearchButton" data-inline="true">Go</button>					
+				</form>
+				
+				
 				<!-- Display the search results with javascript -->
 				<div id="iTunesSearchResultsHtml"></div>
 

@@ -139,7 +139,7 @@ $( function(){
 	function sendITunesSearchRequest(){
 		//Search iTunes API with a dynamically loaded script from user input
 
-		removePreviousSearchResults();
+//		removePreviousSearchResults();
 
 		var searchValue = $('#iTunesSearchValue').val();
 		var searchValueEnc = encodeURIComponent(searchValue);
@@ -149,7 +149,8 @@ $( function(){
 	}
 
 	//Event listener for search handlers
-	$( '#iTunesSearchButton' ).on( 'click', sendITunesSearchRequest );
+//	$( '#iTunesSearchButton' ).on( 'click', sendITunesSearchRequest );
+	$( '#iTunesSearchValue' ).on( 'submit', sendITunesSearchRequest );
 	$( '#podcastSubscriptionForm' ).on('submit', addPodcastFromUrl );
 });
 
