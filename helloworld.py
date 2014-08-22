@@ -119,6 +119,7 @@ class AddPodcast(webapp2.RequestHandler):
 			ep_title = item.find('title').text
 			ep_url = item.find('link').text
 			episode = {'title': ep_title, 'url': ep_url }
+			logging.info( 'ep_url = %s, ep_title= %s, episode= %s, ' %(ep_url, ep_title, episode) )
 			episode_list_return.append(episode)
 
 			episode_list.append(Episode( episode_title = ep_title,
@@ -137,7 +138,7 @@ class AddPodcast(webapp2.RequestHandler):
 		
 		podcast.put()
 				
-		returnInfo = { 'title': podcast.title, 'imageUrl': podcast.imageUrl, 'episodes': episode_list_return }
+		returnInfo = { 'title': podcast.title, 'imageUrl': podcast.imageUrl, 'feedUrl': podcast.feedUrl, 'episodes': episode_list_return }
 		logging.info( 'Return info is = %s ' % type(returnInfo))
 		logging.info( 'Return dumps info is = %s ' % type(json.dumps(returnInfo)))
 
@@ -164,15 +165,14 @@ class RemPodcast(webapp2.RequestHandler):
 		# Should use key to delete instead of retrieving entire entity.
 		# http://stackoverflow.com/questions/22052013/how-to-use-ajax-with-google-app-engine-python 
 
-		logging.info('podcast url body in remove = %s' %self.request.body)
 		feed_id = self.request.get('podcast')
 
 		qry = Podcast.query(Podcast.feedUrl == feed_id)
 		result = qry.fetch(1)
 
 		result[0].key.delete()
-				
-		# self.redirect('/')
+		
+		# return True
 
 app = webapp2.WSGIApplication([
 	('/', MainPage),
