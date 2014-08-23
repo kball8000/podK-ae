@@ -119,16 +119,32 @@ function showITunesSearchResults(arg){
 	$('#iTunesSearchResultsHtml').html(html).trigger('create');
 }
 
+function sendITunesSearchRequest(){
+	//Search iTunes API with a dynamically loaded script from user input
+
+//	removePreviousSearchResults();
+	console.log('hi');
+
+	var searchValue = $('#iTunesSearchValue').val();
+	var searchValueEnc = encodeURIComponent(searchValue);
+	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + searchValueEnc +'&callback=showITunesSearchResults';
+	var html = "<script src='" + url + "'><\/script>";
+	$( "head" ).append(html);
+
+	return false;
+}
+
+
 $( function(){
 	//Search iTunes when user hits enter key on input field.
-	$( "#iTunesSearchValue" ).keypress(function(e){
+/*	$( "#iTunesSearchValue" ).keypress(function(e){
 		var key = e.which;
 		if(key === 13){
 			sendITunesSearchRequest();
-			return false;
+			return true;
 		}
 	});
-				
+*/
 	function removePreviousSearchResults(){
 		// Finish this by removing old search queries to iTunes store in head. Otherwise, you've got all these request to iTunes, 
 		//  but only showing reults from last search.
@@ -136,21 +152,11 @@ $( function(){
 
 	}
 		
-	function sendITunesSearchRequest(){
-		//Search iTunes API with a dynamically loaded script from user input
-
-//		removePreviousSearchResults();
-
-		var searchValue = $('#iTunesSearchValue').val();
-		var searchValueEnc = encodeURIComponent(searchValue);
-		var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + searchValueEnc +'&callback=showITunesSearchResults';
-		var html = "<script src='" + url + "'><\/script>";
-		$( "head" ).append(html);
-	}
 
 	//Event listener for search handlers
 //	$( '#iTunesSearchButton' ).on( 'click', sendITunesSearchRequest );
-	$( '#iTunesSearchValue' ).on( 'submit', sendITunesSearchRequest );
+//	$( '#iTunesSearchButton' ).on( 'submit', sendITunesSearchRequest );
+	$( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
 	$( '#podcastSubscriptionForm' ).on('submit', addPodcastFromUrl );
 });
 
