@@ -42,10 +42,9 @@
 
 				<form id='iTunesSearchForm'>
 					<label for='iTunesSearchValue'>Search iTunes Podcast Library:</label>
-					<input id="iTunesSearchValue" type="text" placeholder="Search iTunes Store"/>
-					<button id="iTunesSearchButton" data-inline="true">Go</button>					
-				</form>
-				
+					<input id="iTunesSearchValue" name="iTunesSearchValue" type="search" placeholder="Search iTunes Store" value=''/>
+					<button id="iTunesSearchButton" data-inline="true" class='ui-hidden-accessible'>Go</button>
+				</form>	
 				
 				<!-- Display the search results with javascript -->
 				<div id="iTunesSearchResultsHtml"></div>

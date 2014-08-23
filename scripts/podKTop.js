@@ -123,17 +123,24 @@ function sendITunesSearchRequest(){
 	//Search iTunes API with a dynamically loaded script from user input
 
 //	removePreviousSearchResults();
-	console.log('hi');
-
+	
 	var searchValue = $('#iTunesSearchValue').val();
 	var searchValueEnc = encodeURIComponent(searchValue);
-	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + searchValueEnc +'&callback=showITunesSearchResults';
+	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + searchValueEnc + '&callback=showITunesSearchResults';
 	var html = "<script src='" + url + "'><\/script>";
 	$( "head" ).append(html);
+
+//	$( '#podcastSubscriptionSearch' ).trigger( 'blur' );
+//	$( '#podcastSubscriptionSearch' ).blur();
+	$( '#iTunesSearchButton' ).focus();
+//	$( '#anotherButton' ).focus().trigger('click');
 
 	return false;
 }
 
+function runNow(){
+	alert('hi from me');
+}
 
 $( function(){
 	//Search iTunes when user hits enter key on input field.
@@ -158,5 +165,6 @@ $( function(){
 //	$( '#iTunesSearchButton' ).on( 'submit', sendITunesSearchRequest );
 	$( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
 	$( '#podcastSubscriptionForm' ).on('submit', addPodcastFromUrl );
+	$( '#anotherButton').on('click', runNow );
 });
 
