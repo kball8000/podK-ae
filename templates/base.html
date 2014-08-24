@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">		
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
+		<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
+		<script src="/scripts/podKTop.js"></script>
+	</head>
+	<body>
+		<div data-role='page'>
+			<div data-role='header'>
+				<div data-role='navbar'>
+					<ul>
+						<li><a href='/' data-icon='home'>Home</a></li>
+						<li><a href='/playlist' data-icon='bars'>Playlist</a></li>
+						<li><a href='/latest' data-icon='star'>Latest</a></li>
+						<li><a href='/search' data-icon='search'>Search</a></li>
+						<!-- class='ui-btn-active' -->
+					</ul>
+				</div>
+			</div>
+			<div data-role='main' class='ui-content'>
+				{% block body %}
+				{% endblock %}
+			</div> <!-- End data-role-main -->
+
+			<div data-role='footer' style='overflow:hidden;'>
+				<h2>Podsy <span style='color:rgb(150,150,150); font-family:monospace; padding-left:2em;'>by kball</span></h2>
+				<a href='/settings' class='ui-btn-right' data-icon='gear' style='margin-top:0;'>Settings</a>
+			</div>
+
+		</div> <!-- End data-role-page -->
+		<script src="/scripts/podK.js"></script>
+	</body>
+</html>
+{% endautoescape %}

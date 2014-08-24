@@ -33,6 +33,7 @@ function addPodcastSubscription( podcast ){
 }
 
 function addPodcast( podcastUrl ){
+	// Send data to python app to add podcast to datastore.
 	var test = JSON.stringify({ podcastUrl: podcastUrl });
 	$.ajax({
 		url: "/addpodcast",
@@ -45,17 +46,37 @@ function addPodcast( podcastUrl ){
 	});
 }
 
-function addPodcastFromUrl( event ){
+function displayAddedNotification(title){
+	$( '#subscribeNotification' ).html('Added ' + title).fadeIn(300).delay(2000).fadeOut(800);
+}
+
+function addPodcastToDatastore( podcastUrl ){
+	var test = JSON.stringify({ podcastUrl: podcastUrl });
+	$.ajax({
+		url: "/addpodcast",
+		type: "POST",
+		dataType: "json",
+		data: JSON.stringify({ podcastUrl: podcastUrl})
+	})
+	.done(function(podcast){
+		console.dir(podcast);
+		displayAddedNotification(podcast.title);
+	});
+}
+
+function addPodcastFromRssUrl( event ){
 	/* Get parameter from add rss input field and send to add podcast, as opposed to subscribe button from iTunes search results. */
 	event.preventDefault();
-	var podcastUrl = $( '#podcastSubscriptionSearch' ).val();
-	addPodcast(podcastUrl);
+	$( '#rssSubscribeButton' ).focus();
+	var podcastUrl = $( '#rssSubscribeUrl' ).val();
+	addPodcastToDatastore(podcastUrl);
 }
 
 function addPodcastITunesSearch(encPodcastUrl){
 	var podcastUrl = decodeURIComponent(encPodcastUrl);
 	addPodcast(podcastUrl);	
 }
+
 function removePodcast(podcast, loopIndex, title){
 	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
 	 -Would like to maintain a history of inactive subscriptions. */
@@ -130,41 +151,23 @@ function sendITunesSearchRequest(){
 	var html = "<script src='" + url + "'><\/script>";
 	$( "head" ).append(html);
 
-//	$( '#podcastSubscriptionSearch' ).trigger( 'blur' );
-//	$( '#podcastSubscriptionSearch' ).blur();
 	$( '#iTunesSearchButton' ).focus();
-//	$( '#anotherButton' ).focus().trigger('click');
 
 	return false;
 }
 
-function runNow(){
-	alert('hi from me');
+function removePreviousSearchResults(){
+	// Finish this by removing old search queries to iTunes store in head. Otherwise, you've got all these request to iTunes, 
+	//  but only showing reults from last search.
+	var scriptVal = document.getElementsByTagName('head');
+
 }
 
+
 $( function(){
-	//Search iTunes when user hits enter key on input field.
-/*	$( "#iTunesSearchValue" ).keypress(function(e){
-		var key = e.which;
-		if(key === 13){
-			sendITunesSearchRequest();
-			return true;
-		}
-	});
-*/
-	function removePreviousSearchResults(){
-		// Finish this by removing old search queries to iTunes store in head. Otherwise, you've got all these request to iTunes, 
-		//  but only showing reults from last search.
-		var scriptVal = document.getElementsByTagName('head');
-
-	}
-		
-
 	//Event listener for search handlers
 //	$( '#iTunesSearchButton' ).on( 'click', sendITunesSearchRequest );
-//	$( '#iTunesSearchButton' ).on( 'submit', sendITunesSearchRequest );
 	$( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
-	$( '#podcastSubscriptionForm' ).on('submit', addPodcastFromUrl );
-	$( '#anotherButton').on('click', runNow );
+	$( '#rssSubscribeForm' ).on('submit', addPodcastFromRssUrl );
 });
 

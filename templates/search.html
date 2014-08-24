@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block body %}
+
+<!-- **  Notification area when I've added a podcast. ** -->
+<div id='subscribeNotificationDiv'>
+	<span id='subscribeNotification' style='display:none'></span>	
+</div>
+
+<!-- **  Search iTunes for podcast or add by pasting url ** -->
+<form id='iTunesSearchForm'>
+	<label for='iTunesSearchValue' class='ui-hidden-accessible'>Search iTunes Podcast Library:</label>
+	<input type="search" id="iTunesSearchValue" name="iTunesSearchValue" placeholder="Search iTunes Store for podcast" 
+		   tabindex='1' data-clear-btn='true'/>
+	<button id="iTunesSearchButton" data-inline="true" class='ui-hidden-accessible'>Go</button>
+</form>	
+<br>
+
+<!-- Display the search results with javascript -->
+<div id="iTunesSearchResultsHtml"></div>
+
+<!-- Example rss feed: http://feeds.twit.tv/sn.xml,  "../twig.xml", "../twit.sml" or "../mbw.xml" -->
+
+<!-- Add a podcast with a url -->
+<form id='rssSubscribeForm'>
+	<label for='rssSubscribeUrl' class='ui-hidden-accessible'>URL</label>
+	<input type='text' id='rssSubscribeUrl' name='rssSubscribeUrl' placeholder="Add podcast with RSS url" 
+		   tabindex='2' data-clear-btn='true'>
+	<button id="rssSubscribeButton" data-inline="true" class='ui-hidden-accessible'>Add Podcast</button>
+</form>
+{% endblock %}

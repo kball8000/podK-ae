@@ -1,3 +1,20 @@
 h1{
     color: rgb(255,0,0);
 }
+
+/* ----- Search page ----- */
+#subscribeNotificationDiv{
+	position: absolute;
+	left: 50%;
+	z-index: 1;
+}
+
+#subscribeNotification{
+	position: relative;
+	left: -50%;
+	padding: 0.5em 2em;
+	background-color: rgb(255,255,100);
+	border-bottom-left-radius: 0.5em;
+	border-bottom-right-radius: 0.5em;
+}
+

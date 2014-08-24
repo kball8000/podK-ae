@@ -11,10 +11,12 @@ import logging
 
 # Should probably add back in json dataType to ajax request, that's what I should be using.
 
+
 JINJA_ENVIRONMENT = jinja2.Environment(
-    loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
-    extensions = ['jinja2.ext.autoescape'],
-    autoescape = True)
+	# loader = jinja2.FileSystemLoader(os.path.dirname(__file__)),
+	loader = jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
+	extensions = ['jinja2.ext.autoescape'],
+	autoescape = True)
 
 DEFAULT_PODCAST_FEED_LIST = 'default_podcast_feed_list'
 # http://feeds.twit.tv/sn.xml
@@ -70,7 +72,18 @@ class MainPage(webapp2.RequestHandler):
 			'user_welcome_nickname': user_welcome_nickname,
 			'user_welcome_href': user_welcome_href
 		}
+		# template = JINJA_ENVIRONMENT.get_template('/templates/index.html')
 		template = JINJA_ENVIRONMENT.get_template('index.html')
+		self.response.write(template.render(template_values))
+
+class SearchPage(webapp2.RequestHandler):
+	def get(self):
+
+		template_values = {
+			'my_var': 'my_var_value',
+		}
+		# template = JINJA_ENVIRONMENT.get_template('/templates/search.html')
+		template = JINJA_ENVIRONMENT.get_template('search.html')
 		self.response.write(template.render(template_values))
 
 def getFeedInfo(url):
@@ -130,23 +143,13 @@ class AddPodcast(webapp2.RequestHandler):
 		#								episodeLength = item.find('{http://search.yahoo.com/mrss/}duration').text,
 										playbackPosition = 0))
 			
-			# episode_url = item.find('link').text,
-			# listened = False))
-
-			
 		podcast.show = episode_list
-		
 		podcast.put()
 				
 		returnInfo = { 'title': podcast.title, 'imageUrl': podcast.imageUrl, 'feedUrl': podcast.feedUrl, 'episodes': episode_list_return }
-		logging.info( 'Return info is = %s ' % type(returnInfo))
-		logging.info( 'Return dumps info is = %s ' % type(json.dumps(returnInfo)))
 
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(json.dumps(returnInfo))
-
-		# return True
-		# self.redirect('/')
 
 class RefreshFeed(webapp2.RequestHandler):
     def post(self):
@@ -175,8 +178,16 @@ class RemPodcast(webapp2.RequestHandler):
 		# return True
 
 app = webapp2.WSGIApplication([
-	('/', MainPage),
-	('/addpodcast', AddPodcast),
-	('/removepodcast', RemPodcast),
-	('/refreshfeed', RefreshFeed),
+		('/', MainPage),
+		# list of functions / actions /methods, not sure proper term
+		('/addpodcast', AddPodcast),
+		('/removepodcast', RemPodcast),
+		('/refreshfeed', RefreshFeed),
+		# list of pages for web app
+		# ('/latest', LatestPage),
+		# ('/playlist', PlaylistPage),
+		('/search', SearchPage),
+		# ('/settings', SettingsPage),
+		
+	
 ], debug=True)
