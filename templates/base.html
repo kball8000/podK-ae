@@ -14,16 +14,17 @@
 			<div data-role='header'>
 				<div data-role='navbar'>
 					<ul>
-						<li><a href='/' class='{{ navClass.home }}' data-icon='home'>Home</a></li>
+						<li><a href='/' class='{{ navClass.home }}' data-icon='home'>Podcasts</a></li>
 						<li><a href='/playlist' class='{{ navClass.playlist }}' data-icon='bars'>Playlist</a></li>
-						<li><a href='/new' class='{{ navClass.new }}' data-icon='star'>Latest</a></li>
+						<li><a href='/new' class='{{ navClass.new }}' data-icon='star'>New</a></li>
 						<li><a href='/search' class='{{ navClass.search }}' data-icon='search'>Search</a></li>
-						<!-- class='ui-btn-active' -->
 					</ul>
 				</div>
 			</div>
 			<div data-role='main' class='ui-content'>
-			<script src="/scripts/podKTop.js"></script>
+			<!-- Script must be below head, for JQM (jQuery Moble), so that it loads as you navigate to different pages.
+			Also had some issues if at the bottom, though it should've been fine???  -->
+			<script src="/scripts/podKTop.js"></script> 
 				{% block body %}
 				{% endblock %}
 			</div> <!-- End data-role-main -->

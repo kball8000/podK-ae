@@ -1,41 +1,9 @@
-// Get image from xml feed, not itunes store, or backup from xml, as direct input of xml will not have an iTunes image to show.
-// Figure out why screen is unresponsive in chrome. something is bogging things down.
-
-function addPodcastSubscription( podcast ){
-/* Need some sort of global counter to increment div id */
-	
-	var html = '';
-	var counter = 0;
-
-	html += '<div style="position:relative;" id="addedSubscriptionItem_' + counter + '">';
-	html += '<div style="position:absolute; top:0.3em; right:0.5em; z-index:1;">';
-	html += '<a href="javascript:removePodcast( \'' + podcast.feedUrl + ', ' + counter + ', ' + podcast.title + '\' )" ';
-	html += 'class="ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline" style="display:inline-block; padding:0.2em 1em;"></a>';
-	html += '<a href="javascript:refreshPodcast(\'' + podcast.title + '\')" class="ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline"';
-	html += 'style="display:inline-block; padding:0.2em 1em;"></a>';
-	html += '</div>';
-
-	html += '<div data-role="collapsible">';
-		
-	html += '<h3><img src="'+ podcast.imageUrl +'" alt="podcast logo" height="45" width="45" style="border-radius:0.3em;';
-	html += 'margin:0 0.7em 0 0.5em; vertical-align:middle;">' + podcast.title + '<\/h3>';
-	html += '<ul data-role="listview">';
-	var i = 0;
-	while( i < podcast.episodes.length ){
-		html += '<li><button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode(\'';
-		html += podcast.episodes[i].url + '\')">Play</button>' + podcast.episodes[i].title + '<\/li>';
-		i += 1;
-	}
-	html += '<\/ul>';
-	html += '<\/div>';
-	$( '#iTunesSearchResultsHtml' ).empty();
-	$( '#subscriptionList' ).prepend(html).trigger('create');
-}
-
+// **--   Home - Pocast page script   --** 
 function removePodcast(podcast, loopIndex, title){
 	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
 	 -Would like to maintain a history of inactive subscriptions. */
 	// Really nice yes / no pop up in http://demos.jquerymobile.com/1.4.3/popup/ -- dialog, but way more complicated than the standard confirm
+	// May want to change this to an undo / dismiss notifcation thing that doesn't disappear until you do something else???
 	
 	if (confirm('Delete ' + title + '?') === true){
 		$.ajax({
@@ -52,11 +20,10 @@ function removePodcast(podcast, loopIndex, title){
 	}
 }
 
+// **--   Search page script   --** 
 function displayAddedNotification(title){
-	console.log('running displayAddedNotification now. title = ');
-	console.dir(title);
-//	title = typeof title !== 'undefined' ? title : 'my temp title';
-	$( '#subscribeNotification' ).html('Added ' + title).fadeIn(300); // .delay(2000).fadeOut(800);
+	var html = 'Added ' + title + '<br>See results in <a href="/">Podcasts</a> tab';
+	$( '#subscribeNotification' ).html(html).fadeIn(300).delay(3000).fadeOut(800);
 }
 
 function addPodcastToDatastore( podcastUrl ){
@@ -68,34 +35,20 @@ function addPodcastToDatastore( podcastUrl ){
 		data: JSON.stringify({ podcastUrl: podcastUrl})
 	})
 	.done(function(podcast){
-		console.dir(podcast);
 		displayAddedNotification(podcast.title);
-	});
-}
-
-function addPodcast( podcastUrl ){
-	// Send data to python app to add podcast to datastore.
-	var test = JSON.stringify({ podcastUrl: podcastUrl });
-	$.ajax({
-		url: "/addpodcast",
-		type: "POST",
-		dataType: "json",
-		data: JSON.stringify({ podcastUrl: podcastUrl})
-	})
-	.done(function(podcast){
-		// addPodcastSubscription(podcast);
-		displayAddedNotification(podcast.title);
+		$('#iTunesSearchResultsHtml').empty();		// Really only applies when searching iTunes, not adding by RSS.
 	});
 }
 
 function addPodcastITunesSearch(encPodcastUrl){
 	var podcastUrl = decodeURIComponent(encPodcastUrl);
-	addPodcast(podcastUrl);	
+	addPodcastToDatastore(podcastUrl);	
 }
 
 function showITunesSearchResults(arg){
 	//This callback function of the dynamically loaded script display the restults from iTunes store.
 	var results = arg.results;
+	var podcastFeed;
 	var html = '';
 
 	// Sort results based on the 'collection name', iTunes term, in genral the title of the show.
@@ -111,22 +64,16 @@ function showITunesSearchResults(arg){
 	}
 	results.sort(compareResultsObjects);
 
-	// 	Get string of collection name without the '(' for comparing, figure out how to handle if last one in list
-	// 	is the same as previous and therefore not closed out.
-
 	if (arg.resultCount === 0) {
-		html = 'No results found';
 		$('#iTunesSearchResultsHtml').empty();	
-		$('#iTunesSearchResultsHtml').html(html);	
+		$('#iTunesSearchResultsHtml').html('No results found');
 		return true;
 	}
 	html += '<ul data-role="listview" data-inset="true">';
-	var myFeed;
-	var myImage;
 	for(var i=0; i<arg.resultCount; i++){
 		/* Using jQuery mobile listiew with thumbnails to display iTunes search results. */
-		myFeed = encodeURIComponent(results[i].feedUrl);
-		html += '<li><a href="javascript:addPodcastITunesSearch(\'' + myFeed + '\')">';
+		podcastFeed = encodeURIComponent(results[i].feedUrl);
+		html += '<li><a href="javascript:addPodcastITunesSearch(\'' + podcastFeed + '\')">';
 		html += '<img src="' + results[i].artworkUrl100 + '">';
 		html += '<h2>' + results[i].collectionCensoredName + '</h2>';
 		html += '<p>' + results[i].artistName + '</p>';
@@ -142,36 +89,28 @@ function sendITunesSearchRequest(event){
 	event.preventDefault();
 
 	var searchValue = $('#iTunesSearchValue').val();
-	var searchValueEnc = encodeURIComponent(searchValue);
-	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + searchValueEnc + '&callback=showITunesSearchResults';
+	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + 
+		encodeURIComponent(searchValue) + '&callback=showITunesSearchResults';
 	var html = "<script src='" + url + "'><\/script>";
-	// $( "search_head_id" ).append(html);
-	$( '#itunesScript' ).empty();
-	$( '#itunesScript' ).append(html);
+	$( '#itunesScript' ).empty(); 		// Remove any searches between page reloads.
+	$( '#itunesScript' ).append(html); 	// Appending script runs it and gets result from Apple store.
+	$( '#iTunesSearchValue').blur(); 	// Makes the go keyboard disappear on mobile.
 
-	$( '#iTunesSearchButton' ).focus();
-
+	// Next display search results.
+	
 	return false;
 }
 
 function addPodcastFromRssUrl( event ){
 	/* Get parameter from add rss input field and send to add podcast, as opposed to subscribe button from iTunes search results. */
 	event.preventDefault();
-	$( '#rssSubscribeButton' ).focus();
+	$( '#rssSubscribeButton' ).focus();  // Closes keyboard on mobile devices.
 	var podcastUrl = $( '#rssSubscribeUrl' ).val();
 	addPodcastToDatastore(podcastUrl);
 }
 
 $( document ).ready( function(){
-	
-	console.log('ready in doc.ready function');
-
-
 	//Event listener for search handlers
-//	$( '#iTunesSearchButton' ).on( 'click', sendITunesSearchRequest );
 	$( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
-	$( '#rssSubscribeForm' ).on('submit', addPodcastFromRssUrl );
-	$( '#newButton').on('click', displayAddedNotification);
-	console.log('End ready in doc.ready function');
-
+	$( '#rssSubscribeForm' ).on( 'submit', addPodcastFromRssUrl );
 });
