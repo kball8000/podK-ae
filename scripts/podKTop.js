@@ -32,51 +32,6 @@ function addPodcastSubscription( podcast ){
 	$( '#subscriptionList' ).prepend(html).trigger('create');
 }
 
-function addPodcast( podcastUrl ){
-	// Send data to python app to add podcast to datastore.
-	var test = JSON.stringify({ podcastUrl: podcastUrl });
-	$.ajax({
-		url: "/addpodcast",
-		type: "POST",
-		dataType: "json",
-		data: JSON.stringify({ podcastUrl: podcastUrl})
-	})
-	.done(function(podcast){
-		addPodcastSubscription(podcast);
-	});
-}
-
-function displayAddedNotification(title){
-	$( '#subscribeNotification' ).html('Added ' + title).fadeIn(300).delay(2000).fadeOut(800);
-}
-
-function addPodcastToDatastore( podcastUrl ){
-	var test = JSON.stringify({ podcastUrl: podcastUrl });
-	$.ajax({
-		url: "/addpodcast",
-		type: "POST",
-		dataType: "json",
-		data: JSON.stringify({ podcastUrl: podcastUrl})
-	})
-	.done(function(podcast){
-		console.dir(podcast);
-		displayAddedNotification(podcast.title);
-	});
-}
-
-function addPodcastFromRssUrl( event ){
-	/* Get parameter from add rss input field and send to add podcast, as opposed to subscribe button from iTunes search results. */
-	event.preventDefault();
-	$( '#rssSubscribeButton' ).focus();
-	var podcastUrl = $( '#rssSubscribeUrl' ).val();
-	addPodcastToDatastore(podcastUrl);
-}
-
-function addPodcastITunesSearch(encPodcastUrl){
-	var podcastUrl = decodeURIComponent(encPodcastUrl);
-	addPodcast(podcastUrl);	
-}
-
 function removePodcast(podcast, loopIndex, title){
 	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
 	 -Would like to maintain a history of inactive subscriptions. */
@@ -97,11 +52,52 @@ function removePodcast(podcast, loopIndex, title){
 	}
 }
 
+function displayAddedNotification(title){
+	console.log('running displayAddedNotification now. title = ');
+	console.dir(title);
+//	title = typeof title !== 'undefined' ? title : 'my temp title';
+	$( '#subscribeNotification' ).html('Added ' + title).fadeIn(300); // .delay(2000).fadeOut(800);
+}
+
+function addPodcastToDatastore( podcastUrl ){
+	var test = JSON.stringify({ podcastUrl: podcastUrl });
+	$.ajax({
+		url: "/addpodcast",
+		type: "POST",
+		dataType: "json",
+		data: JSON.stringify({ podcastUrl: podcastUrl})
+	})
+	.done(function(podcast){
+		console.dir(podcast);
+		displayAddedNotification(podcast.title);
+	});
+}
+
+function addPodcast( podcastUrl ){
+	// Send data to python app to add podcast to datastore.
+	var test = JSON.stringify({ podcastUrl: podcastUrl });
+	$.ajax({
+		url: "/addpodcast",
+		type: "POST",
+		dataType: "json",
+		data: JSON.stringify({ podcastUrl: podcastUrl})
+	})
+	.done(function(podcast){
+		// addPodcastSubscription(podcast);
+		displayAddedNotification(podcast.title);
+	});
+}
+
+function addPodcastITunesSearch(encPodcastUrl){
+	var podcastUrl = decodeURIComponent(encPodcastUrl);
+	addPodcast(podcastUrl);	
+}
+
 function showITunesSearchResults(arg){
 	//This callback function of the dynamically loaded script display the restults from iTunes store.
 	var results = arg.results;
 	var html = '';
-	
+
 	// Sort results based on the 'collection name', iTunes term, in genral the title of the show.
 	// May be unnecessary, but kind of a nicety and not a ton of extra code.
 	function compareResultsObjects(a,b){
@@ -115,12 +111,12 @@ function showITunesSearchResults(arg){
 	}
 	results.sort(compareResultsObjects);
 
-	
-// 	Get string of collection name without the '(' for comparing, figure out how to handle if last one in list
-// 	is the same as previous and therefore not closed out.
-		
+	// 	Get string of collection name without the '(' for comparing, figure out how to handle if last one in list
+	// 	is the same as previous and therefore not closed out.
+
 	if (arg.resultCount === 0) {
 		html = 'No results found';
+		$('#iTunesSearchResultsHtml').empty();	
 		$('#iTunesSearchResultsHtml').html(html);	
 		return true;
 	}
@@ -140,34 +136,42 @@ function showITunesSearchResults(arg){
 	$('#iTunesSearchResultsHtml').html(html).trigger('create');
 }
 
-function sendITunesSearchRequest(){
+function sendITunesSearchRequest(event){
 	//Search iTunes API with a dynamically loaded script from user input
 
-//	removePreviousSearchResults();
-	
+	event.preventDefault();
+
 	var searchValue = $('#iTunesSearchValue').val();
 	var searchValueEnc = encodeURIComponent(searchValue);
 	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + searchValueEnc + '&callback=showITunesSearchResults';
 	var html = "<script src='" + url + "'><\/script>";
-	$( "head" ).append(html);
+	// $( "search_head_id" ).append(html);
+	$( '#itunesScript' ).empty();
+	$( '#itunesScript' ).append(html);
 
 	$( '#iTunesSearchButton' ).focus();
 
 	return false;
 }
 
-function removePreviousSearchResults(){
-	// Finish this by removing old search queries to iTunes store in head. Otherwise, you've got all these request to iTunes, 
-	//  but only showing reults from last search.
-	var scriptVal = document.getElementsByTagName('head');
-
+function addPodcastFromRssUrl( event ){
+	/* Get parameter from add rss input field and send to add podcast, as opposed to subscribe button from iTunes search results. */
+	event.preventDefault();
+	$( '#rssSubscribeButton' ).focus();
+	var podcastUrl = $( '#rssSubscribeUrl' ).val();
+	addPodcastToDatastore(podcastUrl);
 }
 
+$( document ).ready( function(){
+	
+	console.log('ready in doc.ready function');
 
-$( function(){
+
 	//Event listener for search handlers
 //	$( '#iTunesSearchButton' ).on( 'click', sendITunesSearchRequest );
 	$( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
 	$( '#rssSubscribeForm' ).on('submit', addPodcastFromRssUrl );
-});
+	$( '#newButton').on('click', displayAddedNotification);
+	console.log('End ready in doc.ready function');
 
+});

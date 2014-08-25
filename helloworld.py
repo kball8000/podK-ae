@@ -68,6 +68,9 @@ class MainPage(webapp2.RequestHandler):
 		podcast_feeds = podcast_feed_query.fetch(10)
 		
 		template_values = {
+			'navClass': {'home': 'ui-btn-active ui-state-persist' },
+			'dataUrl': '/',
+			'pageTitle': 'Home',
 			'podcast_feeds': podcast_feeds,
 			'user_welcome_nickname': user_welcome_nickname,
 			'user_welcome_href': user_welcome_href
@@ -80,7 +83,9 @@ class SearchPage(webapp2.RequestHandler):
 	def get(self):
 
 		template_values = {
-			'my_var': 'my_var_value',
+			'navClass': {'search': 'ui-btn-active ui-state-persist' },
+			'pageTitle': 'Search',
+			'dataUrl': '/search'
 		}
 		# template = JINJA_ENVIRONMENT.get_template('/templates/search.html')
 		template = JINJA_ENVIRONMENT.get_template('search.html')
@@ -184,7 +189,7 @@ app = webapp2.WSGIApplication([
 		('/removepodcast', RemPodcast),
 		('/refreshfeed', RefreshFeed),
 		# list of pages for web app
-		# ('/latest', LatestPage),
+		# ('/new', NewPage),
 		# ('/playlist', PlaylistPage),
 		('/search', SearchPage),
 		# ('/settings', SettingsPage),

@@ -7,22 +7,23 @@
 		<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
-		<script src="/scripts/podKTop.js"></script>
+		<title>{{ pageTitle }}</title>
 	</head>
 	<body>
-		<div data-role='page'>
+		<div data-role='page' data-url='{{ dataUrl }}'>
 			<div data-role='header'>
 				<div data-role='navbar'>
 					<ul>
-						<li><a href='/' data-icon='home'>Home</a></li>
-						<li><a href='/playlist' data-icon='bars'>Playlist</a></li>
-						<li><a href='/latest' data-icon='star'>Latest</a></li>
-						<li><a href='/search' data-icon='search'>Search</a></li>
+						<li><a href='/' class='{{ navClass.home }}' data-icon='home'>Home</a></li>
+						<li><a href='/playlist' class='{{ navClass.playlist }}' data-icon='bars'>Playlist</a></li>
+						<li><a href='/new' class='{{ navClass.new }}' data-icon='star'>Latest</a></li>
+						<li><a href='/search' class='{{ navClass.search }}' data-icon='search'>Search</a></li>
 						<!-- class='ui-btn-active' -->
 					</ul>
 				</div>
 			</div>
 			<div data-role='main' class='ui-content'>
+			<script src="/scripts/podKTop.js"></script>
 				{% block body %}
 				{% endblock %}
 			</div> <!-- End data-role-main -->
@@ -33,7 +34,7 @@
 			</div>
 
 		</div> <!-- End data-role-page -->
-		<script src="/scripts/podK.js"></script>
 	</body>
+	<script src="/scripts/podK.js"></script>
 </html>
 {% endautoescape %}

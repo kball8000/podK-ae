@@ -3,15 +3,22 @@
 
 <!-- **  Notification area when I've added a podcast. ** -->
 <div id='subscribeNotificationDiv'>
-	<span id='subscribeNotification' style='display:none'></span>	
+	<div id='subscribeNotification' style='display:none;'></div>
 </div>
+
+<!-- **  load the itunes search script here. ** -->
+<div id='itunesScript'></div>
+
+<button id='newButton'>
+	Display Notification
+</button>
 
 <!-- **  Search iTunes for podcast or add by pasting url ** -->
 <form id='iTunesSearchForm'>
 	<label for='iTunesSearchValue' class='ui-hidden-accessible'>Search iTunes Podcast Library:</label>
 	<input type="search" id="iTunesSearchValue" name="iTunesSearchValue" placeholder="Search iTunes Store for podcast" 
 		   tabindex='1' data-clear-btn='true'/>
-	<button id="iTunesSearchButton" data-inline="true" class='ui-hidden-accessible'>Go</button>
+	<button id="iTunesSearchButton" data-inline="true">Go</button> <!-- class='ui-hidden-accessible' -->
 </form>	
 <br>
 
