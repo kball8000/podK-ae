@@ -1,8 +1,23 @@
 /* Need to fix button sizes on mobile */
 
-/* ----- Podcast page ----- */
+/* ----- General styles used across the site ----- */
+.notificationDiv{
+	position: absolute;
+	left: 50%;
+	z-index: 1;
+}
+
+.notification{
+	position: relative;
+	left: -50%;
+	padding: 0.5em 2em;
+	background-color: rgb(255,255,100);
+	border-radius: 0.5em;	
+}
 
 
+
+/* ----- Podcast page specific ----- */
 .subscriptionItem{
 	position:relative;
 }
@@ -27,29 +42,5 @@
 	padding:0.1em 0.2em;
 	margin-right: 0;
 }
-.subscriptionFunctions a:first-child{
-/*	margin-right: 0;
-	margin-left: 0;
-*/}
-
-
 
 /* ----- Search page ----- */
-#subscribeNotificationDiv{
-	position: absolute;
-	left: 50%;
-	z-index: 1;
-}
-
-#subscribeNotification{
-	position: relative;
-	left: -50%;
-	padding: 0.5em 2em;
-	background-color: rgb(255,255,100);
-	border-radius: 0.5em;
-	
-/*	border-bottom-left-radius: 0.5em;
-	border-bottom-right-radius: 0.5em;
-*/
-}
-

@@ -3,6 +3,12 @@
 -Need custom button icons for volume, or leave it as word mute and un-mute, not sure where to go with that yet.
 -->
 {% extends 'base.html' %} {% block body %} {% if user_welcome_nickname %}
+
+<!-- **  Notification area when I've added a podcast. ** -->
+<div id='podcastNotificationDiv' class='notificationDiv'>
+	<div id='podcastNotification' class='notification' style='display:none;'></div>
+</div>
+
 <p>
 	Welcome {{ user_welcome_nickname }}! (<a rel="external" href="{{ user_welcome_href }}">Logout</a> )
 </p>
@@ -18,6 +24,7 @@
 		<source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'>
 	</audio>
 </div>
+
 <div style='display:none;'>
 	<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
 	<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
@@ -68,7 +75,8 @@
 				{% for show in feed.show %}
 				<li>
 					<button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
-						Play</button>{{ show.episode_title }}
+						Play</button>
+					<p>{{ show.episode_title }}</p>
 				</li>
 				{% endfor %}
 			</ul>

@@ -127,13 +127,9 @@ class AddPodcast(webapp2.RequestHandler):
 		# Get podcast feed url
 		podcast_json = self.request.body
 		podcast_dict = json.loads(podcast_json)
-		logging.info('podcast_json = %s' % podcast_json)
-		logging.info('AAAAAAAAAApodcast_dict = %s' % podcast_dict)
-		url = podcast_dict['podcastUrl']
+		url = podcast_dict['url']
 
 		# Create the podcast constructor for datastore entity.
-		# podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
-		# podcast = Podcast(parent=podcast_feed_key(podcast_feed_list))
 		podcast = Podcast(parent=podcast_feed_key())
 
 		# Add a couple basic podcast parameters
