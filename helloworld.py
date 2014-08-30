@@ -49,7 +49,7 @@ class EpisodeSubscription:
 		self.url = url
 		# listened = False
 		# percent listened = 0
-	
+
 class MainPage(webapp2.RequestHandler):
     def get(self):
 		user = users.get_current_user()
@@ -58,13 +58,11 @@ class MainPage(webapp2.RequestHandler):
 		if user:
 			user_welcome_nickname = user.nickname()
 			user_welcome_href = users.create_logout_url('/')
-			
 		else:
 			user_welcome_nickname = None
 			user_welcome_href = users.create_login_url(self.request.uri)
-				
-		podcast_feed_list = self.request.get('podcast_feed', DEFAULT_PODCAST_FEED_LIST)
-		podcast_feed_query = Podcast.query(ancestor = podcast_feed_key(podcast_feed_list)).order(-Podcast.date)
+
+		podcast_feed_query = Podcast.query(ancestor = podcast_feed_key()).order(-Podcast.date)
 		podcast_feeds = podcast_feed_query.fetch(10)
 		
 		template_values = {
@@ -75,8 +73,26 @@ class MainPage(webapp2.RequestHandler):
 			'user_welcome_nickname': user_welcome_nickname,
 			'user_welcome_href': user_welcome_href
 		}
-		# template = JINJA_ENVIRONMENT.get_template('/templates/index.html')
 		template = JINJA_ENVIRONMENT.get_template('index.html')
+		self.response.write(template.render(template_values))
+
+class PlaylistPage(webapp2.RequestHandler):
+	def get(self):
+		
+		dsRequest = Podcast.query(ancestor=podcast_feed_key('DEFAULT_PODCAST_LIST')).order(-Podcast.date)
+		dsResults = dsRequest.fetch(10)
+		
+		playlist = [{'title': 'SN 469: Big Routing Tables', 'url': 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0469/sn0469.mp3' },
+					{'title': "SN 468: Your Questions, Steve's Answers 194", 'url': 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0468/sn0468.mp3' }
+				   ]
+
+		template_values = {
+			'navClass': {'playlist': 'ui-btn-active ui-state-persist' },
+			'pageTitle': 'Playlist',
+			'dataUrl': '/playlist',
+			'playlist': playlist
+		}
+		template = JINJA_ENVIRONMENT.get_template('playlist.html')
 		self.response.write(template.render(template_values))
 
 class SearchPage(webapp2.RequestHandler):
@@ -112,12 +128,13 @@ class AddPodcast(webapp2.RequestHandler):
 		podcast_json = self.request.body
 		podcast_dict = json.loads(podcast_json)
 		logging.info('podcast_json = %s' % podcast_json)
-		logging.info('podcast_dict = %s' % podcast_dict)
+		logging.info('AAAAAAAAAApodcast_dict = %s' % podcast_dict)
 		url = podcast_dict['podcastUrl']
 
 		# Create the podcast constructor for datastore entity.
-		podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
-		podcast = Podcast(parent=podcast_feed_key(podcast_feed_list))
+		# podcast_feed_list = self.request.get('podcast_feed_list', DEFAULT_PODCAST_FEED_LIST)
+		# podcast = Podcast(parent=podcast_feed_key(podcast_feed_list))
+		podcast = Podcast(parent=podcast_feed_key())
 
 		# Add a couple basic podcast parameters
 		if users.get_current_user():
@@ -190,7 +207,7 @@ app = webapp2.WSGIApplication([
 		('/refreshfeed', RefreshFeed),
 		# list of pages for web app
 		# ('/new', NewPage),
-		# ('/playlist', PlaylistPage),
+		('/playlist', PlaylistPage),
 		('/search', SearchPage),
 		# ('/settings', SettingsPage),
 		

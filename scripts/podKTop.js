@@ -1,10 +1,17 @@
 // **--   Home - Pocast page script   --** 
-function removePodcast(podcast, loopIndex, title){
+//function deletePodcast(podcast, loopIndex, title){
+function deletePodcast(e){
 	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
 	 -Would like to maintain a history of inactive subscriptions. */
 	// Really nice yes / no pop up in http://demos.jquerymobile.com/1.4.3/popup/ -- dialog, but way more complicated than the standard confirm
 	// May want to change this to an undo / dismiss notifcation thing that doesn't disappear until you do something else???
 	
+	e.preventDefault();
+	e.stopPropagation();
+	var elem = $( this ).parents().eq(1).get(0);
+	var title = $( elem ).data('podcast-title');		// podcast title
+	var podcast = $( elem ).data('podcast-url');		// podcast feed url
+	var divToRemove = elem.id;						// element on page to remove
 	if (confirm('Delete ' + title + '?') === true){
 		$.ajax({
 			url: "/removepodcast",
@@ -12,12 +19,22 @@ function removePodcast(podcast, loopIndex, title){
 			data: { podcast : podcast }
 		})
 		.done(function(){
-			$( '#subscriptionItem_'+loopIndex).remove();
+			console.log('getting to done');
+			$( '#'+divToRemove ).remove();
+			console.log('getting to end of done');
 		});
 	}
 	else{
 		return true;
 	}
+
+}
+
+function refreshPodcast(e){
+	e.preventDefault();
+	e.stopPropagation();
+	console.dir(e);
+	console.log('refresh podcast');
 }
 
 // **--   Search page script   --** 
@@ -113,4 +130,9 @@ $( document ).ready( function(){
 	//Event listener for search handlers
 	$( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
 	$( '#rssSubscribeForm' ).on( 'submit', addPodcastFromRssUrl );
+	$( '.subscriptionFunctions' ).on( 'click', '.deleteBtn', deletePodcast );
+	$( '.subscriptionFunctions' ).on( 'click', '.refreshBtn', refreshPodcast );
+//	$( '.subscriptionFunctions' ).on( 'click', '.deleteBtn', testFunc2 );
+//	$( '.subscriptionFunctions' ).on( 'click', '.refreshBtn', testFunc2 );
+	
 });
