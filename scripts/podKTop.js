@@ -59,7 +59,11 @@ function addPodcastToDatastore( url, title ){
 	$('#iTunesSearchResultsHtml').empty();		// Really only applies when searching iTunes, not adding by RSS.
 	request.done(function(podcast){
 		$( '#searchNotification' ).fadeOut( 800 );
-//		setTimeout( nextFunc, 1000 ); You can create another function to run in 1000 ms, but no delay to stop changhing background or html content.
+		/* You can create another function to run in 1000 ms, but no delay to stop changhing background or html content. */
+		setTimeout( function(){
+			console.log('in timeout');
+			$( '#searchNotification' ).html(htmlAdded).fadeIn(300).delay(2000); //.fadeOut(800);
+		}, 1500 ); 
 	});
 
 	request.fail(function(){
