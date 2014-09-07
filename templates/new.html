@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+
+<!-- key elements 
+-Refresh button
+-latest episodes from all podcast subscriptions, sorted by latest 'air' date.
+-->
+
+<!-- Display latest episodes in order to add to playlist-->
+<div id='newEpisodes'>
+	<div style='padding:0 0 1em 0;'>
+		<button class='ui-btn ui-icon-refresh ui-btn-icon-right '>
+			Refresh All
+		</button>
+	</div>
+	<ul data-role='listview'>
+		{% for episode in newEpisodes %}
+		<li id='newEpisodesItem_{{ loop.index }}' class='newEpisodesItem'> 
+			<div style='position:absolute; top:0.3em; right:0.5em; z-index:1;' class='newEpisodesFunctions'>
+				<a href="#" class='ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline'></a>
+			</div>
+			<a onclick="myAudio.playSelectedEpisode('{{ episode.url }}');">{{ episode.title }}</a>
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+{% endblock %}

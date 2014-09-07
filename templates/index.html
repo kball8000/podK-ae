@@ -19,64 +19,40 @@
 {% endif %}
 
 <!-- Display player -->
-<div style='display:none;'>
-	<audio controls id='myMusic1'>
-		<source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'>
-	</audio>
-</div>
-
-<div style='display:none;'>
-	<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
-	<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
-	<a class="ui-btn ui-btn-inline" id="fastForwardBtn">&gt;</a>
-	<a class="ui-btn ui-btn-inline" id="muteBtn">Mute</a>
-</div>
-
-
-<div id='testDiv' style='display:none;'>
-	<div id='subscriptionItem_S'>
-		<div data-role='collapsible' data-podcast-title='up2junkers'>
-			<h3 data-podcast-title='up1junkers'>
-				My stuff
-				<button class='hThreeBtn ui-btn ui-btn-inline' onclick='testFunc(event, this);' data-podcast-title='junkers'>
-					h3Button
-				</button>
-			</h3>
-			<ul data-role='listview'>
-				<li>
-					<button class="btnA ui-btn ui-btn-inline">A</button>
-					<button class="btnB ui-btn ui-btn-inline">B</button>
-				</li>
-				<li>
-					<button class="btnA ui-btn ui-btn-inline">C</button>
-					<button class="btnB ui-btn ui-btn-inline">D</button>
-					<button id='btnE' class="ui-btn ui-btn-inline">E</button>
-				</li>
-			</ul>
-		</div>
+<div class='audioPlayer' style='display:none'>
+	<div class='stdAudioControls'>
+		<audio controls id='myMusic1' class='stdControls'>
+ 			<source src='#' class='audioSource'>
+<!-- 			<source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'> -->
+		</audio>
+	</div>
+	<div class='customAudioControls'>
+		<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
+		<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
+		<a class="ui-btn ui-btn-inline" id="fastForwardBtn">&gt;</a>
+		<a class="ui-btn ui-btn-inline" id="muteBtn">Mute</a>
 	</div>
 </div>
-
 
 <!-- Display user's podcast subscription list -->
 <div id='subscriptionList' class='subscriptionList'>
 	{% for feed in podcast_feeds %}
-	<div id='subscriptionItem_{{ loop.index }}' data-podcast-title='{{ feed.title }}' data-podcast-url='{{feed.feedUrl}}' class='subscriptionItem'>
+<!-- 	<div id='subscriptionItem_{{ loop.index }}' data-podcast-title='{{ feed.title }}' data-podcast-url='{{feed.urlPodcast}}' class='subscriptionItem'> -->
+	<div id='subscriptionItem_{{ loop.index }}' data-podcast-url='{{feed.urlPodcast}}' class='subscriptionItem'>
 		<div class='subscriptionFunctions'>
 			<a class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline'></a>
 			<a class='refreshBtn ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline'></a>
 		</div>
 		<div data-role='collapsible' data-inset='false' class='subscriptionCollapsible'>
 			<h3 value='h3Value'>
-				<img src='{{ feed.imageUrl }}' alt='podcast logo' height='45' width='45'> 
+				<img src='{{ feed.urlImage }}' alt='podcast logo' height='45' width='45'> 
 				<span>{{ feed.title }}</span>
 			</h3>
 			<ul data-role='listview'>
-				{% for show in feed.show %}
-				<li>
-					<button class="ui-btn ui-btn-inline" onclick="myAudio.playSelectedEpisode('{{ show.episode_url }}');">
-						Play</button>
-					<p>{{ show.episode_title }}</p>
+				{% for episode in feed.episode %}
+<!-- 				<li data-episode-title='{{ episode.title }}' data-episode-url='{{ episode.url }}'> -->
+				<li data-episode-url='{{ episode.url }}'>
+					<a href='#' class='addToPlaylist'>{{ episode.title }}</a>
 				</li>
 				{% endfor %}
 			</ul>

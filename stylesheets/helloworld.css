@@ -7,20 +7,24 @@
 	z-index: 1;
 }
 
+/* Fixes listview with an absolute in it. These absolute buttons continually
+break things. I need to find another way to do this... */
+
 .notification{
 	position: relative;
 	left: -50%;
-	padding: 0.5em 2em;
+	text-align: center;
+	padding: 1em 0.2em;
 	background-color: rgb(255,255,100);
 	border-radius: 0.5em;	
 }
 
-
-
 /* ----- Podcast page specific ----- */
+
 .subscriptionItem{
 	position:relative;
 }
+
 .subscriptionCollapsible a:first-child{
 	padding-right: 5.5em;
 }
@@ -37,6 +41,7 @@
 	top: 0.5em;
 	right: -0.7em;
 }
+
 .subscriptionFunctions a{
 	display: inline-block;
 	padding:0.1em 0.2em;
@@ -44,3 +49,69 @@
 }
 
 /* ----- Search page ----- */
+
+/* ----- Playlist page ----- */
+
+.audioPlayer{
+	text-align: center;
+	max-width: 300px;
+	margin: 0 auto;
+}
+
+.audioPlayer .ui-block-a{
+	width: 80%;
+}
+
+.audioPlayer .ui-block-b{
+	width: 20%;
+}
+
+.customAudioControls a{
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	margin-top: 0.2em;
+	margin-right: 0.2em;
+}
+
+#muteBtn{
+	font-size: 0.8em;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+}
+
+#playerTimeCurrent{
+	font-size: 85%;
+}
+
+#playerEpisodeInfo{
+	white-space: nowrap;
+	overflow-x: hidden;
+	text-overflow: ellipsis;
+	margin: 0;
+}
+
+.full-width-slider input{
+	display: none;
+}
+
+.full-width-slider .ui-slider-track{
+	margin-left: 15px;
+}
+
+#playlist{
+	padding-top: 1.5em;
+}
+ 
+/* ----- New (latest episodes) page ----- */
+.newEpisodesFunctions{
+	position:absolute; 
+	top:-0.2em; 
+	right:0.3em; 
+	z-index:1;
+}
+
+.newEpisodesFunctions a{
+	display: inline-block;
+	padding:0.1em 0.2em;
+	margin-right: 0;
+}

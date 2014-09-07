@@ -1,5 +1,43 @@
 // **--   Home - Pocast page script   --** 
 
+function addToPlaylist(e){
+	e.preventDefault();
+/* 	e.stopPropagation(); */
+	
+	var elemPodcast = $( this ).parents().eq(4).get(0);
+	var elemEpisode = $( this ).parent().get(0);
+
+	var urlPodcast = $( elemPodcast ).data('podcast-url');
+	var urlEpisode = $( elemEpisode ).data('episode-url');
+/* 	var url = $( elemEpisode ).data('episode-url'); */
+
+	var list = $( '#playlist ul' );
+	var length = $( list ).children().length;
+	console.log('length = ' + length);
+ 	var html = '<li data-icon="false" id="playlistItem_' + (length + 1);
+	html += '" class="playlistItem"><a href="#">';
+	html += '<h2>More<\/h2><p>Less<\/p><\/a><a href="#" class="deleteBtn"><\/a><\/li>';
+	console.log('html: ' + html);
+			
+			
+/*				<h2>{{ episode.titlePodcast }}</h2>
+				<p>{{ episode.titleEpisode }}</p>
+			</a>
+			<a href="#" class='deleteBtn'></a>
+		</li>
+ */
+	
+	var request = $.ajax({
+		url: '/addtoplaylist',
+		type: 'POST',
+		data: { urlEpisode: urlEpisode, urlPodcast: urlPodcast }
+	});
+	request.done( function(result){
+		$( list ).prepend(html).listview('refresh');
+		console.log('Added ' + result.titlePodcast + ' - ' + result.titleEpisode + ' to playlist!');
+	});
+}
+
 function deletePodcast(e){
 	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
 	 -Would like to maintain a history of inactive subscriptions. */
@@ -12,6 +50,9 @@ function deletePodcast(e){
 	var divToRemove = elem.id;
 	var html = 'Removing ' + title;
 
+	e.preventDefault();
+	e.stopImmediatePropagation();
+	
 	if (confirm('Delete ' + title + '?') === true){
 		var request = $.ajax({
 			url: "/removepodcast",
@@ -35,66 +76,89 @@ function refreshPodcast(e){
 	console.log('refresh podcast');
 }
 
-// **--   Search page script   --** 
-
-function displayAddedNotification(title){
-	var html = 'Added ' + title + '<br>See results in <a href="/">Podcasts</a> tab';
-	$( '#searchNotification' ).html(html).fadeIn(300).delay(3000).fadeOut(800);
+// **--   Playlist page script   --** 
+function removeFromPlaylist(e){
+	e.preventDefault();
+	e.stopPropagation();
+	var elem = $( this ).parent().get( 0 );
+	var id = elem.id;
+	var url = $( elem ).data('episode-url');
+	console.log('url for removal: ' + url);
+	// Remove item from datastore
+	var request = $.ajax({
+		url: '/removefromplaylist',
+		type: 'POST',
+		data: { url: url }
+	});
+	request.done( function(result){
+		console.log('Removed from playlist: ' + result );
+	});
+	
+	// Remove item from ui
+	$( '#'+id ).remove();
+	
 }
 
-function addPodcastToDatastore( url, title ){
-	var htmlAdding = 'Adding ' + title;
-	var htmlAdded = 'Added ' + title + '<br>See results in <a href="/">Podcasts</a>';
-	var htmlFailed = 'Failed to add ' + title;
+function playPodcast(e){
+	var elem = $( this ).get( 0 );
+	var url = $( elem ).data('episode-url');
+
+	// This almost makes both players go, but I need the refresh doesn't work.
+	// It only works if I set the actual audio tag source...
 	
-	console.log('url and title are = ' + url + ', ' + title );
+	$('.audioSource').attr('src', url);
+	$('.stdControls').refresh();
+		
+}
+
+// **--   Search page script   --** 
+function addPodcastToDatastore( url, title ){
+	// since I don't know the title like in itunes search which returns it, 
+	// The line below uses default 'rss feed' text since the user isn't supplying title.
+	title = (title) ? title : 'RSS Feed';  
+	var htmlAdding = '<b>Adding</b> ' + title;
+	var htmlAdded = '<b>Added!</b> ' + title + '<br>See results in <a href="/">Podcasts</a>';
+	var htmlFailed = '<i>Failed</i> to add ' + title;
+
+	console.log('url: ' + url);
 	
 	var request = $.ajax({
 		url: "/addpodcast",
 		type: "POST",
-		dataType: "json",
-		data: JSON.stringify({ url: url})
+		data: { url: url }
 	});
 	$('#searchNotification').html(htmlAdding).fadeIn(300);
 	$('#iTunesSearchResultsHtml').empty();		// Really only applies when searching iTunes, not adding by RSS.
 	request.done(function(podcast){
 		$( '#searchNotification' ).fadeOut( 800 );
-		/* You can create another function to run in 1000 ms, but no delay to stop changhing background or html content. */
+		/* Used setTimeout so text doesn't update before display does.*/
 		setTimeout( function(){
-			console.log('in timeout');
-			$( '#searchNotification' ).html(htmlAdded).fadeIn(300).delay(2000); //.fadeOut(800);
+			$( '#searchNotification' ).html(htmlAdded).fadeIn(300).delay(2000).fadeOut(800);
 		}, 1500 ); 
 	});
-
 	request.fail(function(){
-		console.log('did not work');
-//		$('#searchNotification').fadeOut(800);
-//		$('#searchNotification').html(htmlFailed).fadeIn(800).delay(2000).fadeOut(800);
 		$('#searchNotification').html(htmlFailed);
 		$('#searchNotification').delay(5000).fadeOut(800);
 	});
 
 }
 
-//function addPodcastITunesSearch(encPodcastUrl){
 function addPodcastFromITunesSearch(e){
-	var elem = $( this ).get(0);
-//	var podcastUrl = decodeURIComponent(encPodcastUrl);
-	var title = $( elem ).data('podcast-title');
-	var url = $( elem ).data('podcast-url');
+/* 	var elem = $( this ).get(0); */
+	var url = $( this ).data('podcast-url');
+	var title = $( this ).data('podcast-title');
 	event.preventDefault();
 	$( '#iTunesSearchButton' ).focus();  // Closes keyboard on mobile devices.
-	console.log('elem = ' + elem);
-	console.dir(e);
 	addPodcastToDatastore(url, title);	
 }
 
-function addPodcastFromRssUrl( event ){
+function addPodcastFromRssUrl(e){
 	/* Get parameter from add rss input field and send to add podcast, as opposed to subscribe button from iTunes search results. */
-	event.preventDefault();
+	e.preventDefault();
+	/* 	Consider  adding the spinner loader animation from JQM here. */
 	$( '#rssSubscribeButton' ).focus();  // Closes keyboard on mobile devices.
-	var podcastUrl = $( '#rssSubscribeUrl' ).val();
-	addPodcastToDatastore(podcastUrl);
+	var url = $( '#rssSubscribeUrl' ).val();
+	addPodcastToDatastore(url);
 }
 
 function showITunesSearchResults(arg){
@@ -120,15 +184,16 @@ function showITunesSearchResults(arg){
 	if (arg.resultCount === 0) {
 		$('#iTunesSearchResultsHtml').empty();	
 		$('#iTunesSearchResultsHtml').html('No results found');
+		$('#searchNotification').fadeOut(300);
 		return true;
 	}
 	html += '<ul data-role="listview" data-inset="true">';
 	for(var i=0; i<arg.resultCount; i++){
 		/* Using jQuery mobile listiew with thumbnails to display iTunes search results. */
-//		podcastFeed = encodeURIComponent(results[i].feedUrl);
+//		podcastFeed = encodeURIComponent(results[i].urlPodcast);
 		podcastFeed = results[i].feedUrl;
 		title = results[i].collectionCensoredName;
-//	<div id='subscriptionItem_{{ loop.index }}' data-podcast-title='{{ feed.title }}' data-podcast-url='{{feed.feedUrl}}' class='subscriptionItem'>
+//	<div id='subscriptionItem_{{ loop.index }}' data-podcast-title='{{ feed.title }}' data-podcast-url='{{feed.urlPodcast}}' class='subscriptionItem'>
 
 		html += '<li data-podcast-title="' + title + '" data-podcast-url=' + podcastFeed +'><a href="#">';
 		html += '<img src="' + results[i].artworkUrl100 + '">';
@@ -138,6 +203,7 @@ function showITunesSearchResults(arg){
 	}
 	html += '<\/ul>'; // close list of shows
 	$('#iTunesSearchResultsHtml').html(html).trigger('create');
+	$('#searchNotification').fadeOut(300);
 }
 
 function sendITunesSearchRequest(event){
@@ -145,6 +211,7 @@ function sendITunesSearchRequest(event){
 
 	event.preventDefault();
 
+	var notificationHtml = 'Searching iTunes...';
 	var searchValue = $('#iTunesSearchValue').val();
 	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + 
 		encodeURIComponent(searchValue) + '&callback=showITunesSearchResults';
@@ -152,19 +219,22 @@ function sendITunesSearchRequest(event){
 	$( '#itunesScript' ).empty(); 		// Remove any searches between page reloads.
 	$( '#itunesScript' ).append(html); 	// Appending script runs it and gets result from Apple store.
 	$( '#iTunesSearchValue').blur(); 	// Makes the go keyboard disappear on mobile.
+	$('#searchNotification').html(notificationHtml).fadeIn(300);
 
 	// Next display search results.
-	
 	return false;
 }
 
-
 $( document ).ready( function(){
-	//Event listener for search handlers
+	//Event listeners Podcasts Page
+	$( '.subscriptionFunctions' ).on( 'click', '.deleteBtn', deletePodcast );
+	$( '.subscriptionFunctions' ).on( 'click', '.refreshBtn', refreshPodcast );
+	$( '.subscriptionCollapsible' ).on('click', '.addToPlaylist', addToPlaylist);
+	//Event listeners Search Page
 	$( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
 	$( '#rssSubscribeForm' ).on( 'submit', addPodcastFromRssUrl );
 	$( '#iTunesSearchResultsHtml' ).on( 'click', 'li', addPodcastFromITunesSearch );
-	$( '.subscriptionFunctions' ).on( 'click', '.deleteBtn', deletePodcast );
-	$( '.subscriptionFunctions' ).on( 'click', '.refreshBtn', refreshPodcast );
-	
+	//Event listeners Playlists Page
+	$( '#playlist' ).on('click', '.deleteBtn', removeFromPlaylist);
+	$( '#playlist' ).on('click', 'li', playPodcast);
 });

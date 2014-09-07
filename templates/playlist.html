@@ -1,39 +1,48 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block body %}
+
 <!-- Display player -->
-<div>
-	<audio controls id='myMusic1'>
-		<source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'>
+<div class='audioPlayer'>
+	<audio id='myMusic2' class='stdControls'>
+		<source src='#' class='audioSource'>
 	</audio>
-</div>
-<div>
-	<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
-	<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
-	<a class="ui-btn ui-btn-inline" id="fastForwardBtn">&gt;</a>
-	<a class="ui-btn ui-btn-inline" id="muteBtn">Mute</a>
-</div>
-
-<!-- key elements 
--playlst - list (url, title, image)
--removeEpisode(episode_url) - function
-
--->
-
-<!-- Display user's podcast subscription list -->
-<div id='playlist'>
-	<div style='padding:0 0 1em 0;'>
-		<button class='ui-btn ui-icon-refresh ui-btn-icon-right '>
-			Refresh All
-		</button>
+	<div class='ui-grid-a'>
+		<div class='ui-block-a'>
+			<form class='full-width-slider sliderForm'>
+				<label for='playerSlider' class='ui-hidden-accessible'>playerSlider:</label>
+				<input type='range' name='playerSlider' id='playerSlider' min='0' max='100' value='0'>
+			</form>
+		</div>
+		<div class='ui-block-b'>
+			<p id='playerTimeCurrent'>
+				0:00
+<!-- 				{{ nowPlaying.currentTime }} -->
+			</p>
+		</div>
 	</div>
-	<ul data-role='listview'>
+	<div class='customAudioControls'>
+		<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
+		<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
+		<a class="ui-btn ui-btn-inline" id="fastForwardBtn">&gt;</a>
+		<a class="ui-btn ui-btn-inline" id="muteBtn">Mute</a>
+	</div>
+	<p id='playerEpisodeInfo'>
+		Podcast title | Episode title
+<!-- 		{{ nowPlaying.title_podcast }} {{ nowPlaying.title_episode }} -->
+	</p>
+</div>
+
+<div id='playlist' class='playlist'>
+	<ul data-role='listview' data-split-icon='delete'>
 		{% for episode in playlist %}
-		<li id='playlistItem_{{ loop.index }}'> 
-			<div style='position:absolute; top:0.3em; right:0.5em; z-index:1;'>
-				<a href="javascript:removeEpisode( '{{ episode.url }}' )" 
-				   class='ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline' style='display:inline-block; margin: 0; padding:0em 0.5em;'></a>
-			</div>
-			<a onclick="myAudio.playSelectedEpisode('{{ episode.url }}');">{{ episode.title }}</a>
+		<li data-icon='false' data-episode-url='{{ episode.url_episode
+												}}' id='playlistItem_{{ loop.index }}' class='playlistItem'> 
+			<a href='#'>
+				<h2>{{ episode.title_podcast }}</h2>
+				<p>{{ episode.title_episode }}</p>
+<!-- 				<p>{{ episode.percent_listened }}%</p> -->
+			</a>
+			<a href="#" class='deleteBtn'></a>
 		</li>
 		{% endfor %}
 	</ul>
