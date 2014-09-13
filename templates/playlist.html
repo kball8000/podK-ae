@@ -15,8 +15,8 @@
 			</form>
 		</div>
 		<div class='ui-block-b'>
-			<p id='playerTimeCurrent'>
-				{{ nowPlaying.currentTime }}
+			<p id='playerTimeCurrent' data-init-playback-time={{ nowPlaying.current_playback_time }}>
+				{{ nowPlaying.current_playback_time }}
 			</p>
 		</div>
 	</div>
@@ -35,8 +35,8 @@
 		</p>
 	</div>
 </div>
-<div id='playlist' class='playlist'>
-	<ul data-role='listview' data-split-icon='delete'>
+<!-- <div id='playlist' class='playlist'> -->
+	<ul data-role='listview' data-split-icon='delete' id='playlist'>
 		{% for episode in playlist %}
 		<li data-icon='false' data-episode-url='{{ episode.url_episode}}' data-podcast-url='{{ episode.url_podcast}}' 
 			id='playlistItem_{{ loop.index }}' class='playlistItem'> 
@@ -49,5 +49,5 @@
 		</li>
 		{% endfor %}
 	</ul>
-</div>
+<!-- </div> -->
 {% endblock %}

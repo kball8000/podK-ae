@@ -1,39 +1,27 @@
 // **--   Home - Pocast page script   --** 
-
 function addToPlaylist(e){
+/* 	 On main podcast page clicking episodes adds them to the list on the playlist page. 
+Must go to playlist page in order to actually play the episode*/
 	e.preventDefault();
-/* 	e.stopPropagation(); */
+	e.stopImmediatePropagation();
 	
 	var elemPodcast = $( this ).parents().eq(4).get(0);
 	var elemEpisode = $( this ).parent().get(0);
-
 	var urlPodcast = $( elemPodcast ).data('podcast-url');
 	var urlEpisode = $( elemEpisode ).data('episode-url');
-/* 	var url = $( elemEpisode ).data('episode-url'); */
 
-	var list = $( '#playlist ul' );
-	var length = $( list ).children().length;
-	console.log('length = ' + length);
+	var length = $( '#playlist' ).children().length;
  	var html = '<li data-icon="false" id="playlistItem_' + (length + 1);
 	html += '" class="playlistItem"><a href="#">';
 	html += '<h2>More<\/h2><p>Less<\/p><\/a><a href="#" class="deleteBtn"><\/a><\/li>';
-	console.log('html: ' + html);
-			
-			
-/*				<h2>{{ episode.titlePodcast }}</h2>
-				<p>{{ episode.titleEpisode }}</p>
-			</a>
-			<a href="#" class='deleteBtn'></a>
-		</li>
- */
-	
+
 	var request = $.ajax({
 		url: '/addtoplaylist',
 		type: 'POST',
 		data: { urlEpisode: urlEpisode, urlPodcast: urlPodcast }
 	});
 	request.done( function(result){
-		$( list ).prepend(html).listview('refresh');
+		$( '#playlist' ).prepend(html).listview('refresh');
 		console.log('Added ' + result.titlePodcast + ' - ' + result.titleEpisode + ' to playlist!');
 	});
 }
@@ -52,9 +40,7 @@ function deletePodcast(e){
 	
 	var elemUrl = $( this ).parents().eq(1).get(0);
 	var title = $( this ).data('podcast-title');
-	console.dir('title in delete podcast' + title);
 	var podcast = $( elemUrl ).data('podcast-url');
-/* 	var title = $( elemTitle ).data('podcast-title'); */
 	var divToRemove = elemUrl.id;
 	var html = 'Removing ' + title;
 	var html_done = title + ' removed' ;
@@ -134,6 +120,24 @@ function playPodcast(){
 		player.pause();
 	}
 	savePlaybackPositionTimer = setInterval( savePlaybackPosition , 10000);
+}
+
+function setAudioPlayerInit(){
+	var initialPlaybackTime = $('#playerTimeCurrent').data('init-playback-time');
+	var readyStateInterval;
+	var player = $('#audioPlayer')[0];
+	console.dir(player);
+	player.load();
+
+	readyStateInterval = setInterval( function(){
+		console.log('hi ' + player.readyState);
+		if (player.readyState > 0) {
+			player.currentTime = initialPlaybackTime;
+			clearInterval(readyStateInterval);
+		}
+	}, 100);
+	initialPlaybackTime += 45;
+	$('#playerTimeCurrent').html(initialPlaybackTime);
 }
 
 function setNowPlaying(urlPodcast, urlEpisode){
@@ -287,17 +291,14 @@ $('#PodcastPage').on('pagecreate', function(e, ui){
 });
 // Playlists Page
 $('#PlaylistPage').on('pagecreate', function(e, ui){
-	/* 		load time from data in nowPlaying */
-	if( $( '#audioPlayer' ).length  ){
-		console.log('loading player...');
-	}
+	setAudioPlayerInit();
 	$( '#playlist' ).on( 'click', '.deleteBtn', removeFromPlaylist );
 	$( '#playlist' ).on( 'click', 'li', sendEpisodeToPlayer );
 	$( '#playBtnId' ).on( 'click', playPodcast );
 });
 // New Page
 $('#NewPage').on('pagecreate', function(e, ui){
-	console.log('in new page')
+	console.log('in new page');
 });
 // Search Page
 $('#SearchPage').on('pagecreate', function(e, ui){

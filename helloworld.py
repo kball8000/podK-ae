@@ -116,19 +116,19 @@ class PlaylistPage(webapp2.RequestHandler):
 
 		playlist = result_1.playlist
 		playlist.reverse()
-		
-		nowPlaying = result_2.playlist if result_2 else 'nada'
+
+		# since there is only one item in list.
+		nowPlaying = result_2.playlist[0] if result_2 else 'nada'
 		logging.info('\n\nPlaylist: nowPlaying %s ' % nowPlaying)
 		
-		nowPlaying[0]['current_playback_time']= 45
-
+		nowPlaying['current_playback_time'] = 45
 
 		template_values = {
 			'navClass': {'playlist': 'ui-btn-active ui-state-persist' },
 			'pageTitle': 'Playlist',
 			'pageId': 'PlaylistPage',
 			'playlist': playlist,
-			'nowPlaying': nowPlaying[0] # since there is only one item in list.
+			'nowPlaying': nowPlaying 
 		}
 		template = JINJA_ENVIRONMENT.get_template('playlist.html')
 		self.response.write(template.render(template_values))
