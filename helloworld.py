@@ -118,10 +118,11 @@ class PlaylistPage(webapp2.RequestHandler):
 		playlist.reverse()
 
 		# since there is only one item in list.
-		nowPlaying = result_2.playlist[0] if result_2 else 'nada'
+		nowPlaying = result_2.playlist if result_2 else 'nada'
 		logging.info('\n\nPlaylist: nowPlaying %s ' % nowPlaying)
 		
-		nowPlaying['current_playback_time'] = 45
+		if len(nowPlaying) > 0:
+			nowPlaying[0]['current_playback_time'] = 45
 
 		template_values = {
 			'navClass': {'playlist': 'ui-btn-active ui-state-persist' },
