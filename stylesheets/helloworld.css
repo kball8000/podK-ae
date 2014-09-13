@@ -93,11 +93,11 @@ break things. I need to find another way to do this... */
 	padding: 0;
 }
 
-#playerPodcastTitle{
-	font-size: 0.7em;
+#playerEpisodeInfo p:first-child{
+	font-size: 0.8em;
 }
-#playerEpisodeTitle{
-	font-size: 0.85em;	
+#playerEpisodeInfo p:last-child{
+	font-size: 0.7em;
 }
 
 .full-width-slider input{

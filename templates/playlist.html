@@ -3,7 +3,7 @@
 
 <!-- Display player -->
 <div class='audioPlayerDiv'>
-	<audio id='audioPlayer' class='audioPlayer' controls data-start-playback-time='{{ nowPlaying.current_playback_time }}'
+	<audio id='audioPlayer' class='audioPlayer' controls data-podcast-url='{{ nowPlaying.url_podcast }}' 
 		   preload='metadata'>
 		<source src='{{ nowPlaying.url_episode }}'>
 	</audio>
@@ -15,7 +15,7 @@
 			</form>
 		</div>
 		<div class='ui-block-b'>
-			<p id='playerTimeCurrent' data-init-playback-time={{ nowPlaying.current_playback_time }}>
+			<p id='playerTimeCurrent' data-init-playback-time='{{ nowPlaying.current_playback_time }}'>
 				{{ nowPlaying.current_playback_time }}
 			</p>
 		</div>
@@ -27,12 +27,10 @@
 		<a class="muteBtn ui-btn ui-btn-inline">Mute</a>
 	</div>
 	<div id='playerEpisodeInfo'>
-		<p id='playerPodcastTitle'>
-			{{ nowPlaying.title_podcast }}
-		</p>
-		<p id='playerEpisodeTitle'>
-			{{ nowPlaying.title_episode }}
-		</p>
+	<!-- Important not to have extra spaces here, since this is read in as data for
+	nowPlaying info stored in app engine datastore.-->
+		<p>{{ nowPlaying.title_podcast }}</p>
+		<p>{{ nowPlaying.title_episode }}</p>
 	</div>
 </div>
 <!-- <div id='playlist' class='playlist'> -->

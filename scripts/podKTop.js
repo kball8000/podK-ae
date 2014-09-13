@@ -96,30 +96,55 @@ function removeFromPlaylist(e){
 }
 
 function playPodcast(){
-/* 	var elem = $( this ).get( 0 );
-	var url = $( elem ).data('episode-url');
- */
-/* 	var url = $( this ).data('episode-url'); */
+	/* Plays podcast, saves current playback time so user can pick up where they left off and goes to next episode
+	on the list when the current playing is finished. */
 	console.log('in playpodcast playlist page playBtn');
-	var savePlaybackPositionTimer;
-//	console.log('episode url in playpodcast: ' + url );
-	// This almost makes both players go, but I need the refresh doesn't work.
-	// It only works if I set the actual audio tag source...
-	
-	var player = $( '#audioPlayer' )[0];
+ 	var savePlaybackPositionTimer;
+	var player = $('#audioPlayer')[0];
 	console.dir(player);
-	
+
 	function savePlaybackPosition(){
-/* 		$.ajax request */
+		var playerSrc = $( player ).children()[0];
+		var episodeInfo = $('#playerEpisodeInfo').children();
+//		var test1 = episodeInfo[0];
+//		console.dir(ep)
+		console.log('in save position timer: ' + savePlaybackPositionTimer);
+		console.dir(episodeInfo);
+		if( player.paused){
+			clearInterval(savePlaybackPositionTimer);
+		}
+		console.log( 'episode info childrennn: ' + episodeInfo);
+		console.dir($('#playerEpisodeInfo'));
+		console.dir(episodeInfo[0]);
+
+ 		var data = {
+			url_podcast: $(player).data('podcast-url'),
+			url_episode:  $(playerSrc).attr('src') ,
+			title_podcast: $(episodeInfo).eq(0).html(),
+			title_episode: $(episodeInfo).eq(1).text(),
+			current_playback_time: Math.floor(player.currentTime)
+		};
+		console.log('current playback time: ' + data.current_playback_time);
+		console.log('data is here: ');
+		console.dir(data);
+		var request = $.ajax({
+			url: '/saveplaybackposition',
+			type: 'POST',
+			data: data
+		});
+		request.fail( function(){
+			console.log('failed to save now playing to datastore');
+		});
 	}
-	
+
 	if(player.paused){
+		savePlaybackPositionTimer = setInterval( function(){savePlaybackPosition();} , 3000);
+		console.log('timer started in if of play: ' + savePlaybackPositionTimer);
 		player.play();
 	}
 	else{
 		player.pause();
 	}
-	savePlaybackPositionTimer = setInterval( savePlaybackPosition , 10000);
 }
 
 function setAudioPlayerInit(){
@@ -136,7 +161,7 @@ function setAudioPlayerInit(){
 			clearInterval(readyStateInterval);
 		}
 	}, 100);
-	initialPlaybackTime += 45;
+	// initialPlaybackTime += 45;
 	$('#playerTimeCurrent').html(initialPlaybackTime);
 }
 

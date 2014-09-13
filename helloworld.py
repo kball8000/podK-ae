@@ -121,15 +121,15 @@ class PlaylistPage(webapp2.RequestHandler):
 		nowPlaying = result_2.playlist if result_2 else 'nada'
 		logging.info('\n\nPlaylist: nowPlaying %s ' % nowPlaying)
 		
-		if len(nowPlaying) > 0:
-			nowPlaying[0]['current_playback_time'] = 45
+# 		if len(nowPlaying) > 0:
+# 			nowPlaying[0]['current_playback_time'] = 45
 
 		template_values = {
 			'navClass': {'playlist': 'ui-btn-active ui-state-persist' },
 			'pageTitle': 'Playlist',
 			'pageId': 'PlaylistPage',
 			'playlist': playlist,
-			'nowPlaying': nowPlaying 
+			'nowPlaying': nowPlaying[0]
 		}
 		template = JINJA_ENVIRONMENT.get_template('playlist.html')
 		self.response.write(template.render(template_values))
@@ -297,7 +297,30 @@ class AddToPlaylist(webapp2.RequestHandler):
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.write(json.dumps(return_info))
 
+class SaveNowPlaying(webapp2.RequestHandler):
+	""" Saves current playback position to datastore. Used to retrieve on startup to resume where user stopped listening. """
+	def post(self):
+		user = users.get_current_user();
+		
+		
+		qry = Playlist.query(Playlist.author == user)
+		qry_1 = qry.filter(Playlist.listType == 'nowPlaying')
+		nowPlaying = qry_1.fetch(1)[0]
+# 		x = self.request.get('current_playback_time')
+# 		logging.info('\n\n\n current playback time %s' % x )
+		
+		nowPlaying.playlist = [{
+				'url_podcast': self.request.get('url_podcast'),
+				'url_episode': self.request.get('url_episode'),
+				'title_podcast': self.request.get('title_podcast'),
+				'title_episode': self.request.get('title_episode'),
+				'current_playback_time': self.request.get('current_playback_time')
+		}]
+		
+		nowPlaying.put()
+	
 class SetNowPlaying(webapp2.RequestHandler):
+	""" Initializes player with last played episode and last playback time. """
 	def post(self):
 		# logging.info('\n\nsetnow playing python----')
 		
@@ -360,15 +383,16 @@ class RemoveFromPlaylist(webapp2.RequestHandler):
 		self.response.write(episode_removed)
 
 app = webapp2.WSGIApplication([
-		('/', PodcastPage),
 		# list of functions / actions /methods, not sure proper term
 		('/addpodcast', AddPodcast),
 		('/removepodcast', RemPodcast),
 		('/removefromplaylist', RemoveFromPlaylist),
 		('/addtoplaylist', AddToPlaylist),
 		('/setnowplaying', SetNowPlaying),
+		('/saveplaybackposition', SaveNowPlaying),
 		('/refreshfeed', RefreshFeed),
 		# list of pages for web app
+		('/', PodcastPage),
 		('/new', NewPage),
 		('/playlist', PlaylistPage),
 		('/search', SearchPage),
