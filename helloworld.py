@@ -1,4 +1,6 @@
 """Some general 'themes' throught coding. 
+-Podcast refers to show, whereas episode refers to individual epsisodes. Pointing
+this out to avoid confusion, as some refer to an individual show/episode as a podcast.
 -url's are usually used as id values for querying
 -title's are used more as the human readable version to return.
 -On first load page is python/datastore/jinja
@@ -6,7 +8,7 @@
 duplication, but some of the pages are written twice, once jinja, second in JS.
 i.e. adding an episode to playlist requires updating the page before a reload
 which would have used the code in jinja I'd already written.
--url routing tends to handled here in python.
+-url routing is handled here in python.
 
 Sample podcast feed: http://feeds.twit.tv/sn.xml
 """
@@ -36,12 +38,12 @@ def podcast_feed_key(podcast_feed=DEFAULT_PODCAST_FEED_LIST):
 class Episode(ndb.Model):
 	title = ndb.StringProperty(indexed=False)
 	url = ndb.StringProperty(indexed=False)
-	listened = ndb.BooleanProperty()
+	listened = ndb.BooleanProperty(indexed=False)
 	pubDate = ndb.StringProperty(indexed=False)
 	dateAdded = ndb.DateTimeProperty(auto_now_add=True) # date added
 	episodeLength_str = ndb.StringProperty(indexed=False) # string format, not date
 	# episodeLength_int = ndb.ComputedProperty() # integer, seconds format of episode duration
-	playbackPosition = ndb.IntegerProperty() # in milliseconds
+	playbackPosition = ndb.IntegerProperty(indexed=False) # in milliseconds
 	# percentListened = ndb.ComputedProperty() # integer of percent listened
 
 class Podcast(ndb.Model):
@@ -49,13 +51,13 @@ class Podcast(ndb.Model):
 	title = ndb.StringProperty(indexed=False)
 	urlPodcast = ndb.StringProperty()
 	urlImage = ndb.StringProperty(indexed=False)
-	episode = ndb.StructuredProperty(Episode, repeated=True)
+	episode = ndb.StructuredProperty(Episode, repeated=True, indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
 
 class Playlist(ndb.Model):
 	author = ndb.UserProperty()
 	listType = ndb.StringProperty() 				# playlist, new or currentPlaying
-	playlist = ndb.JsonProperty(compressed=True) 	# misnamed as playlist, it is actually more generic
+	playlist = ndb.JsonProperty(compressed=True, indexed=False) 	# misnamed as playlist, it is actually more generic
 	
 class PodcastPage(webapp2.RequestHandler):
     def get(self):
@@ -79,13 +81,21 @@ class PodcastPage(webapp2.RequestHandler):
 			playlist.playlist = []
 			playlist.listType = 'playlist'
 			playlist.put()
-			
+
+			nowPlaying = Playlist(parent=podcast_feed_key())
+			if users.get_current_user():
+				nowPlaying.author = users.get_current_user()
+			nowPlaying.playlist = []
+			nowPlaying.listType = 'nowPlaying'
+			nowPlaying.put()
+
 		podcast_feed_qry = Podcast.query(ancestor = podcast_feed_key()).order(-Podcast.date)
 		podcast_feeds = podcast_feed_qry.fetch(50)
 				
 		template_values = {
 			'navClass': {'home': 'ui-btn-active ui-state-persist' },
 			'pageTitle': 'Home',
+			'pageId': 'PodcastPage',
 			'podcast_feeds': podcast_feeds,
 			'user_welcome_nickname': user_welcome_nickname,
 			'user_welcome_href': user_welcome_href
@@ -95,40 +105,32 @@ class PodcastPage(webapp2.RequestHandler):
 
 class PlaylistPage(webapp2.RequestHandler):
 	def get(self):
-		
+		user = users.get_current_user()
+
 		# Get playlist from datastore
 		qry = Playlist.query(ancestor = podcast_feed_key())
-		temp_fetch = qry.fetch()
-		logging.info('qry = %s' % qry)
-		logging.info('qry = %s' % temp_fetch)
-		qry_1 = qry.filter(Playlist.listType == 'playlist', Playlist.author == users.get_current_user())
-		qry_2 = qry.filter(Playlist.listType == 'nowPlaying', Playlist.author == users.get_current_user())
-  		result_1 = qry_1.fetch(1)[0];
-  		result_2 = qry_2.fetch(1)[0] if len(qry_2.fetch(1)) > 0 else None
+		qry_1 = qry.filter(Playlist.listType == 'playlist', Playlist.author == user)
+		qry_2 = qry.filter(Playlist.listType == 'nowPlaying', Playlist.author == user)
+  		result_1 = qry_1.fetch(1)[0]
+  		result_2 = qry_2.fetch(1)[0]
 
 		playlist = result_1.playlist
 		playlist.reverse()
-		logging.info('playlist reversed: %s' % playlist)
 		
 		nowPlaying = result_2.playlist if result_2 else 'nada'
+		logging.info('\n\nPlaylist: nowPlaying %s ' % nowPlaying)
+		
+		nowPlaying[0]['current_playback_time']= 45
+
 
 		template_values = {
 			'navClass': {'playlist': 'ui-btn-active ui-state-persist' },
 			'pageTitle': 'Playlist',
+			'pageId': 'PlaylistPage',
 			'playlist': playlist,
-			'nowPlaying': nowPlaying
+			'nowPlaying': nowPlaying[0] # since there is only one item in list.
 		}
 		template = JINJA_ENVIRONMENT.get_template('playlist.html')
-		self.response.write(template.render(template_values))
-
-class SearchPage(webapp2.RequestHandler):
-	def get(self):
-
-		template_values = {
-			'navClass': {'search': 'ui-btn-active ui-state-persist' },
-			'pageTitle': 'Search'
-		}
-		template = JINJA_ENVIRONMENT.get_template('search.html')
 		self.response.write(template.render(template_values))
 
 class NewPage(webapp2.RequestHandler):
@@ -136,10 +138,22 @@ class NewPage(webapp2.RequestHandler):
 
 		template_values = {
 			'navClass': {'new': 'ui-btn-active ui-state-persist' },
+			'pageId': 'NewPage',
 			# 'dataUrl': '/new',
 			'pageTitle': 'New'
 		}
 		template = JINJA_ENVIRONMENT.get_template('new.html')
+		self.response.write(template.render(template_values))
+
+class SearchPage(webapp2.RequestHandler):
+	def get(self):
+
+		template_values = {
+			'navClass': {'search': 'ui-btn-active ui-state-persist' },
+			'pageId': 'SearchPage',
+			'pageTitle': 'Search'
+		}
+		template = JINJA_ENVIRONMENT.get_template('search.html')
 		self.response.write(template.render(template_values))
 
 def getFeedInfo(url):
@@ -152,6 +166,7 @@ def getFeedInfo(url):
 	
 	return response
 
+# Search page functions
 class AddPodcast(webapp2.RequestHandler):
 	def post(self):
 		episode_list = []
@@ -212,16 +227,7 @@ class AddPodcast(webapp2.RequestHandler):
 		self.response.headers['Content-Type'] = 'application/json'
 		self.response.out.write(json.dumps(returnInfo))
 
-class RefreshFeed(webapp2.RequestHandler):
-    def post(self):
-		url = self.request.get('refreshFeed')
-		feed_info = getFeedInfo(url)
-		
-		# Need to do something with feed_info, unless I just want to do a full page refresh.
-		# If I want to do ajax, may need jQuery
-		
-	
-
+# Podcast / Main page functions
 class RemPodcast(webapp2.RequestHandler):
     def post(self):
 		
@@ -234,15 +240,23 @@ class RemPodcast(webapp2.RequestHandler):
 		qry = Podcast.query(ancestor=podcast_feed_key())
 		qry_2 = qry.filter(Podcast.urlPodcast == feed_id, Podcast.author == users.get_current_user())
 		result = qry_2.fetch(1, keys_only=True)[0]
-		
+		logging.info('remPodcast: id is: %s' % result.id())
 		result.delete()
+
+class RefreshFeed(webapp2.RequestHandler):
+    def post(self):
+		url = self.request.get('refreshFeed')
+		feed_info = getFeedInfo(url)
+		
+		# Need to do something with feed_info, unless I just want to do a full page refresh.
+		# If I want to do ajax, may need jQuery
+		
+	
 
 class AddToPlaylist(webapp2.RequestHandler):
 	def post(self):
 
 		# Get values from ajax / post request
-#		titlePodcast = self.request.get('titlePodcast')
-#		titleEpisode = self.request.get('titleEpisode')
 		url_episode = self.request.get('urlEpisode')
 		url_podcast = self.request.get('urlPodcast')
 
@@ -266,17 +280,13 @@ class AddToPlaylist(webapp2.RequestHandler):
 		for episode in podcast.episode:
 			if episode.url == url_episode:
 				title_episode = episode.title
-# 		for x in podcast:
-# 			logging.info('playlist - x : %s' % x)
-		
-		# Save a generic blob - list of dicts - to App Engine datastore
-#  		playlist.playlist.append({'titlePodcast': titlePodcast , 'titleEpisode': titleEpisode, 'url': url })
- 		playlist.playlist.append({'title_podcast': podcast.title ,
-# 								  'title_episode': podcast.episode.title, 
+
+		playlist.playlist.append({'title_podcast': podcast.title ,
  								  'title_episode': title_episode, 
 								  #'duration': podcast.episodeLength_str,
 								  #'percent_listened': podcast.percentListened,
 								  'url_episode': url_episode,
+								  'url_podcast': podcast.urlPodcast,
  								  'url_image': podcast.urlImage
 								 })
 		playlist.put()
@@ -284,24 +294,65 @@ class AddToPlaylist(webapp2.RequestHandler):
 
 		return_info = {'titlePodcast': podcast.title, 'titleEpisode': title_episode}
 		self.response.headers['Content-Type'] = 'application/json'
-# 		self.response.out.write(json.dumps(return_info))
 		self.response.write(json.dumps(return_info))
-		
-		
 
+class SetNowPlaying(webapp2.RequestHandler):
+	def post(self):
+		# logging.info('\n\nsetnow playing python----')
+		
+		user = users.get_current_user()
+
+		url_podcast = self.request.get('url_podcast')
+		url_episode = self.request.get('url_episode')
+		
+		# Retrieve nowplaying entity from App Engine datastore so we can set info and save back.
+		qry = Playlist.query(ancestor=podcast_feed_key())
+		qry_1 = qry.filter(Playlist.listType == 'nowPlaying', Playlist.author == user)
+		nowPlaying = qry_1.fetch(1)[0]
+		logging.info('nowPlaying = %s' % (nowPlaying))
+		
+		# Retrieve episode from datastore to get current playback time
+		qry_podcast = Podcast.query(ancestor=podcast_feed_key())
+		qry_podcast_1 = qry_podcast.filter(Podcast.urlPodcast == url_podcast, Podcast.author == user)
+ 		podcast = qry_podcast_1.fetch(1)[0]
+		# podcast = qry_podcast_1.fetch(1)
+		logging.info('podcast from ds = %s' % (podcast))
+		for episode in podcast.episode:
+			logging.info('episode loop looping')
+			if episode.url == url_episode:
+ 				current_playback_time = episode.playbackPosition
+				logging.info('episode loop setting time %s' % current_playback_time )
+				title_episode = episode.title
+				break
+			else:
+				current_playback_time = 0
+
+		nowPlaying.playlist = [{
+				'url_podcast': url_podcast,
+				'url_episode': url_episode,
+				'title_podcast': podcast.title,
+				'title_episode': title_episode,
+				'current_playback_time': current_playback_time
+			}]
+		
+		nowPlaying.put()
+
+# Playlist page functions
 class RemoveFromPlaylist(webapp2.RequestHandler):
 	""" Removes entry from datastore using episode's url and returns that episodes 
 	title to web page."""
 	def post(self):
 		url = self.request.get('url')
-		
-		# qry = Playlist.query(ancestor=podcast_feed_key(), Playlist.author == users.get_current_user())
-		qry = Playlist.query(Playlist.author == users.get_current_user())
-		playlist = qry.fetch(1)[0];
+		user = users.get_current_user()
+		qry = Playlist.query(ancestor=podcast_feed_key())
+		qry_1 = qry.filter(Playlist.listType == 'playlist')
+		playlist = qry_1.fetch(1)[0];
+		logging.info('\n\nplaylist entity = %s' % playlist)
 		
 		for episode in playlist.playlist:
+			logging.info('episode = %s' % episode)
 			if (episode['url_episode'] == url):
-				playlist.playlist.removee(episode)
+				playlist.playlist.remove(episode)
 				episode_removed = episode['title_episode']
 		playlist.put()
 		
@@ -314,6 +365,7 @@ app = webapp2.WSGIApplication([
 		('/removepodcast', RemPodcast),
 		('/removefromplaylist', RemoveFromPlaylist),
 		('/addtoplaylist', AddToPlaylist),
+		('/setnowplaying', SetNowPlaying),
 		('/refreshfeed', RefreshFeed),
 		# list of pages for web app
 		('/new', NewPage),

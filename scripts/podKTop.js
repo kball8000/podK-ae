@@ -41,18 +41,24 @@ function addToPlaylist(e){
 function deletePodcast(e){
 	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
 	 -Would like to maintain a history of inactive subscriptions. */
-	// Really nice yes / no pop up in http://demos.jquerymobile.com/1.4.3/popup/ -- dialog, but way more complicated than the standard confirm
-	// May want to change this to an undo / dismiss notifcation thing that doesn't disappear until you do something else???
+	// -Really nice yes / no pop up in http://demos.jquerymobile.com/1.4.3/popup/ -- dialog, but way more complicated than the standard confirm
+	// -May want to change this to an undo / dismiss notifcation thing that doesn't disappear until you do something else???
+	// -When I redo where the delete and refresh buttons are, change the way you retrieve the title
+	// from data-url to looking at title text in <a> element.
 	
-	var elem = $( this ).parents().eq(1).get(0);
-	var title = $( elem ).data('podcast-title');
-	var podcast = $( elem ).data('podcast-url');
-	var divToRemove = elem.id;
-	var html = 'Removing ' + title;
-
+	
 	e.preventDefault();
 	e.stopImmediatePropagation();
 	
+	var elemUrl = $( this ).parents().eq(1).get(0);
+	var title = $( this ).data('podcast-title');
+	console.dir('title in delete podcast' + title);
+	var podcast = $( elemUrl ).data('podcast-url');
+/* 	var title = $( elemTitle ).data('podcast-title'); */
+	var divToRemove = elemUrl.id;
+	var html = 'Removing ' + title;
+	var html_done = title + ' removed' ;
+
 	if (confirm('Delete ' + title + '?') === true){
 		var request = $.ajax({
 			url: "/removepodcast",
@@ -63,6 +69,9 @@ function deletePodcast(e){
 		request.done(function(){
 			$( '#'+divToRemove ).remove();
 			$( '#podcastNotification' ).fadeOut(800);
+			setTimeout( function(){
+				$( '#podcastNotification' ).html(html_done).fadeIn(300).delay(4000).fadeOut(800);
+			}, 1100);
 		});
 	}
 	else{
@@ -79,7 +88,8 @@ function refreshPodcast(e){
 // **--   Playlist page script   --** 
 function removeFromPlaylist(e){
 	e.preventDefault();
-	e.stopPropagation();
+	e.stopImmediatePropagation();
+
 	var elem = $( this ).parent().get( 0 );
 	var id = elem.id;
 	var url = $( elem ).data('episode-url');
@@ -99,16 +109,58 @@ function removeFromPlaylist(e){
 	
 }
 
-function playPodcast(e){
-	var elem = $( this ).get( 0 );
+function playPodcast(){
+/* 	var elem = $( this ).get( 0 );
 	var url = $( elem ).data('episode-url');
-
+ */
+/* 	var url = $( this ).data('episode-url'); */
+	console.log('in playpodcast playlist page playBtn');
+	var savePlaybackPositionTimer;
+//	console.log('episode url in playpodcast: ' + url );
 	// This almost makes both players go, but I need the refresh doesn't work.
 	// It only works if I set the actual audio tag source...
 	
-	$('.audioSource').attr('src', url);
-	$('.stdControls').refresh();
-		
+	var player = $( '#audioPlayer' )[0];
+	console.dir(player);
+	
+	function savePlaybackPosition(){
+/* 		$.ajax request */
+	}
+	
+	if(player.paused){
+		player.play();
+	}
+	else{
+		player.pause();
+	}
+	savePlaybackPositionTimer = setInterval( savePlaybackPosition , 10000);
+}
+
+function setNowPlaying(urlPodcast, urlEpisode){
+	console.log('setNowPlaying ep url: ' + urlEpisode );
+	console.log('setNowPlaying pd url: ' + urlPodcast );
+	var request = $.ajax({
+		url:'/setnowplaying',
+		type: 'POST',
+		data: { url_podcast: urlPodcast, url_episode: urlEpisode }
+	});
+	request.fail( function(){
+		console.log('failed to load to player');
+	});
+/* 	$.ajax request to save info to datastore */
+}
+
+function sendEpisodeToPlayer(e){
+/* When clicking episode in playlist (listview) play the episode */
+	var url = $( this ).data('episode-url');
+	var urlPodcast = $( this ).data('podcast-url');
+	var player = $( '#audioPlayer' )[0];
+	var playerSrc = $( player ).children()[0];
+	
+	$( playerSrc ).attr( 'src', url );
+	player.load();
+	setNowPlaying(urlPodcast, url);
+	playPodcast();	
 }
 
 // **--   Search page script   --** 
@@ -225,16 +277,31 @@ function sendITunesSearchRequest(event){
 	return false;
 }
 
-$( document ).ready( function(){
-	//Event listeners Podcasts Page
+
+// **--  Event listeners --**
+// Podcasts Page
+$('#PodcastPage').on('pagecreate', function(e, ui){
 	$( '.subscriptionFunctions' ).on( 'click', '.deleteBtn', deletePodcast );
 	$( '.subscriptionFunctions' ).on( 'click', '.refreshBtn', refreshPodcast );
-	$( '.subscriptionCollapsible' ).on('click', '.addToPlaylist', addToPlaylist);
-	//Event listeners Search Page
+	$( '.subscriptionCollapsible' ).on( 'click', '.addToPlaylist', addToPlaylist );
+});
+// Playlists Page
+$('#PlaylistPage').on('pagecreate', function(e, ui){
+	/* 		load time from data in nowPlaying */
+	if( $( '#audioPlayer' ).length  ){
+		console.log('loading player...');
+	}
+	$( '#playlist' ).on( 'click', '.deleteBtn', removeFromPlaylist );
+	$( '#playlist' ).on( 'click', 'li', sendEpisodeToPlayer );
+	$( '#playBtnId' ).on( 'click', playPodcast );
+});
+// New Page
+$('#NewPage').on('pagecreate', function(e, ui){
+	console.log('in new page')
+});
+// Search Page
+$('#SearchPage').on('pagecreate', function(e, ui){
 	$( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
 	$( '#rssSubscribeForm' ).on( 'submit', addPodcastFromRssUrl );
 	$( '#iTunesSearchResultsHtml' ).on( 'click', 'li', addPodcastFromITunesSearch );
-	//Event listeners Playlists Page
-	$( '#playlist' ).on('click', '.deleteBtn', removeFromPlaylist);
-	$( '#playlist' ).on('click', 'li', playPodcast);
 });

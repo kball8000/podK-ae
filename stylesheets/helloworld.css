@@ -48,21 +48,19 @@ break things. I need to find another way to do this... */
 	margin-right: 0;
 }
 
-/* ----- Search page ----- */
-
 /* ----- Playlist page ----- */
 
-.audioPlayer{
+.audioPlayerDiv{
 	text-align: center;
 	max-width: 300px;
 	margin: 0 auto;
 }
 
-.audioPlayer .ui-block-a{
+.audioPlayerDiv .ui-block-a{
 	width: 80%;
 }
 
-.audioPlayer .ui-block-b{
+.audioPlayerDiv .ui-block-b{
 	width: 20%;
 }
 
@@ -90,6 +88,18 @@ break things. I need to find another way to do this... */
 	margin: 0;
 }
 
+#playerEpisodeInfo p{
+	margin: 0;
+	padding: 0;
+}
+
+#playerPodcastTitle{
+	font-size: 0.7em;
+}
+#playerEpisodeTitle{
+	font-size: 0.85em;	
+}
+
 .full-width-slider input{
 	display: none;
 }
@@ -115,3 +125,6 @@ break things. I need to find another way to do this... */
 	padding:0.1em 0.2em;
 	margin-right: 0;
 }
+
+/* ----- Search page ----- */
+

@@ -2,9 +2,10 @@
 {% block body %}
 
 <!-- Display player -->
-<div class='audioPlayer'>
-	<audio id='myMusic2' class='stdControls'>
-		<source src='#' class='audioSource'>
+<div class='audioPlayerDiv'>
+	<audio id='audioPlayer' class='audioPlayer' controls data-start-playback-time='{{ nowPlaying.current_playback_time }}'
+		   preload='metadata'>
+		<source src='{{ nowPlaying.url_episode }}'>
 	</audio>
 	<div class='ui-grid-a'>
 		<div class='ui-block-a'>
@@ -15,28 +16,30 @@
 		</div>
 		<div class='ui-block-b'>
 			<p id='playerTimeCurrent'>
-				0:00
-<!-- 				{{ nowPlaying.currentTime }} -->
+				{{ nowPlaying.currentTime }}
 			</p>
 		</div>
 	</div>
 	<div class='customAudioControls'>
-		<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
-		<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
-		<a class="ui-btn ui-btn-inline" id="fastForwardBtn">&gt;</a>
-		<a class="ui-btn ui-btn-inline" id="muteBtn">Mute</a>
+		<a class="playBtn ui-btn ui-btn-inline" id='playBtnId'>&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
+		<a class="rewindBtn ui-btn ui-btn-inline">&lt;</a>
+		<a class="fastForwardBtn ui-btn ui-btn-inline">&gt;</a>
+		<a class="muteBtn ui-btn ui-btn-inline">Mute</a>
 	</div>
-	<p id='playerEpisodeInfo'>
-		Podcast title | Episode title
-<!-- 		{{ nowPlaying.title_podcast }} {{ nowPlaying.title_episode }} -->
-	</p>
+	<div id='playerEpisodeInfo'>
+		<p id='playerPodcastTitle'>
+			{{ nowPlaying.title_podcast }}
+		</p>
+		<p id='playerEpisodeTitle'>
+			{{ nowPlaying.title_episode }}
+		</p>
+	</div>
 </div>
-
 <div id='playlist' class='playlist'>
 	<ul data-role='listview' data-split-icon='delete'>
 		{% for episode in playlist %}
-		<li data-icon='false' data-episode-url='{{ episode.url_episode
-												}}' id='playlistItem_{{ loop.index }}' class='playlistItem'> 
+		<li data-icon='false' data-episode-url='{{ episode.url_episode}}' data-podcast-url='{{ episode.url_podcast}}' 
+			id='playlistItem_{{ loop.index }}' class='playlistItem'> 
 			<a href='#'>
 				<h2>{{ episode.title_podcast }}</h2>
 				<p>{{ episode.title_episode }}</p>

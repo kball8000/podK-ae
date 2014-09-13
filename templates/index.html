@@ -1,14 +1,9 @@
-
-<!-- 
--Need custom button icons for volume, or leave it as word mute and un-mute, not sure where to go with that yet.
--->
 {% extends 'base.html' %} {% block body %} {% if user_welcome_nickname %}
 
 <!-- **  Notification area when I've added a podcast. ** -->
 <div id='podcastNotificationDiv' class='notificationDiv'>
 	<div id='podcastNotification' class='notification' style='display:none;'></div>
 </div>
-
 <p>
 	Welcome {{ user_welcome_nickname }}! (<a rel="external" href="{{ user_welcome_href }}">Logout</a> )
 </p>
@@ -18,29 +13,13 @@
 </p>
 {% endif %}
 
-<!-- Display player -->
-<div class='audioPlayer' style='display:none'>
-	<div class='stdAudioControls'>
-		<audio controls id='myMusic1' class='stdControls'>
- 			<source src='#' class='audioSource'>
-<!-- 			<source src='http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0462/sn0462.mp3'> -->
-		</audio>
-	</div>
-	<div class='customAudioControls'>
-		<a class="ui-btn ui-btn-inline" id="playBtn">&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
-		<a class="ui-btn ui-btn-inline" id="rewindBtn">&lt;</a>
-		<a class="ui-btn ui-btn-inline" id="fastForwardBtn">&gt;</a>
-		<a class="ui-btn ui-btn-inline" id="muteBtn">Mute</a>
-	</div>
-</div>
-
 <!-- Display user's podcast subscription list -->
 <div id='subscriptionList' class='subscriptionList'>
 	{% for feed in podcast_feeds %}
 <!-- 	<div id='subscriptionItem_{{ loop.index }}' data-podcast-title='{{ feed.title }}' data-podcast-url='{{feed.urlPodcast}}' class='subscriptionItem'> -->
 	<div id='subscriptionItem_{{ loop.index }}' data-podcast-url='{{feed.urlPodcast}}' class='subscriptionItem'>
 		<div class='subscriptionFunctions'>
-			<a class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline'></a>
+			<a class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline' data-podcast-title='{{ feed.title }}'></a>
 			<a class='refreshBtn ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline'></a>
 		</div>
 		<div data-role='collapsible' data-inset='false' class='subscriptionCollapsible'>

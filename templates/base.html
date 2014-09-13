@@ -12,8 +12,8 @@
 		<title>{{ pageTitle }}</title>
 	</head>
 	<body>
- 		<div data-role='page'>  <!-- data-url='{{ dataUrl }}' -->
-			<div data-role='header'>
+ 		<div data-role='page' id='{{ pageId }}'>  <!-- data-url='{{ dataUrl }}' -->
+			<div data-role='header' data-position='fixed'>
 				<div data-role='navbar'>
 					<ul>
 						<li><a href='/' class='{{ navClass.home }}' data-icon='home'>Podcasts</a></li>
@@ -31,13 +31,13 @@
 				{% endblock %}
 			</div> <!-- End data-role-main -->
 
-			<div data-role='footer' style='overflow:hidden;'>
+			<div data-role='footer' style='overflow:hidden;' data-position='fixed'>
 				<h2>Podsy <span style='color:rgb(150,150,150); font-family:monospace; padding-left:2em;'>by kball</span></h2>
 				<a href='/settings' class='ui-btn-right' data-icon='gear' style='margin-top:0;'>Settings</a>
 			</div>
 
 		</div> <!-- End data-role-page -->
 	</body>
-	<script src="/scripts/podK.js"></script>
+<!-- 	<script src="/scripts/podK.js"></script> -->
 </html>
 {% endautoescape %}
