@@ -104,10 +104,10 @@ class PodcastPage(webapp2.RequestHandler):
 		self.response.write(template.render(template_values))
 
 class PlaylistPage(webapp2.RequestHandler):
+	""" Get playlist from datastore and send playlist data to Jinja to render the page"""
 	def get(self):
 		user = users.get_current_user()
 
-		# Get playlist from datastore
 		qry = Playlist.query(ancestor = podcast_feed_key())
 		qry_1 = qry.filter(Playlist.listType == 'playlist', Playlist.author == user)
 		qry_2 = qry.filter(Playlist.listType == 'nowPlaying', Playlist.author == user)
@@ -116,20 +116,15 @@ class PlaylistPage(webapp2.RequestHandler):
 
 		playlist = result_1.playlist
 		playlist.reverse()
-
-		# since there is only one item in list.
-		nowPlaying = result_2.playlist if result_2 else 'nada'
-		logging.info('\n\nPlaylist: nowPlaying %s ' % nowPlaying)
 		
-# 		if len(nowPlaying) > 0:
-# 			nowPlaying[0]['current_playback_time'] = 45
-
+		nowPlaying = result_2.playlist if result_2 else 'nada'
+		
 		template_values = {
 			'navClass': {'playlist': 'ui-btn-active ui-state-persist' },
 			'pageTitle': 'Playlist',
 			'pageId': 'PlaylistPage',
 			'playlist': playlist,
-			'nowPlaying': nowPlaying[0]
+			'nowPlaying': nowPlaying[0] # since there is only one item in 'list'.
 		}
 		template = JINJA_ENVIRONMENT.get_template('playlist.html')
 		self.response.write(template.render(template_values))
@@ -207,7 +202,7 @@ class AddPodcast(webapp2.RequestHandler):
 
 		for item in root.find('channel').findall('item'):
 			title_episode = item.find('title').text
-			url_episode = item.find('link').text
+			url_episode = item.find('enclosure').get('url')
 			episode = {'title': title_episode, 'url': url_episode }
 			episode_list_return.append(episode)
 
@@ -302,12 +297,9 @@ class SaveNowPlaying(webapp2.RequestHandler):
 	def post(self):
 		user = users.get_current_user();
 		
-		
 		qry = Playlist.query(Playlist.author == user)
 		qry_1 = qry.filter(Playlist.listType == 'nowPlaying')
 		nowPlaying = qry_1.fetch(1)[0]
-# 		x = self.request.get('current_playback_time')
-# 		logging.info('\n\n\n current playback time %s' % x )
 		
 		nowPlaying.playlist = [{
 				'url_podcast': self.request.get('url_podcast'),
@@ -318,11 +310,10 @@ class SaveNowPlaying(webapp2.RequestHandler):
 		}]
 		
 		nowPlaying.put()
-	
+
 class SetNowPlaying(webapp2.RequestHandler):
 	""" Initializes player with last played episode and last playback time. """
 	def post(self):
-		# logging.info('\n\nsetnow playing python----')
 		
 		user = users.get_current_user()
 
@@ -339,13 +330,10 @@ class SetNowPlaying(webapp2.RequestHandler):
 		qry_podcast = Podcast.query(ancestor=podcast_feed_key())
 		qry_podcast_1 = qry_podcast.filter(Podcast.urlPodcast == url_podcast, Podcast.author == user)
  		podcast = qry_podcast_1.fetch(1)[0]
-		# podcast = qry_podcast_1.fetch(1)
-		logging.info('podcast from ds = %s' % (podcast))
+		
 		for episode in podcast.episode:
-			logging.info('episode loop looping')
 			if episode.url == url_episode:
  				current_playback_time = episode.playbackPosition
-				logging.info('episode loop setting time %s' % current_playback_time )
 				title_episode = episode.title
 				break
 			else:

@@ -72,6 +72,166 @@ function refreshPodcast(e){
 }
 
 // **--   Playlist page script   --** 
+
+function displayPlayerTime(){
+	/* Displays the time in the player region of the ui.*/
+
+	var player = $('#audioPlayer')[0];
+	var time_s = player.currentTime;  // time in seconds
+	$('#playerTimeCurrent').data('init-playback-time', Math.floor(time_s));
+	console.log('data-init time = : ' + $('#playerTimeCurrent').data('init-playback-time'));
+
+	var duration = Math.floor(player.duration);
+	var s = 0, min = 0, hr = 0;
+
+	hr = Math.floor(time_s/3600);
+	min = Math.floor((time_s % 3600)/60);
+	s = Math.floor((time_s % 60));
+
+	if(duration >= 3600){
+		hr = (hr>0) ? hr.toString() + ':' : '0:' ;
+	}
+	else{
+		hr = (hr>0) ? hr.toString() + ':' : '' ;
+	}
+	if(time_s > 3600 && min < 10 || duration >= 3600 && min < 10){
+		min = '0' + min.toString() + ':' ;
+	}
+	else{
+		min = min.toString() + ':' ;
+	}
+	s = (s>9) ? s.toString() : '0' + s.toString();
+	$('#playerTimeCurrent').html(hr+min+s);
+}
+
+function setAudioPlayerInit(){
+	var initialPlaybackTime = $('#playerTimeCurrent').data('init-playback-time');
+	var readyStateInterval;
+	var player = $('#audioPlayer')[0];
+	player.load();
+
+	readyStateInterval = setInterval( function(){
+		console.log('Player ready state when loading player for the first time: ' + 
+					player.readyState);
+		if (player.readyState > 0) {
+			player.currentTime = initialPlaybackTime;
+			displayPlayerTime();
+			clearInterval(readyStateInterval);
+		}
+	}, 100);
+	$('#playerTimeCurrent').html(initialPlaybackTime);
+}
+
+function playTrack(){
+	/* Plays podcast, saves current playback time so user can pick up where they left off and goes to next episode
+		on the list when the current playing is finished. */
+	var savePlaybackPositionTimer;
+	var playbackPositionTimer;
+	var nextTrackTimer;
+	var player = $('#audioPlayer')[0];
+
+	function ifNextTrack(){
+		console.log('in next track');
+		if (player.ended){
+			console.log('track has ended.');
+			clearInterval(nextTrackTimer);
+		}
+	}
+	
+	function checkPlayerTimeChange(){
+		/* Check to see if diplay needs updating. */
+		var time_player = $('#audioPlayer')[0].currentTime;  // time in seconds of player
+		var time_displayed = $('#playerTimeCurrent').data('init-playback-time');
+
+		if (time_displayed !== Math.floor(time_player)){
+			displayPlayerTime();
+		}
+		if( player.paused){
+			clearInterval(playbackPositionTimer);
+		}
+	}
+
+	function savePlaybackPosition(){
+		// Save playback postion to datastore.
+		var playerSrc = $( player ).children()[0];
+		var episodeInfo = $('#playerEpisodeInfo').children();
+		
+		if( player.paused){
+			clearInterval(savePlaybackPositionTimer);
+		}
+
+ 		var data = {
+			url_podcast: $(player).data('podcast-url'),
+			url_episode:  $(playerSrc).attr('src') ,
+			title_podcast: $(episodeInfo).eq(0).html(),
+			title_episode: $(episodeInfo).eq(1).text(),
+			current_playback_time: Math.floor(player.currentTime)
+		};
+		
+		console.log('Saving playback position to datastore');
+		var request = $.ajax({
+			url: '/saveplaybackposition',
+			type: 'POST',
+			data: data
+		});
+	}
+
+	if(player.paused){
+		playbackPositionTimer = setInterval( checkPlayerTimeChange , 300);
+		savePlaybackPositionTimer = setInterval( savePlaybackPosition , 15000);
+		nextTrackTimer = setInterval( ifNextTrack , 1000 );
+		player.play();
+	}
+	else{
+		player.pause();
+	}
+}
+
+function rewindTrack(){
+	var player = $('#audioPlayer')[0];
+	player.currentTime -= 15;
+}
+
+function fastForwardTrack(){
+	var player = $('#audioPlayer')[0];
+	player.currentTime += 30;
+}
+
+function muteAudio(){
+	var player = $('#audioPlayer')[0];
+	var btn = $('#muteBtn');
+	if (player.muted){
+		player.muted = false;
+		btn.html('Mute');
+	}
+	else{
+		player.muted = true;
+		btn.html('Unmute');
+	}
+}
+
+function setNowPlaying(urlPodcast, urlEpisode){
+	// Save this new 'now playing track' to data store.
+	var request = $.ajax({
+		url:'/setnowplaying',
+		type: 'POST',
+		data: { url_podcast: urlPodcast, url_episode: urlEpisode }
+	});
+}
+
+function sendEpisodeToPlayer(e){
+/* When clicking episode in playlist (listview) play the episode */
+	var url = $( this ).data('episode-url');
+	var urlPodcast = $( this ).data('podcast-url');
+	var player = $( '#audioPlayer' )[0];
+	var playerSrc = $( player ).children()[0];
+	
+	$( playerSrc ).attr( 'src', url );
+	player.load();
+	setNowPlaying(urlPodcast, url);
+	playTrack();	
+}
+
 function removeFromPlaylist(e){
 	e.preventDefault();
 	e.stopImmediatePropagation();
@@ -93,103 +253,6 @@ function removeFromPlaylist(e){
 	// Remove item from ui
 	$( '#'+id ).remove();
 	
-}
-
-function playPodcast(){
-	/* Plays podcast, saves current playback time so user can pick up where they left off and goes to next episode
-	on the list when the current playing is finished. */
-	console.log('in playpodcast playlist page playBtn');
- 	var savePlaybackPositionTimer;
-	var player = $('#audioPlayer')[0];
-	console.dir(player);
-
-	function savePlaybackPosition(){
-		var playerSrc = $( player ).children()[0];
-		var episodeInfo = $('#playerEpisodeInfo').children();
-//		var test1 = episodeInfo[0];
-//		console.dir(ep)
-		console.log('in save position timer: ' + savePlaybackPositionTimer);
-		console.dir(episodeInfo);
-		if( player.paused){
-			clearInterval(savePlaybackPositionTimer);
-		}
-		console.log( 'episode info childrennn: ' + episodeInfo);
-		console.dir($('#playerEpisodeInfo'));
-		console.dir(episodeInfo[0]);
-
- 		var data = {
-			url_podcast: $(player).data('podcast-url'),
-			url_episode:  $(playerSrc).attr('src') ,
-			title_podcast: $(episodeInfo).eq(0).html(),
-			title_episode: $(episodeInfo).eq(1).text(),
-			current_playback_time: Math.floor(player.currentTime)
-		};
-		console.log('current playback time: ' + data.current_playback_time);
-		console.log('data is here: ');
-		console.dir(data);
-		var request = $.ajax({
-			url: '/saveplaybackposition',
-			type: 'POST',
-			data: data
-		});
-		request.fail( function(){
-			console.log('failed to save now playing to datastore');
-		});
-	}
-
-	if(player.paused){
-		savePlaybackPositionTimer = setInterval( function(){savePlaybackPosition();} , 3000);
-		console.log('timer started in if of play: ' + savePlaybackPositionTimer);
-		player.play();
-	}
-	else{
-		player.pause();
-	}
-}
-
-function setAudioPlayerInit(){
-	var initialPlaybackTime = $('#playerTimeCurrent').data('init-playback-time');
-	var readyStateInterval;
-	var player = $('#audioPlayer')[0];
-	console.dir(player);
-	player.load();
-
-	readyStateInterval = setInterval( function(){
-		console.log('hi ' + player.readyState);
-		if (player.readyState > 0) {
-			player.currentTime = initialPlaybackTime;
-			clearInterval(readyStateInterval);
-		}
-	}, 100);
-	// initialPlaybackTime += 45;
-	$('#playerTimeCurrent').html(initialPlaybackTime);
-}
-
-function setNowPlaying(urlPodcast, urlEpisode){
-	console.log('setNowPlaying ep url: ' + urlEpisode );
-	console.log('setNowPlaying pd url: ' + urlPodcast );
-	var request = $.ajax({
-		url:'/setnowplaying',
-		type: 'POST',
-		data: { url_podcast: urlPodcast, url_episode: urlEpisode }
-	});
-	request.fail( function(){
-		console.log('failed to load to player');
-	});
-/* 	$.ajax request to save info to datastore */
-}
-
-function sendEpisodeToPlayer(e){
-/* When clicking episode in playlist (listview) play the episode */
-	var url = $( this ).data('episode-url');
-	var urlPodcast = $( this ).data('podcast-url');
-	var player = $( '#audioPlayer' )[0];
-	var playerSrc = $( player ).children()[0];
-	
-	$( playerSrc ).attr( 'src', url );
-	player.load();
-	setNowPlaying(urlPodcast, url);
-	playPodcast();	
 }
 
 // **--   Search page script   --** 
@@ -242,6 +305,25 @@ function addPodcastFromRssUrl(e){
 	addPodcastToDatastore(url);
 }
 
+function sendITunesSearchRequest(event){
+	//Search iTunes API with a dynamically loaded script from user input
+
+	event.preventDefault();
+
+	var notificationHtml = 'Searching iTunes...';
+	var searchValue = $('#iTunesSearchValue').val();
+	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + 
+		encodeURIComponent(searchValue) + '&callback=showITunesSearchResults';
+	var html = "<script src='" + url + "'><\/script>";
+	$( '#itunesScript' ).empty(); 		// Remove any searches between page reloads.
+	$( '#itunesScript' ).append(html); 	// Appending script runs it and gets result from Apple store.
+	$( '#iTunesSearchValue').blur(); 	// Makes the go keyboard disappear on mobile.
+	$('#searchNotification').html(notificationHtml).fadeIn(300);
+
+	// Next display search results.
+	return false;
+}
+
 function showITunesSearchResults(arg){
 	//This callback function of the dynamically loaded script display the restults from iTunes store.
 	var results = arg.results;
@@ -269,12 +351,10 @@ function showITunesSearchResults(arg){
 		return true;
 	}
 	html += '<ul data-role="listview" data-inset="true">';
-	for(var i=0; i<arg.resultCount; i++){
+	for(var i=0; i<arg.resultCount; i+=1){
 		/* Using jQuery mobile listiew with thumbnails to display iTunes search results. */
-//		podcastFeed = encodeURIComponent(results[i].urlPodcast);
 		podcastFeed = results[i].feedUrl;
 		title = results[i].collectionCensoredName;
-//	<div id='subscriptionItem_{{ loop.index }}' data-podcast-title='{{ feed.title }}' data-podcast-url='{{feed.urlPodcast}}' class='subscriptionItem'>
 
 		html += '<li data-podcast-title="' + title + '" data-podcast-url=' + podcastFeed +'><a href="#">';
 		html += '<img src="' + results[i].artworkUrl100 + '">';
@@ -287,27 +367,22 @@ function showITunesSearchResults(arg){
 	$('#searchNotification').fadeOut(300);
 }
 
-function sendITunesSearchRequest(event){
-	//Search iTunes API with a dynamically loaded script from user input
-
-	event.preventDefault();
-
-	var notificationHtml = 'Searching iTunes...';
-	var searchValue = $('#iTunesSearchValue').val();
-	var url = 'https://itunes.apple.com/search?entity=podcast' + '&term=' + 
-		encodeURIComponent(searchValue) + '&callback=showITunesSearchResults';
-	var html = "<script src='" + url + "'><\/script>";
-	$( '#itunesScript' ).empty(); 		// Remove any searches between page reloads.
-	$( '#itunesScript' ).append(html); 	// Appending script runs it and gets result from Apple store.
-	$( '#iTunesSearchValue').blur(); 	// Makes the go keyboard disappear on mobile.
-	$('#searchNotification').html(notificationHtml).fadeIn(300);
-
-	// Next display search results.
-	return false;
-}
-
 
 // **--  Event listeners --**
+//$( document ).pagecontainer({
+$( ':mobile-pagecontainer' ).pagecontainer({
+//$( 'body' ).pagecontainer({
+	beforechange: function(event, ui){
+		console.log('in before change function, checking if audio player is going.');
+		if ( $('#audioPlayer').length > 0){
+			console.log('player exists.');
+			var player = $('#audioPlayer')[0];
+			if ( !player.paused ){
+				playTrack();
+			}
+		}
+	}
+});
 // Podcasts Page
 $('#PodcastPage').on('pagecreate', function(e, ui){
 	$( '.subscriptionFunctions' ).on( 'click', '.deleteBtn', deletePodcast );
@@ -319,7 +394,10 @@ $('#PlaylistPage').on('pagecreate', function(e, ui){
 	setAudioPlayerInit();
 	$( '#playlist' ).on( 'click', '.deleteBtn', removeFromPlaylist );
 	$( '#playlist' ).on( 'click', 'li', sendEpisodeToPlayer );
-	$( '#playBtnId' ).on( 'click', playPodcast );
+	$( '#playBtn' ).on( 'click', playTrack );
+	$( '#rewindBtn' ).on( 'click', rewindTrack );
+	$( '#fastForwardBtn').on( 'click', fastForwardTrack );
+	$( '#muteBtn' ).on( 'click', muteAudio );
 });
 // New Page
 $('#NewPage').on('pagecreate', function(e, ui){

@@ -16,15 +16,16 @@
 		</div>
 		<div class='ui-block-b'>
 			<p id='playerTimeCurrent' data-init-playback-time='{{ nowPlaying.current_playback_time }}'>
-				{{ nowPlaying.current_playback_time }}
+<!-- 				{{ nowPlaying.current_playback_time }} -->
+				0:00
 			</p>
 		</div>
 	</div>
 	<div class='customAudioControls'>
-		<a class="playBtn ui-btn ui-btn-inline" id='playBtnId'>&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
-		<a class="rewindBtn ui-btn ui-btn-inline">&lt;</a>
-		<a class="fastForwardBtn ui-btn ui-btn-inline">&gt;</a>
-		<a class="muteBtn ui-btn ui-btn-inline">Mute</a>
+		<a class="playBtn ui-btn ui-btn-inline" id='playBtn'>&#9654; <span style='padding:0 0.5em;'>/</span> ||</a>
+		<a class="rewindBtn ui-btn ui-btn-inline" id='rewindBtn'>&lt;</a>
+		<a class="fastForwardBtn ui-btn ui-btn-inline" id='fastForwardBtn' >&gt;</a>
+		<a class="muteBtn ui-btn ui-btn-inline" id='muteBtn'>Mute</a>
 	</div>
 	<div id='playerEpisodeInfo'>
 	<!-- Important not to have extra spaces here, since this is read in as data for
