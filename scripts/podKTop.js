@@ -1,59 +1,65 @@
 // **--   Home - Pocast page script   --** 
+function createPlaylistListviewItem(result){
+	var html = '';
+	html = '<li data-icon="false" data-episode-url=' + result.urlEpisode + 'id="playlistItem_';
+	html += (result.length + 1) + '" class="playlistItem"><a href="#">';
+	html += '<h2>' + result.titlePodcast + '<\/h2><p>' + result.titleEpisode;
+	html += '<\/p><\/a><a href="#" class="deleteBtn"><\/a><\/li>';
+
+	return html;
+}
+
 function addToPlaylist(e){
 /* 	 On main podcast page clicking episodes adds them to the list on the playlist page. 
 Must go to playlist page in order to actually play the episode*/
 	e.preventDefault();
 	e.stopImmediatePropagation();
 	
-	var elemPodcast = $( this ).parents().eq(4).get(0);
-	var elemEpisode = $( this ).parent().get(0);
-	var urlPodcast = $( elemPodcast ).data('podcast-url');
-	var urlEpisode = $( elemEpisode ).data('episode-url');
-
+	var elemId = $( this ).parents().eq(3).get(0);
+	var storageId = $( elemId ).data('storage-id');
+	var urlEpisode = $( this ).parent().data('episode-url');
+	var playlistId = $( '#subscriptionList' ).data('playlist-id');
 	var length = $( '#playlist' ).children().length;
- 	var html = '<li data-icon="false" id="playlistItem_' + (length + 1);
-	html += '" class="playlistItem"><a href="#">';
-	html += '<h2>More<\/h2><p>Less<\/p><\/a><a href="#" class="deleteBtn"><\/a><\/li>';
+ 	var html = '';
 
 	var request = $.ajax({
 		url: '/addtoplaylist',
 		type: 'POST',
-		data: { urlEpisode: urlEpisode, urlPodcast: urlPodcast }
+		data: { url_episode: urlEpisode, storage_id: storageId, playlist_id: playlistId }
 	});
+	$.mobile.loading('show');
 	request.done( function(result){
+		result.length = length;
+		html = createPlaylistListviewItem(result);
 		$( '#playlist' ).prepend(html).listview('refresh');
-		console.log('Added ' + result.titlePodcast + ' - ' + result.titleEpisode + ' to playlist!');
+		$.mobile.loading('hide');
 	});
 }
 
 function deletePodcast(e){
-	/* -Acts on the 'X' button next to each podcast. It removes the subscription to that podcast.
-	 -Would like to maintain a history of inactive subscriptions. */
 	// -Really nice yes / no pop up in http://demos.jquerymobile.com/1.4.3/popup/ -- dialog, but way more complicated than the standard confirm
 	// -May want to change this to an undo / dismiss notifcation thing that doesn't disappear until you do something else???
-	// -When I redo where the delete and refresh buttons are, change the way you retrieve the title
-	// from data-url to looking at title text in <a> element.
-	
 	
 	e.preventDefault();
 	e.stopImmediatePropagation();
 	
-	var elemUrl = $( this ).parents().eq(1).get(0);
-	var title = $( this ).data('podcast-title');
-	var podcast = $( elemUrl ).data('podcast-url');
-	var divToRemove = elemUrl.id;
+	var elemTitle = $( this ).parent();
+	var elemId = $( this ).parents().eq(3).get(0);
+	var title = $( elemTitle ).data('podcast-title');
+	var storageId = $( elemId ).data('storage-id');
+
 	var html = 'Removing ' + title;
 	var html_done = title + ' removed' ;
-
+	
 	if (confirm('Delete ' + title + '?') === true){
 		var request = $.ajax({
 			url: "/removepodcast",
 			type: "POST",
-			data: { podcast : podcast }
+			data: { storage_id : storageId }
 		});
 		$( '#podcastNotification' ).html(html).fadeIn(300);
 		request.done(function(){
-			$( '#'+divToRemove ).remove();
+			$( elemId ).fadeOut(2000);
 			$( '#podcastNotification' ).fadeOut(800);
 			setTimeout( function(){
 				$( '#podcastNotification' ).html(html_done).fadeIn(300).delay(4000).fadeOut(800);
@@ -108,17 +114,22 @@ function setAudioPlayerInit(){
 	var initialPlaybackTime = $('#playerTimeCurrent').data('init-playback-time');
 	var readyStateInterval;
 	var player = $('#audioPlayer')[0];
-	player.load();
+	var playerSrc = $( player ).children()[0];
 
-	readyStateInterval = setInterval( function(){
-		console.log('Player ready state when loading player for the first time: ' + 
-					player.readyState);
-		if (player.readyState > 0) {
-			player.currentTime = initialPlaybackTime;
-			displayPlayerTime();
-			clearInterval(readyStateInterval);
-		}
-	}, 100);
+	if ($( playerSrc ).attr( 'src' )){
+		
+		player.load();
+
+		readyStateInterval = setInterval( function(){
+			console.log('Player ready state when loading player for the first time: ' + 
+						player.readyState);
+			if (player.readyState > 0) {
+				player.currentTime = initialPlaybackTime;
+				displayPlayerTime();
+				clearInterval(readyStateInterval);
+			}
+		}, 100);
+	}
 	$('#playerTimeCurrent').html(initialPlaybackTime);
 }
 
@@ -134,6 +145,9 @@ function playTrack(){
 		console.log('in next track');
 		if (player.ended){
 			console.log('track has ended.');
+			clearInterval(nextTrackTimer);
+		}
+		if (player.paused){
 			clearInterval(nextTrackTimer);
 		}
 	}
@@ -154,6 +168,7 @@ function playTrack(){
 	function savePlaybackPosition(){
 		// Save playback postion to datastore.
 		var playerSrc = $( player ).children()[0];
+		var storageId = $( player ).data('storage-id');
 		var episodeInfo = $('#playerEpisodeInfo').children();
 		
 		if( player.paused){
@@ -161,13 +176,13 @@ function playTrack(){
 		}
 
  		var data = {
-			url_podcast: $(player).data('podcast-url'),
+			storage_id: storageId,
 			url_episode:  $(playerSrc).attr('src') ,
-			title_podcast: $(episodeInfo).eq(0).html(),
-			title_episode: $(episodeInfo).eq(1).text(),
 			current_playback_time: Math.floor(player.currentTime)
 		};
 		
+		console.log('saving playback postion data: ');
+		console.dir(data);
 		console.log('Saving playback position to datastore');
 		var request = $.ajax({
 			url: '/saveplaybackposition',
@@ -178,7 +193,7 @@ function playTrack(){
 
 	if(player.paused){
 		playbackPositionTimer = setInterval( checkPlayerTimeChange , 300);
-		savePlaybackPositionTimer = setInterval( savePlaybackPosition , 15000);
+		savePlaybackPositionTimer = setInterval( savePlaybackPosition , 5000);
 		nextTrackTimer = setInterval( ifNextTrack , 1000 );
 		player.play();
 	}
@@ -210,25 +225,33 @@ function muteAudio(){
 	}
 }
 
-function setNowPlaying(urlPodcast, urlEpisode){
+// function setNowPlaying(urlPodcast, urlEpisode){
+function setNowPlaying(storageId, urlEpisode){
 	// Save this new 'now playing track' to data store.
 	var request = $.ajax({
 		url:'/setnowplaying',
 		type: 'POST',
-		data: { url_podcast: urlPodcast, url_episode: urlEpisode }
+		data: { storage_id: storageId, url_episode: urlEpisode }
 	});
 }
 
 function sendEpisodeToPlayer(e){
 /* When clicking episode in playlist (listview) play the episode */
 	var url = $( this ).data('episode-url');
-	var urlPodcast = $( this ).data('podcast-url');
+	var storageId = $( this ).data('storage-id');
+	// var urlPodcast = $( this ).data('podcast-url');
 	var player = $( '#audioPlayer' )[0];
 	var playerSrc = $( player ).children()[0];
 	
+	console.log('in send ep to player');
+	console.log( 'ep_url: ' + url);
+	console.log(', storageId: ' + storageId);
+//	console.log(', pod_url: ' + urlPodcast);
+	
 	$( playerSrc ).attr( 'src', url );
 	player.load();
-	setNowPlaying(urlPodcast, url);
+	setNowPlaying(storageId, url);
+//	setNowPlaying(urlPodcast, url);
 	playTrack();	
 }
 
@@ -246,8 +269,8 @@ function removeFromPlaylist(e){
 		type: 'POST',
 		data: { url: url }
 	});
-	request.done( function(result){
-		console.log('Removed from playlist: ' + result );
+	request.done( function(){
+		console.log('Successfully removed from playlist: ');
 	});
 	
 	// Remove item from ui
@@ -256,6 +279,25 @@ function removeFromPlaylist(e){
 }
 
 // **--   Search page script   --** 
+function createHtmlPodcastPage(podcast){
+	console.log('in createHtmlPodcastPage');
+	var i = 100;
+	var html = "<div id='subscriptionItem_" + (podcast.length + 1) + "' class='subscriptionItem'>";
+	html += "<div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' data-storage-id='" + podcast.storageId + "'>";
+	html += "<h3><img src='" + podcast.urlImage + "' alt='podcast logo' height='45' width='45'>";
+	html += "<span>" + podcast.title + "<\/span>";
+	html += "<div class='subscriptionFunctions' data-podcast-title='" + podcast.title + "'>";
+	html += "<button class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline'><\/button><span id='podcastBtnSpace'> <\/span>";
+	html += "<button class='refreshBtn ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline'><\/button>";
+	html += "<\/div><\/h3>";
+	html += "<ul data-role='listview'>";
+	html += "<li data-episode-url='" + podcast.episode_url + "'>";
+	html += "<a href='#' class='addToPlaylist'>" + podcast.episodeTitle + "Time: " + podcast.playbackPosition;
+	html += "<\/a><\/li><\/ul><\/div><\/div>";
+	
+	return html;
+}
+
 function addPodcastToDatastore( url, title ){
 	// since I don't know the title like in itunes search which returns it, 
 	// The line below uses default 'rss feed' text since the user isn't supplying title.
@@ -263,6 +305,8 @@ function addPodcastToDatastore( url, title ){
 	var htmlAdding = '<b>Adding</b> ' + title;
 	var htmlAdded = '<b>Added!</b> ' + title + '<br>See results in <a href="/">Podcasts</a>';
 	var htmlFailed = '<i>Failed</i> to add ' + title;
+	var htmlPodcastPage = '';
+	var length = $('#subscriptionList').children().length;
 
 	console.log('url: ' + url);
 	
@@ -275,6 +319,9 @@ function addPodcastToDatastore( url, title ){
 	$('#iTunesSearchResultsHtml').empty();		// Really only applies when searching iTunes, not adding by RSS.
 	request.done(function(podcast){
 		$( '#searchNotification' ).fadeOut( 800 );
+		podcast.length = length;
+		htmlPodcastPage = createHtmlPodcastPage(podcast);
+		$('#subscriptionList').prepend(htmlPodcastPage).trigger('create');
 		/* Used setTimeout so text doesn't update before display does.*/
 		setTimeout( function(){
 			$( '#searchNotification' ).html(htmlAdded).fadeIn(300).delay(2000).fadeOut(800);
@@ -291,7 +338,7 @@ function addPodcastFromITunesSearch(e){
 /* 	var elem = $( this ).get(0); */
 	var url = $( this ).data('podcast-url');
 	var title = $( this ).data('podcast-title');
-	event.preventDefault();
+	e.preventDefault();
 	$( '#iTunesSearchButton' ).focus();  // Closes keyboard on mobile devices.
 	addPodcastToDatastore(url, title);	
 }
@@ -305,10 +352,10 @@ function addPodcastFromRssUrl(e){
 	addPodcastToDatastore(url);
 }
 
-function sendITunesSearchRequest(event){
+function sendITunesSearchRequest(e){
 	//Search iTunes API with a dynamically loaded script from user input
 
-	event.preventDefault();
+	e.preventDefault();
 
 	var notificationHtml = 'Searching iTunes...';
 	var searchValue = $('#iTunesSearchValue').val();
@@ -385,9 +432,9 @@ $( ':mobile-pagecontainer' ).pagecontainer({
 });
 // Podcasts Page
 $('#PodcastPage').on('pagecreate', function(e, ui){
-	$( '.subscriptionFunctions' ).on( 'click', '.deleteBtn', deletePodcast );
-	$( '.subscriptionFunctions' ).on( 'click', '.refreshBtn', refreshPodcast );
-	$( '.subscriptionCollapsible' ).on( 'click', '.addToPlaylist', addToPlaylist );
+	$( '.deleteBtn' ).on( 'click', deletePodcast );
+	$( '.refreshBtn' ).on( 'click', refreshPodcast );
+	$( '.subscriptionList' ).on( 'click', '.addToPlaylist', addToPlaylist );
 });
 // Playlists Page
 $('#PlaylistPage').on('pagecreate', function(e, ui){

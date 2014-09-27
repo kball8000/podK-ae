@@ -3,9 +3,11 @@
 
 <!-- Display player -->
 <div class='audioPlayerDiv'>
-	<audio id='audioPlayer' class='audioPlayer' controls data-podcast-url='{{ nowPlaying.url_podcast }}' 
+	<audio id='audioPlayer' class='audioPlayer' controls 
+		   data-storage-id='{{ playlist.storage_id }}'
+		   data-episode-url='{{ playlist.now_playing_url }}'
 		   preload='metadata'>
-		<source src='{{ nowPlaying.url_episode }}'>
+		<source src='{{ playlist.now_playing_url }}'>
 	</audio>
 	<div class='ui-grid-a'>
 		<div class='ui-block-a'>
@@ -15,8 +17,7 @@
 			</form>
 		</div>
 		<div class='ui-block-b'>
-			<p id='playerTimeCurrent' data-init-playback-time='{{ nowPlaying.current_playback_time }}'>
-<!-- 				{{ nowPlaying.current_playback_time }} -->
+			<p id='playerTimeCurrent' data-init-playback-time='{{ playlist.now_playing_playback_time }}'>
 				0:00
 			</p>
 		</div>
@@ -28,16 +29,15 @@
 		<a class="muteBtn ui-btn ui-btn-inline" id='muteBtn'>Mute</a>
 	</div>
 	<div id='playerEpisodeInfo'>
-	<!-- Important not to have extra spaces here, since this is read in as data for
-	nowPlaying info stored in app engine datastore.-->
-		<p>{{ nowPlaying.title_podcast }}</p>
-		<p>{{ nowPlaying.title_episode }}</p>
+		<p>{{ playlist.now_playing_title_podcast }}</p>
+		<p>{{ playlist.now_playing_title_episode }}</p>
 	</div>
 </div>
 <!-- <div id='playlist' class='playlist'> -->
 	<ul data-role='listview' data-split-icon='delete' id='playlist'>
-		{% for episode in playlist %}
-		<li data-icon='false' data-episode-url='{{ episode.url_episode}}' data-podcast-url='{{ episode.url_podcast}}' 
+		{% for episode in playlist.list_item %}
+		<li data-icon='false' data-episode-url='{{ episode.url_episode}}'
+			data-storage-id='{{ episode.storage_id }}'
 			id='playlistItem_{{ loop.index }}' class='playlistItem'> 
 			<a href='#'>
 				<h2>{{ episode.title_podcast }}</h2>

@@ -37,15 +37,16 @@ break things. I need to find another way to do this... */
 
 .subscriptionFunctions{
 	position:absolute;
-	z-index: 1;
-	top: 0.5em;
-	right: -0.7em;
+	top: 0.6em;
+	right: 1em;
 }
 
-.subscriptionFunctions a{
-	display: inline-block;
-	padding:0.1em 0.2em;
-	margin-right: 0;
+.subscriptionFunctions button{
+	padding:0.5em 0.7em;
+}
+
+#podcastBtnSpace{
+	padding: 0 0.2em;
 }
 
 /* ----- Playlist page ----- */
@@ -128,3 +129,13 @@ break things. I need to find another way to do this... */
 
 /* ----- Search page ----- */
 
+/* ----- Sign On page ----- */
+
+.signonDiv a{
+	margin: 2em 2em 0 2em;
+	padding: 1.5em 1em;
+}
+
+.signonDiv p{
+	text-align: center;
+}
