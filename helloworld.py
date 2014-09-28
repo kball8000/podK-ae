@@ -345,7 +345,6 @@ class RefreshFeed(webapp2.RequestHandler):
 class AddToPlaylist(webapp2.RequestHandler):
 	def post(self):
 		page_list_item = {};
-		logging.info('\n\nIn add to playlist ***---***')
 		
 		""" Add check to see if episoode is already in playlist """
 
@@ -353,11 +352,9 @@ class AddToPlaylist(webapp2.RequestHandler):
 		episode_url = self.request.get('episode_url')
 		podcast_key = ndb.Key(urlsafe = self.request.get('urlsafe_key'))
 		playlist_key = ndb.Key(urlsafe = self.request.get('playlist_urlsafe_key'))
-		
-		# Get playlist from datastore using key stored in data- on webpage
+				
+		# Add item to playlist and save updated playlist to datastore
 		playlist = playlist_key.get()
-		
-		# Save updated playlist to datastore
 		list_item = ListItem(episode_url=episode_url, podcast_key=podcast_key)
 		playlist.list_item.append(list_item)
 		playlist.put()
@@ -380,6 +377,18 @@ class AddToPlaylist(webapp2.RequestHandler):
 		self.response.write(json.dumps(page_list_item))
 
 # Playlist page functions
+
+def dump_json(self, data):
+	""" Writes out json data, generally a return for ajax requests."""
+
+	self.response.headers['Content-Type'] = 'application/json'
+	self.response.out.write(json.dumps(data))
+
+def episode_info(podcast, url, info):
+	for episode in podcast.episode:
+		if episode.url == url:
+			return getattr(episode, info)
+
 class RemoveFromPlaylist(webapp2.RequestHandler):
 	""" Removes entry from datastore using episode's url and returns that episodes 
 	title to web page."""
@@ -395,25 +404,19 @@ class RemoveFromPlaylist(webapp2.RequestHandler):
 				playlist.list_item.remove(item)
 		playlist.put()
 
-class SavePlaybackPosition(webapp2.RequestHandler):
+class SavePlaybackTime(webapp2.RequestHandler):
 	""" Saves current playback position to datastore. Used to retrieve on startup to resume where user stopped listening. """
 	def post(self):
-		user = users.get_current_user();
-		
-		qry = Playlist.query(ancestor=podcast_feed_key())
-		playlist = qry.filter(Playlist.author == user).fetch(1)[0]
-
-		urlsafe_key = self.request.get('urlsafe_key')
-		logging.info('saveplaybackposition, urlsafe_key: %s' % urlsafe_key )
-		playlist.now_playing_key = ndb.Key(urlsafe=urlsafe_key)
-		podcast = playlist.now_playing_key.get()
 		
 		episode_url = self.request.get('episode_url')
+		urlsafe_key = self.request.get('urlsafe_key')	# podcast key
 		current_time = self.request.get('current_time')
+		
+		podcast = ndb.Key(urlsafe=urlsafe_key).get()
 		for episode in podcast.episode:
 			if episode.url == episode_url:
 				episode.current_time = int(current_time)
-				
+		
 		podcast.put()
 
 class SaveNowPlaying(webapp2.RequestHandler):
@@ -423,32 +426,26 @@ class SaveNowPlaying(webapp2.RequestHandler):
 	"""
 	def post(self):
 		
-		# user = users.get_current_user()
 		returnInfo = {}
-		
-		logging.info('\n\nsavenowplaying: in ---****')
-		
-		episode_url = self.request.get('url')
+				
+		url = self.request.get('url')
 		playlist_urlsafe_key = self.request.get('playlist_urlsafe_key')
 		podcast_urlsafe_key = self.request.get('podcast_urlsafe_key')
 		
 		# Save playlist with nowplaying pointers to actual podcast 
 		# and get details of episode from podcast entity.
-		playlist = ndb.Key(urlsafe=playlist_urlsafe_key).get()
-		
+		playlist = ndb.Key(urlsafe=playlist_urlsafe_key).get()		
 		podcast = ndb.Key(urlsafe=podcast_urlsafe_key).get()
+
 		returnInfo['podcast_title'] = podcast.title
-		for episode in podcast.episode:
-			if episode.url == episode_url:
-				returnInfo['episode_title'] = episode.title
-
+		returnInfo['episode_title'] = episode_info(podcast, url, 'title')
+		returnInfo['current_time'] = episode_info(podcast, url, 'current_time')
+		
 		playlist.now_playing_key = ndb.Key(urlsafe=podcast_urlsafe_key)
-		playlist.now_playing_url = episode_url
-
+		playlist.now_playing_url = url
 		playlist.put()
-
-		self.response.headers['Content-Type'] = 'application/json'
-		self.response.out.write(json.dumps(returnInfo))
+		
+		dump_json(self, returnInfo)
 
 app = webapp2.WSGIApplication([
 		# list of functions / actions /methods, not sure proper term
@@ -457,7 +454,7 @@ app = webapp2.WSGIApplication([
 		('/removefromplaylist', RemoveFromPlaylist),
 		('/addtoplaylist', AddToPlaylist),
 		('/savenowplaying', SaveNowPlaying),
-		('/saveplaybackposition', SavePlaybackPosition),
+		('/saveplaybacktime', SavePlaybackTime),
 		('/refreshfeed', RefreshFeed),
 		# list of pages for web app
 		('/', PodcastPage),

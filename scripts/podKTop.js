@@ -88,20 +88,11 @@ function refreshPodcast(e){
 
 // **--   Playlist page script   --** 
 
-function displayPlayerTime(){
-	/* Displays the time in the player region of the ui.*/
+function secondsToReadableTime(time_s, duration){
 
-	var player = $('#audioPlayer')[0];
-	var time_s = player.currentTime;  // time in seconds
-	$('#playerTimeCurrent').data('init-playback-time', Math.floor(time_s));
-	console.log('data-init time = : ' + $('#playerTimeCurrent').data('init-playback-time'));
-
-	var duration = Math.floor(player.duration);
-	var s = 0, min = 0, hr = 0;
-
-	hr = Math.floor(time_s/3600);
-	min = Math.floor((time_s % 3600)/60);
-	s = Math.floor((time_s % 60));
+	var hr = Math.floor(time_s/3600);
+	var min = Math.floor((time_s % 3600)/60);
+	var s = Math.floor((time_s % 60));
 
 	if(duration >= 3600){
 		hr = (hr>0) ? hr.toString() + ':' : '0:' ;
@@ -116,11 +107,51 @@ function displayPlayerTime(){
 		min = min.toString() + ':' ;
 	}
 	s = (s>9) ? s.toString() : '0' + s.toString();
-	$('#playerTimeCurrent').html(hr+min+s);
+
+	return (hr+min+s);
+}
+
+function findItemPlaylist(episode_url){
+	
+	var elem = '';
+	$('.playlistItem').each( function(){
+		if ($(this).data('episode-url') === episode_url){
+			elem = $(this);
+		}
+	});
+	
+	return elem;
+}
+
+function findTimeElem(elem){
+	elem = elem.children().eq(0);
+	elem = $(elem).children().eq(2);
+	
+	return elem;
+}
+
+function displayPlayerTime(){
+	/* Displays the time in the player region of the ui.*/
+
+	var player = $('#audioPlayer')[0];
+
+	var playerTime_s = Math.floor(player.currentTime);  // time in seconds
+	var duration = Math.floor(player.duration);
+	var episodeUrl = $(player).data('episode-url');
+
+	var readableTime = secondsToReadableTime(playerTime_s, duration);
+	var playlistItem = findItemPlaylist(episodeUrl);
+	var playlistItemTime = findTimeElem(playlistItem);
+
+	$('#playerTimeCurrent').html(readableTime);
+	$('#playerTimeCurrent').data('playback-time', playerTime_s);
+
+	playlistItemTime.html(readableTime);
+	playlistItemTime.data('playback-time', playerTime_s);
 }
 
 function setAudioPlayerInit(){
-	var initialPlaybackTime = $('#playerTimeCurrent').data('init-playback-time');
+	var initialPlaybackTime = $('#playerTimeCurrent').data('playback-time');
 	var readyStateInterval;
 	var player = $('#audioPlayer')[0];
 	var playerSrc = $( player ).children()[0];
@@ -163,10 +194,11 @@ function playTrack(){
 	
 	function checkPlayerTimeChange(){
 		/* Check to see if diplay needs updating. */
-		var time_player = $('#audioPlayer')[0].currentTime;  // time in seconds of player
-		var time_displayed = $('#playerTimeCurrent').data('init-playback-time');
+		var playerTime = Math.floor(player.currentTime);
+		var time_displayed = $('#playerTimeCurrent').data('playback-time');
 
-		if (time_displayed !== Math.floor(time_player)){
+		// if (time_displayed !== Math.floor(time_player)){
+		if (time_displayed !== playerTime){
 			displayPlayerTime();
 		}
 		if( player.paused){
@@ -176,8 +208,6 @@ function playTrack(){
 
 	function savePlaybackPosition(){
 		// Save playback postion to datastore.
-		var playerSrc = $( player ).children()[0];
-		var episodeInfo = $('#playerEpisodeInfo').children();
 		
 		if( player.paused){
 			clearInterval(savePlaybackPositionTimer);
@@ -185,16 +215,15 @@ function playTrack(){
 
  		var data = {
 			urlsafe_key: $( player ).data('storage-id'),
-			episode_url:  $(playerSrc).attr('src') ,
+			episode_url:  $( player ).data('episode-url') ,
 			current_time: Math.floor(player.currentTime)
 		};
 		
-		console.log('saving playback postion data: ');
-		console.log('saving playback postion data: urlsafe_key: ' + $( player ).data('storage-id'));
+		console.log('Saving playback position to datastore, data:');
 		console.dir(data);
-		console.log('Saving playback position to datastore');
+		
 		var request = $.ajax({
-			url: '/saveplaybackposition',
+			url: '/saveplaybacktime',
 			type: 'POST',
 			data: data
 		});
@@ -245,6 +274,7 @@ function saveNowPlaying(data){
 		// Set values in player to the now current title
 		$('#playerPodcastTitle').html(result.podcast_title);
 		$('#playerEpisodeTitle').html(result.episode_title);
+		$('#audioPlayer')[0].currentTime = result.current_time;
 	});
 }
 
@@ -257,38 +287,35 @@ function setPlayerAttributes(elem, data){
 function sendEpisodeToPlayer(e){
 // When clicking episode in playlist (listview) play the episode
 // Saves to datastore and updates player to show titles.
-	var elem = {};
-	var data = {};
+	var elem = {
+		player: $( '#audioPlayer' )[0]
+	};
+	var data = {
+		url: $( this ).data('episode-url'),
+		podcast_urlsafe_key: $( this ).data('storage-id'),
+		playlist_urlsafe_key: $('#playlist').data('playlist-id')
+	};
 
-	elem.player = $( '#audioPlayer' )[0];
+	// Added separately, since it's dependant on the player element of elem dict.
 	elem.playerSrc = $( elem.player ).children()[0];
 
-	data.url = $( this ).data('episode-url');
-	data.podcast_urlsafe_key = $( this ).data('storage-id');
-	data.playlist_urlsafe_key = $('#playlist').data('playlist-id');
-
-	elem.player.load();
-	playTrack();	
 	setPlayerAttributes(elem, data);
+	elem.player.load();
+	playTrack();
 	saveNowPlaying(data);
+	console.dir(elem);
 }
 
 function removeFromPlaylist(e){
 	e.preventDefault();
 	e.stopImmediatePropagation();
 
-/* 	var elem = $( this ).parent().get( 0 ); */
 	var elem = $( this ).parent();
-
+	
 	var id = $( elem ).attr('id');
 	var url = $( elem ).data('episode-url');
 	var playlistKey = $('#playlist').data('playlist-id');
-/* 	var storageId = $( elem ).data('storage-id'); */
 
-	console.dir(elem);
-	console.log('id for removal: ' + id);
-	console.log('url for removal: ' + url);
-/* 	console.log('storageId for removal: ' + storageId); */
 	// Remove item from datastore
 	var request = $.ajax({
 		url: '/removefromplaylist',
@@ -296,7 +323,7 @@ function removeFromPlaylist(e){
 		data: { url: url, playlist_key: playlistKey }
 	});
 	request.done( function(){
-		console.log('Successfully removed from playlist: ');
+		console.log('Successfully removed from playlist');
 		$( elem ).fadeOut(800);
 	});
 	

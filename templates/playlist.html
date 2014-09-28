@@ -17,7 +17,7 @@
 			</form>
 		</div>
 		<div class='ui-block-b'>
-			<p id='playerTimeCurrent' data-init-playback-time='{{ playlist.now_playing_current_time }}'>
+			<p id='playerTimeCurrent' data-playback-time='{{ playlist.now_playing_current_time }}'>
 				0:00
 			</p>
 		</div>
@@ -37,13 +37,15 @@
 	<ul data-role='listview' data-split-icon='delete' id='playlist' 
 		data-playlist-id='{{ playlist.urlsafe_key }}'>
 		{% for episode in playlist.list_item %}
-		<li data-icon='false' data-episode-url='{{ episode.episode_url}}'
+		<li data-icon='false' 
+			data-episode-url='{{ episode.episode_url}}'
 			data-storage-id='{{ episode.urlsafe_key }}'
 			id='playlistItem_{{ loop.index }}' class='playlistItem'> 
 			<a href='#'>
 				<h2>{{ episode.podcast_title }}</h2>
 				<p>{{ episode.episode_title }}</p>
-<!-- 				<p>{{ episode.percent_listened }}%</p> -->
+				<p class='ui-li-aside' data-playback-time='{{ episode.current_time }}'>
+					<b>{{ episode.current_time }}</b></p>
 			</a>
 			<a href="#" class='deleteBtn'></a>
 		</li>
