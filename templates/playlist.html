@@ -4,7 +4,7 @@
 <!-- Display player -->
 <div class='audioPlayerDiv'>
 	<audio id='audioPlayer' class='audioPlayer' controls 
-		   data-storage-id='{{ playlist.storage_id }}'
+		   data-storage-id='{{ playlist.now_playing_urlsafe_key }}'
 		   data-episode-url='{{ playlist.now_playing_url }}'
 		   preload='metadata'>
 		<source src='{{ playlist.now_playing_url }}'>
@@ -17,7 +17,7 @@
 			</form>
 		</div>
 		<div class='ui-block-b'>
-			<p id='playerTimeCurrent' data-init-playback-time='{{ playlist.now_playing_playback_time }}'>
+			<p id='playerTimeCurrent' data-init-playback-time='{{ playlist.now_playing_current_time }}'>
 				0:00
 			</p>
 		</div>
@@ -29,19 +29,20 @@
 		<a class="muteBtn ui-btn ui-btn-inline" id='muteBtn'>Mute</a>
 	</div>
 	<div id='playerEpisodeInfo'>
-		<p>{{ playlist.now_playing_title_podcast }}</p>
-		<p>{{ playlist.now_playing_title_episode }}</p>
+		<p id='playerPodcastTitle'>{{ playlist.now_playing_podcast_title }}</p>
+		<p id='playerEpisodeTitle'>{{ playlist.now_playing_episode_title }}</p>
 	</div>
 </div>
 <!-- <div id='playlist' class='playlist'> -->
-	<ul data-role='listview' data-split-icon='delete' id='playlist'>
+	<ul data-role='listview' data-split-icon='delete' id='playlist' 
+		data-playlist-id='{{ playlist.urlsafe_key }}'>
 		{% for episode in playlist.list_item %}
-		<li data-icon='false' data-episode-url='{{ episode.url_episode}}'
-			data-storage-id='{{ episode.storage_id }}'
+		<li data-icon='false' data-episode-url='{{ episode.episode_url}}'
+			data-storage-id='{{ episode.urlsafe_key }}'
 			id='playlistItem_{{ loop.index }}' class='playlistItem'> 
 			<a href='#'>
-				<h2>{{ episode.title_podcast }}</h2>
-				<p>{{ episode.title_episode }}</p>
+				<h2>{{ episode.podcast_title }}</h2>
+				<p>{{ episode.episode_title }}</p>
 <!-- 				<p>{{ episode.percent_listened }}%</p> -->
 			</a>
 			<a href="#" class='deleteBtn'></a>

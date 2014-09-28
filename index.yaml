@@ -3,5 +3,12 @@ indexes:
 - kind: Podcast
   ancestor: yes
   properties:
+  - name: active
+  - name: author
   - name: date
     direction: desc
+
+- kind: Playlist
+  ancestor: yes
+  properties:
+  - name: author

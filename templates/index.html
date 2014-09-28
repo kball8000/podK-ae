@@ -6,30 +6,17 @@
 	<div id='podcastNotification' class='notification' style='display:none;'></div>
 </div>
 
-{% if user_welcome_nickname %}
 <p>
 	Welcome {{ user_welcome_nickname }}! (<a rel="external" href="{{ user_welcome_href }}">Logout</a> )
 </p>
-{% else %}
-<p>
-	<a rel="external" href="{{ user_welcome_href }}">Sign In</a> to your Google account
-</p>
-{% endif %}
 
 <!-- Display user's podcast subscription list -->
-<div id='subscriptionList' class='subscriptionList' data-playlist-id='{{ playlist_id }}'>
+<div id='subscriptionList' class='subscriptionList' data-playlist-id='{{ playlist_urlsafe_key }}'>
 	{% for feed in podcast_feeds %}
-<!-- 	<div id='subscriptionItem_{{ loop.index }}' data-podcast-title='{{ feed.title }}' data-podcast-url='{{feed.urlPodcast}}' class='subscriptionItem'> -->
-<!-- 	<div id='subscriptionItem_{{ loop.index }}' data-podcast-url='{{feed.urlPodcast}}' class='subscriptionItem'> -->
 	<div id='subscriptionItem_{{ loop.index }}' class='subscriptionItem'>
-<!-- 		<div class='subscriptionFunctions'> -->
-<!-- 			<a class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline' ></a> -->
-<!-- 			<a class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline'></a> -->
-<!-- 			<a class='refreshBtn ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline'></a> -->
-<!-- 		</div> -->
-		<div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' data-storage-id='{{ feed.storage_id }}'>
+		<div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' data-storage-id='{{ feed.urlsafe_key }}'>
 			<h3>
-				<img src='{{ feed.urlImage }}' alt='podcast logo' height='45' width='45'> 
+				<img src='{{ feed.image_url }}' alt='podcast logo' height='45' width='45'> 
 				<span>{{ feed.title }}</span>
 				<div class='subscriptionFunctions' data-podcast-title='{{ feed.title }}'>
 					<button class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline'></button>
@@ -41,7 +28,7 @@
 				{% for episode in feed.episode %}
 <!-- 				<li data-episode-title='{{ episode.title }}' data-episode-url='{{ episode.url }}'> -->
 				<li data-episode-url='{{ episode.url }}'>
-					<a href='#' class='addToPlaylist'> {{ episode.title }} Time: {{ episode.playbackPosition }}</a>
+					<a href='#' class='addToPlaylist'> {{ episode.title }} Time: {{ episode.current_time }}</a>
 				</li>
 				{% endfor %}
 			</ul>
