@@ -3,7 +3,7 @@
 
 <!-- **  Notification area when I've added a podcast. ** -->
 <div id='searchNotificationDiv' class='notificationDiv'>
-	<div id='searchNotification' class='notification' style='display:none;'></div>
+    <div id='searchNotification' class='notification' style='display:none;'></div>
 </div>
 
 <!-- **  load the itunes search script here. ** -->
@@ -11,11 +11,11 @@
 
 <!-- Search iTunes for podcast -->
 <form id='iTunesSearchForm'>
-	<label for='iTunesSearchValue' class='ui-hidden-accessible'>Search iTunes Podcast Library:</label>
-	<input type="search" id="iTunesSearchValue" name="iTunesSearchValue" placeholder="Search iTunes Store for podcast" 
-		   tabindex='1' data-clear-btn='true'/>
-	<button id="iTunesSearchButton" data-inline="true" class='ui-hidden-accessible'>Go</button>
-</form>	
+    <label for='iTunesSearchValue' class='ui-hidden-accessible'>Search iTunes Podcast Library:</label>
+    <input type="search" id="iTunesSearchValue" name="iTunesSearchValue" placeholder="Search iTunes Store for podcast" 
+           tabindex='1' data-clear-btn='true'/>
+    <button id="iTunesSearchButton" data-inline="true" class='ui-hidden-accessible'>Go</button>
+</form>    
 <br>
 
 <!-- Display the search results with javascript -->
@@ -25,9 +25,9 @@
 
 <!-- Add a podcast with a url -->
 <form id='rssSubscribeForm'>
-	<label for='rssSubscribeUrl' class='ui-hidden-accessible'>URL</label>
-	<input type='text' id='rssSubscribeUrl' name='rssSubscribeUrl' placeholder="Add podcast with RSS url" 
-		   tabindex='2' data-clear-btn='true'>
-	<button id="rssSubscribeButton" data-inline="true" class='ui-hidden-accessible'>Add Podcast</button>
+    <label for='rssSubscribeUrl' class='ui-hidden-accessible'>URL</label>
+    <input type='text' id='rssSubscribeUrl' name='rssSubscribeUrl' placeholder="Add podcast with RSS url" 
+           tabindex='2' data-clear-btn='true'>
+    <button id="rssSubscribeButton" data-inline="true" class='ui-hidden-accessible'>Add Podcast</button>
 </form>
 {% endblock %}

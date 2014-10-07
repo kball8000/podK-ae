@@ -2,129 +2,142 @@
 
 /* ----- General styles used across the site ----- */
 .notificationDiv{
-	position: absolute;
-	left: 50%;
-	z-index: 1;
+    position: absolute;
+    left: 50%;
+    z-index: 1;
 }
 
 /* Fixes listview with an absolute in it. These absolute buttons continually
 break things. I need to find another way to do this... */
 
 .notification{
-	position: relative;
-	left: -50%;
-	text-align: center;
-	padding: 1em 0.2em;
-	background-color: rgb(255,255,100);
-	border-radius: 0.5em;	
+    position: relative;
+    left: -50%;
+    text-align: center;
+    padding: 1em 0.2em;
+    background-color: rgb(255,255,100);
+    border-radius: 0.5em;    
 }
 
 /* ----- Podcast page specific ----- */
 
 .subscriptionItem{
-	position:relative;
+    position:relative;
 }
 
 .subscriptionCollapsible a:first-child{
-	padding-right: 5.5em;
+    padding-right: 5.5em;
 }
 
 .subscriptionItem img{
-	border-radius:0.3em; 
-	margin: 0;
-	vertical-align: middle;
+    border-radius:0.3em; 
+    margin: 0;
+    vertical-align: middle;
 }
 
 .subscriptionFunctions{
-	position:absolute;
-	top: 0.6em;
-	right: 1em;
+    position:absolute;
+    top: 0.6em;
+    right: 1em;
 }
 
 .subscriptionFunctions button{
-	padding:0.5em 0.7em;
+    padding:0.5em 0.7em;
 }
 
 #podcastBtnSpace{
-	padding: 0 0.2em;
+    padding: 0 0.2em;
 }
 
 /* ----- Playlist page ----- */
 
 .audioPlayerDiv{
-	text-align: center;
-	max-width: 300px;
-	margin: 0 auto;
+    text-align: center;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .audioPlayerDiv .ui-block-a{
-	width: 80%;
+    width: 80%;
 }
 
 .audioPlayerDiv .ui-block-b{
-	width: 20%;
+    width: 20%;
 }
 
 .customAudioControls a{
-	padding-top: 0.2em;
-	padding-bottom: 0.2em;
-	margin-top: 0.2em;
-	margin-right: 0.2em;
-}
-
-#muteBtn{
-	font-size: 0.8em;
-	padding-top: 0.5em;
-	padding-bottom: 0.5em;
-}
-
-#playerTimeCurrent{
-	font-size: 85%;
-}
-
-#playerEpisodeInfo{
-	white-space: nowrap;
-	overflow-x: hidden;
-	text-overflow: ellipsis;
-	margin: 0;
-}
-
-#playerEpisodeInfo p{
-	margin: 0;
-	padding: 0;
-}
-
-#playerEpisodeInfo p:first-child{
-	font-size: 0.8em;
-}
-#playerEpisodeInfo p:last-child{
-	font-size: 0.7em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    margin-top: 0.2em;
+    margin-right: 0.2em;
 }
 
 .full-width-slider input{
-	display: none;
+    display: none;
 }
 
 .full-width-slider .ui-slider-track{
-	margin-left: 15px;
+    margin-left: 15px;
+    margin-right: 8px;
+}
+
+.seekableSegment{
+    position: absolute;
+    height: 0.85em;
+    background-color: rgb(230, 180, 120);
+    border-color: #ddd;
+    border-width: 1px;
+    border-style: solid;
+    z-index: 1;
+}
+
+/* #audioPlayerDiv .activeSliderButton{ */
+
+#muteBtn{
+    font-size: 0.8em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+#playerTimeCurrent{
+    font-size: 85%;
+}
+
+#playerEpisodeInfo{
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+#playerEpisodeInfo p{
+    margin: 0;
+    padding: 0;
+}
+
+#playerEpisodeInfo p:first-child{
+    font-size: 0.8em;
+}
+#playerEpisodeInfo p:last-child{
+    font-size: 0.7em;
 }
 
 #playlist{
-	padding-top: 1.5em;
+    padding-top: 1.5em;
 }
  
 /* ----- New (latest episodes) page ----- */
 .newEpisodesFunctions{
-	position:absolute; 
-	top:-0.2em; 
-	right:0.3em; 
-	z-index:1;
+    position:absolute; 
+    top:-0.2em; 
+    right:0.3em; 
+    z-index:1;
 }
 
 .newEpisodesFunctions a{
-	display: inline-block;
-	padding:0.1em 0.2em;
-	margin-right: 0;
+    display: inline-block;
+    padding:0.1em 0.2em;
+    margin-right: 0;
 }
 
 /* ----- Search page ----- */
@@ -132,10 +145,10 @@ break things. I need to find another way to do this... */
 /* ----- Sign On page ----- */
 
 .signonDiv a{
-	margin: 2em 2em 0 2em;
-	padding: 1.5em 1em;
+    margin: 2em 2em 0 2em;
+    padding: 1.5em 1em;
 }
 
 .signonDiv p{
-	text-align: center;
+    text-align: center;
 }

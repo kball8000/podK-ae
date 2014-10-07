@@ -3,37 +3,37 @@
 
 <!-- **  Notification area when I've added a podcast. ** -->
 <div id='podcastNotificationDiv' class='notificationDiv'>
-	<div id='podcastNotification' class='notification' style='display:none;'></div>
+    <div id='podcastNotification' class='notification' style='display:none;'></div>
 </div>
 
 <p>
-	Welcome {{ user_welcome_nickname }}! (<a rel="external" href="{{ user_welcome_href }}">Logout</a> )
+    Welcome {{ user_welcome_nickname }}! (<a rel="external" href="{{ user_welcome_href }}">Logout</a> )
 </p>
 
 <!-- Display user's podcast subscription list -->
 <div id='subscriptionList' class='subscriptionList' data-playlist-id='{{ playlist_urlsafe_key }}'>
-	{% for feed in podcast_feeds %}
-	<div id='subscriptionItem_{{ loop.index }}' class='subscriptionItem'>
-		<div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' data-storage-id='{{ feed.urlsafe_key }}'>
-			<h3>
-				<img src='{{ feed.image_url }}' alt='podcast logo' height='45' width='45'> 
-				<span>{{ feed.title }}</span>
-				<div class='subscriptionFunctions' data-podcast-title='{{ feed.title }}'>
-					<button class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline'></button>
-					<span id='podcastBtnSpace'> </span>
-					<button class='refreshBtn ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline'></button>
-				</div>
-			</h3>
-			<ul data-role='listview'>
-				{% for episode in feed.episode %}
-<!-- 				<li data-episode-title='{{ episode.title }}' data-episode-url='{{ episode.url }}'> -->
-				<li data-episode-url='{{ episode.url }}'>
-					<a href='#' class='addToPlaylist'> {{ episode.title }} Time: {{ episode.current_time }}</a>
-				</li>
-				{% endfor %}
-			</ul>
-		</div>
-	</div>
-	{% endfor %}
+    {% for feed in podcasts %}
+    <div id='subscriptionItem_{{ loop.index }}' class='subscriptionItem'>
+        <div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' data-storage-id='{{ feed.urlsafe_key }}'>
+            <h3>
+                <img src='{{ feed.image_url }}' alt='podcast logo' height='45' width='45'> 
+                <span>{{ feed.title }}</span>
+                <div class='subscriptionFunctions' data-podcast-title='{{ feed.title }}'>
+                    <button class='deleteBtn ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-inline'></button>
+                    <span id='podcastBtnSpace'> </span>
+                    <button class='refreshBtn ui-btn ui-icon-refresh ui-btn-icon-notext ui-btn-inline'></button>
+                </div>
+            </h3>
+            <ul data-role='listview'>
+                {% for episode in feed.episode %}
+<!--                 <li data-episode-title='{{ episode.title }}' data-episode-url='{{ episode.url }}'> -->
+                <li data-episode-url='{{ episode.url }}'>
+                    <a href='#' class='addToPlaylist'> {{ episode.title }} Time: {{ episode.current_time }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

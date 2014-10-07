@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 {% autoescape true %}
 <html>
-	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">		
-		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
-		<link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.js"></script>
-<!--		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
-<!--		<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script> -->
-		<title>{{ pageTitle }}</title>
-	</head>
-	<body>
- 		<div data-role='page' id='{{ pageId }}'>  <!-- data-url='{{ dataUrl }}' -->
-			<div data-role='header' data-position='fixed'>
-				<div data-role='navbar'>
-					<ul>
-						<li><a href='/' class='{{ navClass.home }}' data-icon='home'>Podcasts</a></li>
-						<li><a href='/playlist' class='{{ navClass.playlist }}' data-icon='bars'>Playlist</a></li>
-						<li><a href='/new' class='{{ navClass.new }}' data-icon='star'>New</a></li>
-						<li><a href='/search' class='{{ navClass.search }}' data-icon='search'>Search</a></li>
-					</ul>
-				</div>
-			</div>
-			<div data-role='main' class='ui-content'>
-			<!-- Script must be below head, for JQM (jQuery Moble), so that it loads as you navigate to different pages.
-			Also had some issues if at the bottom, though it should've been fine???  -->
-			<script src="/scripts/podKTop.js"></script> 
-				{% block body %}
-				{% endblock %}
-			</div> <!-- End data-role-main -->
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">        
+        <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
+        <link type="text/css" rel="stylesheet" href="/stylesheets/helloworld.css">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.js"></script>
+<!--        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
+<!--        <script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script> -->
+        <title>{{ pageTitle }}</title>
+    </head>
+    <body>
+         <div data-role='page' id='{{ pageId }}'>  <!-- data-url='{{ dataUrl }}' -->
+            <div data-role='header' data-position='fixed'>
+                <div data-role='navbar'>
+                    <ul>
+                        <li><a href='/' class='{{ navClass.home }}' data-icon='home'>Podcasts</a></li>
+                        <li><a href='/playlist' class='{{ navClass.playlist }}' data-icon='bars'>Playlist</a></li>
+                        <li><a href='/new' class='{{ navClass.new }}' data-icon='star'>New</a></li>
+                        <li><a href='/search' class='{{ navClass.search }}' data-icon='search'>Search</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div data-role='main' class='ui-content'>
+            <!-- Script must be below head, for JQM (jQuery Moble), so that it loads as you navigate to different pages.
+            Also had some issues if at the bottom, though it should've been fine???  -->
+            <script src="/scripts/podKTop.js"></script> 
+                {% block body %}
+                {% endblock %}
+            </div> <!-- End data-role-main -->
 
-			<div data-role='footer' style='overflow:hidden;' data-position='fixed'>
-				<h2>Podsy <span style='color:rgb(150,150,150); font-family:monospace; padding-left:2em;'>by kball</span></h2>
-				<a href='/settings' class='ui-btn-right' data-icon='gear' style='margin-top:0;'>Settings</a>
-			</div>
+            <div data-role='footer' style='overflow:hidden;' data-position='fixed'>
+                <h2>Podsy <span style='color:rgb(150,150,150); font-family:monospace; padding-left:2em;'>by kball</span></h2>
+                <a href='/settings' class='ui-btn-right' data-icon='gear' style='margin-top:0;'>Settings</a>
+            </div>
 
-		</div> <!-- End data-role-page -->
-	</body>
-<!-- 	<script src="/scripts/podK.js"></script> -->
+        </div> <!-- End data-role-page -->
+    </body>
+<!--     <script src="/scripts/podK.js"></script> -->
 </html>
 {% endautoescape %}
