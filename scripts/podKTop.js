@@ -30,8 +30,63 @@ function createPlaylistListviewItem(result){
     return html;
 }
 
-function updatePodcastHtml(){
-    console.log('will update podcast collapsible list.');
+function createListViewItem(epiode){
+    var html = "<li data-episode-url='" + epiode.url + "'>";
+    html += "<a href='#' class='addToPlaylist'> ";
+    html += epiode.title + 'Time: ' + epiode.current_time;
+    html += "<\/a><\/li>";
+    
+    return html;
+}
+
+function removeListViewItem(listview, remove){
+    var items = $(listview).find('li');
+    console.log('removelistviewitem, items, remove: ' + items);
+    console.dir(items);
+    console.dir(remove);
+    for(var i=0; i<remove.length; i+=1){
+        for(var j=0; j<items.length; j+=1){
+            console.log('removelistviewitem, items');
+            console.dir($(items[j]));
+            console.log('items[j].data: ' + $(items[j]).data('episode-url'));
+            console.log('remove[i].url: ' + remove[i].url);
+            if ($(items[j]).data('episode-url') == remove[i].url){
+                $(items[j]).remove();
+                console.log('removelistviewitem, removed');
+                console.dir($(items[j]));
+                break;
+            }
+        }
+/*         $(items).each(function(){
+            console.log('removelistviewitem, each');
+            console.dir($(this));
+            console.dir($(this).data('episode-url'));
+            console.log('remove.url' + remove[i].url);
+            if ($(this).data('episode-url') == remove[i].url){
+                $(this).remove();
+                console.log('removelistviewitem, remove');
+                console.dir($(this));
+            }
+        }); */
+    }
+}
+
+function updatePodcastHtml(elemId, result){
+    var listview = $(elemId).find('ul');
+    var html;
+    console.log('result: ');
+    console.dir(result);
+    console.log('listview: ');
+    console.dir($(listview));
+    for(var i=0; i<result.add.length; i+=1){
+        html = createListViewItem(result.add[i]);
+        console.log('updatePodcastHtml html: ' + html);
+        $(listview).prepend(html);
+    }
+    removeListViewItem(listview , result.remove);
+    $(listview).listview('refresh');
+    console.log('listview: ');
+    console.dir($(listview));
 }
 
 function addToPlaylist(e){
@@ -112,8 +167,9 @@ function refreshPodcast(e){
         type: "POST",
         data: { urlsafe_key : storageId }
     });
-    request.done(function(){
-        updatePodcastHtml();
+    request.done(function(result){
+        console.log('refreshpodast done.');
+        updatePodcastHtml(elemId, result);
     });
 }
 

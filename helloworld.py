@@ -343,13 +343,6 @@ def create_podcast_entity(info):
     
     for episode in info['episode']:
         episode_list.append(create_episode_entity(episode))
-#         episode_list.append(Episode(title = episode['title'],
-#                                     url = episode['url'],
-#                                     listened = False,
-#                                     pub_date = episode['pub_date'],
-#                                     length_str = episode['length_str'],
-#                                     current_time = episode['current_time'])
-#                            )
 
     podcast.episode = episode_list
     
@@ -377,28 +370,41 @@ def remove_episode(podcast):
     podcast.put()
 
 def update_podcast_episodes(podcast, add, remove, info):
-    for item in remove:
-        for episode in podcast.episode:
-            if episode.url == item:
-                podcast.episode.remove(episode)
-                """ Check against playlist here """
-    podcast.episode.reverse()       # after op, sorted oldest to newest
+    add_info = remove_info = []
+    playlist = get_playlist(users.get_current_user())
 
+    for old_url in remove:
+        for episode in podcast.episode:
+            if episode.url == old_url:
+                for item in playlist.list_item:
+                    if item.episode_url == old_url:
+                        break
+                    else:
+                        logging.info('podcast.episode: %s' % podcast.episode)
+                        logging.info('episode: %s' % episode)
+                        
+                        podcast.episode.remove(episode)
+                        remove_info.append({'url': episode.url})
+                        break
+    """ Check against playlist here """
+
+    podcast.episode.reverse()       # after op, sorted oldest to newest
     add.reverse()   # after op oldest to newest
     for new in add:
-#         logging.info('updatepodcastepisode, new %s' % new)
         for episode in info['episode']:
-#             logging.info('updatepodcastepisode, episode %s' % episode)
-#             logging.info('updatepodcastepisode, episode[url] %s' % episode['url'])
             if episode['url'] == new:
                 new_episode = create_episode_entity(episode)
-#                 logging.info('updatepodcastepisode, new_episode %s' % new_episode)
                 podcast.episode.append(new_episode)
+                add_info.append(episode)
+    add_info.reverse()
+                
     podcast.episode.reverse()       # after op, sorted newest to oldest
-#     logging.info('updatepodcastepisode, podcast %s' % podcast.episode)
-    
+    # logging.info('updatepodcastepisode, podcast %s' % podcast.episode)
     
     podcast.put()
+    
+    return_info = {'add': add_info, 'remove': remove_info}
+    return return_info
 
 # Podcast / Main page classes
 class RemovePodcast(webapp2.RequestHandler):
@@ -441,34 +447,35 @@ class RefreshAllPodcasts(webapp2.RequestHandler):
 class RefreshPodcast(webapp2.RequestHandler):
     def post(self):
         urlsafe_key = self.request.get('urlsafe_key')   # podcast key
-        logging.info('refreshpodcast, key: %s ' % urlsafe_key)
+        # logging.info('refreshpodcast, key: %s ' % urlsafe_key)
         podcast = ndb.Key(urlsafe=urlsafe_key).get()
         feed_info = get_info_from_rss(podcast.url)
         
-#         logging.info('refreshpodcast, info-episodes: %s' % feed_info['episode'])
-#         logging.info('refreshpodcast, podcast-episodes: %s' % podcast.episode)
+        # logging.info('refreshpodcast, info-episodes: %s' % feed_info['episode'])
+        # logging.info('refreshpodcast, podcast-episodes: %s' % podcast.episode)
         
         episodes_to_add = []
         episodes_to_remove = []
-        
+
+        # remove_episode(podcast)
+
         current_episode_list = [episode.url for episode in podcast.episode]
-#         logging.info('refreshfeed, current rss episode list %s' % current_episode_list)
+        logging.info('refreshfeed, current episode list %s' % current_episode_list)
         new_rss_episode_list = [episode['url'] for episode in feed_info['episode']]
-#         logging.info('refreshfeed, new rss [] episode list %s' % new_rss_episode_list)
+        logging.info('refreshfeed, new rss [] episode list %s' % new_rss_episode_list)
                 
-        for episode in new_rss_episode_list:        # Comparing urls to mp3 file.
-            if episode not in current_episode_list:
-                episodes_to_add.append(episode)
+        for episode_url in new_rss_episode_list:        # Comparing urls to mp3 file.
+            if episode_url not in current_episode_list:
+                episodes_to_add.append(episode_url)
         logging.info('refreshpodcast, listepisodestoadd: %s' % episodes_to_add)
                 
-        for episode in current_episode_list:        # Comparing urls to mp3 file.
-            if episode not in new_rss_episode_list:
-                episodes_to_remove.append(episode)
+        for episode_url in current_episode_list:        # Comparing urls to mp3 file.
+            if episode_url not in new_rss_episode_list:
+                episodes_to_remove.append(episode_url)
         logging.info('refreshpodcast, listepisodestoremove: %s' % episodes_to_remove)
         
-#         remove_episode(podcast)
-        update_podcast_episodes(podcast, episodes_to_add, episodes_to_remove, feed_info)
-
+        info = update_podcast_episodes(podcast, episodes_to_add, episodes_to_remove, feed_info)
+        return dump_json(self, info)
         
         # Need to do something with feed_info, unless I just want to do a full page refresh.
         # If I want to do ajax, may need jQuery
