@@ -14,7 +14,7 @@
 <div id='subscriptionList' class='subscriptionList' data-playlist-id='{{ playlist_urlsafe_key }}'>
     {% for feed in podcasts %}
     <div id='subscriptionItem_{{ loop.index }}' class='subscriptionItem'>
-        <div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' data-storage-id='{{ feed.urlsafe_key }}'>
+        <div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' data-podcast-id='{{ feed.urlsafe_key }}'>
             <h3>
                 <img src='{{ feed.image_url }}' alt='podcast logo' height='45' width='45'> 
                 <span>{{ feed.title }}</span>

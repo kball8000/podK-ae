@@ -2,10 +2,18 @@
 {% block body %}
 
 <!-- Display player -->
-<div class='audioPlayerDiv'>
+<div class='mediaPlayersDiv'>
+    <video id='videoPlayer' width='600' class='videoPlayer'
+           data-podcast-id='{{ playlist.now_playing_urlsafe_key }}'
+           data-episode-url='{{ playlist.now_playing_url }}'
+           preload='metadata'>
+        <source id='videoSrc' src='{{ playlist.now_playing_video_url }}' type='video/mp4'>
+    </video>
+</div>
+<div class='mediaPlayersDiv'>
 <!--     <audio id='audioPlayer' class='audioPlayer' controls  -->
     <audio id='audioPlayer' class='audioPlayer'
-           data-storage-id='{{ playlist.now_playing_urlsafe_key }}'
+           data-podcast-id='{{ playlist.now_playing_urlsafe_key }}'
            data-episode-url='{{ playlist.now_playing_url }}'
            preload='metadata'>
         <source id='audioSrc' src='{{ playlist.now_playing_url }}' type='audio/mp3'>
@@ -41,17 +49,18 @@
         {% for episode in playlist.list_item %}
         <li data-icon='false' 
             data-episode-url='{{ episode.episode_url}}'
-            data-storage-id='{{ episode.urlsafe_key }}'
+            data-podcast-id='{{ episode.urlsafe_key }}'
             class='playlistItem'> 
 <!--             id='playlistItem_{{ loop.index }}'  -->
             <a href='#'>
+<!--                 <h2>{{ episode.podcast_title }}</h2> -->
                 <h2>{{ episode.podcast_title }}</h2>
                 <p>{{ episode.episode_title }}</p>
                 <p class='ui-li-aside episodeCurrentTime' 
                    data-playback-time='{{ episode.current_time }}'>
                     <b>{{ episode.current_time }}</b></p>
             </a>
-            <a href="#" class='deleteBtn'></a>
+            <a href="#" class='deletePlaylistBtn'></a>
         </li>
         {% endfor %}
     </ul>

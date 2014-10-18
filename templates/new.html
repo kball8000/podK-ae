@@ -4,16 +4,17 @@
 <!-- Display latest episodes in order to add to playlist-->
 <div id='newEpisodes'>
     <div style='padding:0 0 1em 0;'>
-        <button class='ui-btn ui-icon-refresh ui-btn-icon-right '>
+        <button id='refreshAllPodcasts' class='ui-btn ui-icon-refresh ui-btn-icon-right '>
             Refresh All
         </button>
     </div>
     <ul data-role='listview' id='newList' 
-        data-new-list-id='{{ newList.urlsafe_key }}'>
+        data-newlist-id='{{ newList.urlsafe_key }}'
+        data-playlist-id='{{ newList.playlist_urlsafe_key }}'>
         {% for episode in newList.list_item %}
         <li data-icon='false' 
             data-episode-url='{{ episode.episode_url}}'
-            data-storage-id='{{ episode.urlsafe_key }}'
+            data-podcast-id='{{ episode.urlsafe_key }}'
             class='newListItem'> 
             <a href='#'>
                 <h2>{{ episode.podcast_title }}</h2>

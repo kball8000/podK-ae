@@ -21,7 +21,12 @@ import json
 import os
 import jinja2
 import logging
-from operator import itemgetter, attrgetter
+import time
+# from operator import itemgetter, attrgetter
+# from datetime import datetime, date, time
+# import sys
+# sys.path.insert(0, 'libs')
+# from dateutil import parser
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader = jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
@@ -41,7 +46,7 @@ class Episode(ndb.Model):
 class Podcast(ndb.Model):
     author = ndb.UserProperty()
     title = ndb.StringProperty(indexed=False)
-    url = ndb.StringProperty(indexed=False)
+    url = ndb.StringProperty(indexed=False)         # RSS feed url
     image_url = ndb.StringProperty(indexed=False)
     active = ndb.BooleanProperty(required=True, default=True)
     episode = ndb.StructuredProperty(Episode, repeated=True, indexed=False)
@@ -101,18 +106,26 @@ def get_new_list(user):
 
     return new_list
 
+def get_active_podcasts(user):
+    qry = Podcast.query(ancestor = podcast_feed_key())
+    qry_1 = qry.filter(Podcast.author == user, Podcast.active == True).order(-Podcast.date)
+    return qry_1.fetch(20)
+
 def get_list_data(li):
     
     for item in li.list_item:
         podcast = item.podcast_key.get()
+
         item.podcast_title = podcast.title
         item.urlsafe_key = podcast.key.urlsafe()
+
         for episode in podcast.episode:
             if episode.url == item.episode_url:
                 item.episode_title = episode.title
                 item.current_time = episode.current_time
                 break
-    
+
+    # logging.info('getlistdata, li after processing %s' % li)
     return li
 
 def get_now_playing_data(playlist):
@@ -135,20 +148,22 @@ def remove_inactive_podcasts(user, playlist):
     # leave so the playlist can still reference the individual episode for playing info.
     qry = Podcast.query(ancestor = podcast_feed_key())
     qry_1 = qry.filter(Podcast.author == user, Podcast.active == False)
-    inactive_podcasts = qry_1.fetch(20, keys_only=True)
+    inactive_podcast_keys = qry_1.fetch(20, keys_only=True)
 
-    if len(inactive_podcasts) > 0:
-        li_item = [item.podcast_key for item in playlist.list_item]
+    if len(inactive_podcast_keys) > 0:
+        playlist_keys = [item.podcast_key for item in playlist.list_item]
 
-        for inactive in inactive_podcasts:
-            if inactive not in li_item:
+        for inactive in inactive_podcast_keys:
+            if inactive not in playlist_keys:
                  inactive.delete()
 
 class PodcastPage(webapp2.RequestHandler):
     def get(self):
-        user = users.get_current_user()
+        
+        start = time.time()
 
         # Have user log in and show their current subscriptions.
+        user = users.get_current_user()
         if user:
             user_welcome_nickname = user.nickname()
             user_welcome_href = users.create_logout_url('/')
@@ -156,22 +171,17 @@ class PodcastPage(webapp2.RequestHandler):
             self.redirect('/signon?page=%2F')
             return
 
-         # On first use of Podsy, create playlist and new_list
-        playlist = get_playlist(user)
-
         # Get subscription list from datastore
-        qry = Podcast.query(ancestor = podcast_feed_key())
-        qry_1 = qry.filter(Podcast.author == user, Podcast.active == True).order(-Podcast.date)
-        podcasts = qry_1.fetch(20)
-        
         """ This is pretty fundamental to the program, passing key to webpage for 
         retrieving anything about the podcast or it's episodes, later."""
+        podcasts = get_active_podcasts(user)
         for podcast in podcasts:
             podcast.urlsafe_key = podcast.key.urlsafe()
 
-        # Get playlist from datastore in order to display key in data- on page and to see if any inactive
-        # podcast subscriptions can be removed.
-
+        # We keep podcasts, marked as inactive, if user wants to remove from 
+        # subscription list, but there are still episodes in playlist. This removes 
+        # the ones that no longer have the episodes in the playlist.
+        playlist = get_playlist(user)
         remove_inactive_podcasts(user, playlist)
 
         template_values = {
@@ -185,10 +195,13 @@ class PodcastPage(webapp2.RequestHandler):
         }
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
+        logging.info('PodcastPage, total load time: %.2f s' % (time.time()-start))
 
 class PlaylistPage(webapp2.RequestHandler):
     """ Get playlist from datastore and send playlist data to Jinja to render the page"""
     def get(self):
+
+        start = time.time()
 
         user = users.get_current_user()
         if not user:
@@ -197,14 +210,24 @@ class PlaylistPage(webapp2.RequestHandler):
 
         # Get playlist from datastore and sort from newest to oldest.
         playlist = get_playlist(user)
-
         playlist.urlsafe_key = playlist.key.urlsafe()
         playlist.list_item.reverse()
-        
+
         # Playlist info is initially very barebones, get more data from
         # the source, the podcast entity.
         playlist = get_list_data(playlist)
         playlist = get_now_playing_data(playlist)
+        
+        tail = os.path.splitext(playlist.now_playing_url)
+        # logging.info('playlist page, tail: %s' % tail)
+        logging.info('playlist page, tail: %s' % tail[1])
+        if(tail[1] == 'mp4'):
+            playlist.now_playing_video_url  = playlist.now_playing_url
+            playlist.now_playing_url        = '#'
+        else:
+            playlist.now_playing_video_url  = '#'
+        
+        # logging.info('playlistpage, playlist before serving jinja %s' % playlist)
         
         template_values = {
             'navClass': {'playlist': 'ui-btn-active ui-state-persist' },
@@ -214,22 +237,27 @@ class PlaylistPage(webapp2.RequestHandler):
         }
         template = JINJA_ENVIRONMENT.get_template('playlist.html')
         self.response.write(template.render(template_values))
+        logging.info('PlaylistPage, total load time: %.2f s' % (time.time()-start))
 
 class NewPage(webapp2.RequestHandler):
     def get(self):
         
+        start = time.time()
+
         user = users.get_current_user()
         if not user:
             self.redirect('/signon?page=%2Fnew')
             return
         
-        new_list = get_new_list(user)
 
         # New list info is initially very barebones, get more data from
         # the source, the podcast entity.        
+        new_list = get_new_list(user)
         new_list = get_list_data(new_list)
         new_list.urlsafe_key = new_list.key.urlsafe()
-         # new_list.list_item.reverse()
+        playlist = get_playlist(user)
+        new_list.playlist_urlsafe_key = playlist.key.urlsafe()
+        new_list.list_item.reverse()
 
         template_values = {
             'navClass': {'new': 'ui-btn-active ui-state-persist' },
@@ -239,10 +267,13 @@ class NewPage(webapp2.RequestHandler):
         }
         template = JINJA_ENVIRONMENT.get_template('new.html')
         self.response.write(template.render(template_values))
+        logging.info('NewPage, total load time: %.2f s' % (time.time()-start))
 
 class SearchPage(webapp2.RequestHandler):
     def get(self):
         
+        start = time.time()
+
         user = users.get_current_user()
         if not user:
             self.redirect('/signon?page=%2Fsearch')
@@ -255,9 +286,11 @@ class SearchPage(webapp2.RequestHandler):
         }
         template = JINJA_ENVIRONMENT.get_template('search.html')
         self.response.write(template.render(template_values))
+        logging.info('SearcgPage, total load time: %.2f s' % (time.time()-start))
 
 class SignOnPage(webapp2.RequestHandler):
     def get(self):
+        """ Pretty much the fanciest log in page ever :) """
         
         page = self.request.get('page')
         user_welcome_href = users.create_login_url(page)
@@ -272,7 +305,7 @@ class SignOnPage(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 # General methods
-def getFeedInfo(url):
+def retrieve_feed_info(url):
 
     request = urllib2.Request(url)
     try:
@@ -289,12 +322,10 @@ def dump_json(self, data):
     self.response.out.write(json.dumps(data))
 
 def get_info_from_rss(rss_url):
-    logging.info('getting podcast rss feed')
     info = {}         # Overall podcast info
     episode_list = []
 
-    response = getFeedInfo(rss_url)
-    # parse xml response from rss feed URI
+    response = retrieve_feed_info(rss_url)
     root = ET.fromstring(response)
     
     """ May need some error checking here. """
@@ -304,11 +335,17 @@ def get_info_from_rss(rss_url):
     info['rss_url'] = rss_url
     
     for item in root.find('channel').findall('item'):
+        length_obj  = item.find('{http://www.itunes.com/dtds/podcast-1.0.dtd}duration')
+        pub_obj     = item.find('pubDate')
+        
+        length_str = length_obj.text if length_obj else ''
+        pub_date = pub_obj.text if pub_obj else ''
+        
         episode = {
-            'title': item.find('title').text,
-            'url': item.find('enclosure').get('url'),
-            'pub_date': item.find('pubDate').text,
-            'length_str': item.find('{http://www.itunes.com/dtds/podcast-1.0.dtd}duration').text,
+            'title': item.find('title').text or '',
+            'url': item.find('enclosure').get('url'),       # Required
+            'pub_date': pub_date,
+            'length_str': length_str,
             'current_time': 0
         }
         episode_list.append(episode)
@@ -316,6 +353,27 @@ def get_info_from_rss(rss_url):
     info['episode'] = episode_list
     
     return info
+
+def episode_info(podcast, url, info):
+    for episode in podcast.episode:
+        if episode.url == url:
+            return getattr(episode, info)
+
+def dict_from_episode(podcast, episode):
+    """ Returns a dictionary from an episode entity. """
+    dict = {
+        'podcast_title': podcast.title,
+        'urlsafe_key': podcast.key.urlsafe(),
+        'episode_title': episode.title,
+        'episode_url': episode.url,
+        'listened': episode.listened,
+        'pub_date': episode.pub_date,
+        # 'date_added': episode.date_added,  # returns an object not a string.
+        'length_str': episode.length_str,
+        'current_time': episode.current_time
+    }
+    
+    return dict
 
 # Search page methods
 def create_episode_entity(info):
@@ -353,58 +411,129 @@ class AddPodcast(webapp2.RequestHandler):
     def post(self):
         rss_url = self.request.get('url')
         
-        """Add check to see if podcast already exists"""
-
-        podcast_info = get_info_from_rss(rss_url)         # to display on page
-        podcast = create_podcast_entity(podcast_info)     # for datastore
-        podcast_key = podcast.put()                     # save to datastore
-        
-        podcast_info['urlsafe_key'] = podcast_key.urlsafe()
+        podcasts    = get_active_podcasts(users.get_current_user())
+        urls        = [podcast.url for podcast in podcasts]
+        logging.info('addpodcast, urls: %s ' % urls)
+        if rss_url not in urls:
+            podcast_info = get_info_from_rss(rss_url)         # to display on page
+            if podcast_info:
+                podcast = create_podcast_entity(podcast_info) 
+                podcast_key = podcast.put()
+                podcast_info['urlsafe_key'] = podcast_key.urlsafe()
+            else:
+                podcast_info = False
+        else:
+            podcast_info = False
 
         dump_json(self, podcast_info)                     # send info to page
 
 # Podcast / Main page functions
-def remove_episode(podcast):
-    podcast.episode.pop()
-    podcast.episode.pop()
-    podcast.put()
+def update_new_list(add):
+    """ This will be displayed on New Page of Podsy. Verify it is not already in 
+    the list, then create an entity and store in datastore. """
+    new_list = get_new_list(users.get_current_user())
+    new_episodes = [item.episode_url for item in new_list.list_item]
+    
+    add.reverse()       # after op: oldest to newest
+    for item in add:
+        logging.info('update_new_list, item %s'% item)
+        # logging.info('updatenewlist, item[episode_url]: %s' % item['url'])
+        # logging.info('update_new_list, new_episodes: %s', new_episodes)
+        """Temp just so loop will work, remove once functionality is verified."""
+        # if item['episode_url'] not in new_episodes:
+        if item['episode_url'] not in new_episodes:
+            # logging.info('updatenewlist, in if loop, which I should not be')
+            episode = ListItem()
+            episode.episode_url = item['episode_url']
+            episode.podcast_key = ndb.Key(urlsafe=item['urlsafe_key'])
+            new_list.list_item.append(episode)
 
-def update_podcast_episodes(podcast, add, remove, info):
-    add_info = remove_info = []
-    playlist = get_playlist(users.get_current_user())
+    # logging.info('update_new_list: new_list to save to ds %s' % new_list)
+    new_list.put()
 
-    for old_url in remove:
+def remove_episodes_from_rss(podcast, playlist, removed_episodes):
+    """ Remove episodes from datastore no longer in rss feed and not in playlist."""
+    delete_flag = True      # for check agains playlist
+    for removed in removed_episodes:
         for episode in podcast.episode:
-            if episode.url == old_url:
+            if episode.url == removed['url']:
+                """ Check against playlist here """
                 for item in playlist.list_item:
-                    if item.episode_url == old_url:
+                    if item.episode_url == removed['url']:
+                        delete_flag = False
                         break
-                    else:
-                        logging.info('podcast.episode: %s' % podcast.episode)
-                        logging.info('episode: %s' % episode)
-                        
-                        podcast.episode.remove(episode)
-                        remove_info.append({'url': episode.url})
-                        break
-    """ Check against playlist here """
+                if delete_flag:
+                    podcast.episode.remove(episode)
 
-    podcast.episode.reverse()       # after op, sorted oldest to newest
-    add.reverse()   # after op oldest to newest
-    for new in add:
-        for episode in info['episode']:
-            if episode['url'] == new:
-                new_episode = create_episode_entity(episode)
+def add_episodes_from_rss(podcast, rss_info, added_episodes):
+    """ Add episodes to datastore if rss has new episodes not stored."""
+    return_info = []
+    
+    logging.info('addepisodesfromrss, podcast.episode %s' % podcast.episode)
+    logging.info('addepisodesfromrss, added_episodes %s' % added_episodes)
+    
+    podcast.episode.reverse()       # after op oldest to newest
+    added_episodes.reverse()        # after op oldest to newest
+    for added in added_episodes:
+        for rss_episode in rss_info['episode']:
+            if rss_episode['url'] == added['url']:
+                new_episode = create_episode_entity(rss_episode)
                 podcast.episode.append(new_episode)
-                add_info.append(episode)
-    add_info.reverse()
-                
-    podcast.episode.reverse()       # after op, sorted newest to oldest
-    # logging.info('updatepodcastepisode, podcast %s' % podcast.episode)
+                return_info.append(dict_from_episode(podcast, new_episode))
+    # after op, these are both sorted newest to oldest
+    podcast.episode.reverse()
+    return_info.reverse()
     
-    podcast.put()
-    
-    return_info = {'add': add_info, 'remove': remove_info}
+    key = podcast.put()
+    logging.info('addepisodesfromrss, key from podcast.put op: %s' % key)
+
     return return_info
+
+def update_podcast_episodes(podcast, rss_info, changes):
+    playlist = get_playlist(users.get_current_user())
+    
+    # Add and remove episodes from stored entities in datastore.
+    remove_episodes_from_rss(podcast, playlist, changes['remove'])
+    changes['add'] = add_episodes_from_rss(podcast, rss_info, changes['add'])
+
+    # Update list for new page stored in datastore.
+    # logging.info("updatepodcastepisode, changes['add'] %s" % changes['add'])
+    update_new_list(changes['add'])
+    
+    # logging.info('updatepodcastepisodes, changes %s' % changes)
+    return changes
+
+def get_podcast_changes(podcast):
+    
+    feed_info = get_info_from_rss(podcast.url)
+
+    add_list = []
+    remove_list = []
+    changes = {'add': add_list, 'remove': remove_list}
+
+    current_episode_list = [episode.url for episode in podcast.episode]
+    new_rss_episode_list = [episode['url'] for episode in feed_info['episode']]
+
+    logging.info('refreshfeed, current episode list %s' % current_episode_list)
+    logging.info('refreshfeed, new rss [] episode list %s' % new_rss_episode_list)
+
+    for episode_url in new_rss_episode_list:        # Comparing urls to mp3 file.
+        if episode_url not in current_episode_list:
+            changes['add'].append({'url': episode_url})
+    logging.info('getpodcastchanges, changes["add"]: %s' % changes['add'])
+    # changes['add'] as is: newest to oldest
+    # changes['add'].reverse();       # after op: newest to oldest
+
+    for episode_url in current_episode_list:        # Comparing urls to mp3 file.
+        if episode_url not in new_rss_episode_list:
+            changes['remove'].append({'url': episode_url})
+
+    logging.info('refreshpodcast, changes: %s' % changes)
+
+    # Updte datastore based on changes from rss feed.
+    info = update_podcast_episodes(podcast, feed_info, changes)
+
+    return info
 
 # Podcast / Main page classes
 class RemovePodcast(webapp2.RequestHandler):
@@ -415,15 +544,13 @@ class RemovePodcast(webapp2.RequestHandler):
         # Check playlist to see if the podcast the user wants to remove is in there, if so, set inactive
         # and do not remove it. On startup of app, then check to see if any inactives are still being used
         # in playlist, if not remove podcast permanently, if still used do nothing.
-        user = users.get_current_user()
+        
         delete_flag = True
 
         urlsafe_key = self.request.get('urlsafe_key')
         key = ndb.Key(urlsafe=urlsafe_key)
 
-        # qry = Playlist.query(ancestor=podcast_feed_key())
-        # playlist = qry.filter(Playlist.author==user).fetch(1)[0]
-        playlist = get_playlist(user)
+        playlist = get_playlist(users.get_current_user())
 
         # If a playlist item references a podcast, only mark inactive and leave for deletion
         # when all dependancies are gone. Checks on podcast page load.
@@ -438,90 +565,53 @@ class RemovePodcast(webapp2.RequestHandler):
         if delete_flag:
             key.delete()
 
-class RefreshAllPodcasts(webapp2.RequestHandler):
-    def post(self):
-        logging.info('refreshallfeeds')
-        # Get all podcasts.
-        # for podcast in podcasts call refresh feed
-
 class RefreshPodcast(webapp2.RequestHandler):
     def post(self):
         urlsafe_key = self.request.get('urlsafe_key')   # podcast key
-        # logging.info('refreshpodcast, key: %s ' % urlsafe_key)
         podcast = ndb.Key(urlsafe=urlsafe_key).get()
-        feed_info = get_info_from_rss(podcast.url)
-        
-        # logging.info('refreshpodcast, info-episodes: %s' % feed_info['episode'])
-        # logging.info('refreshpodcast, podcast-episodes: %s' % podcast.episode)
-        
-        episodes_to_add = []
-        episodes_to_remove = []
 
-        # remove_episode(podcast)
+        info = get_podcast_changes(podcast)
 
-        current_episode_list = [episode.url for episode in podcast.episode]
-        logging.info('refreshfeed, current episode list %s' % current_episode_list)
-        new_rss_episode_list = [episode['url'] for episode in feed_info['episode']]
-        logging.info('refreshfeed, new rss [] episode list %s' % new_rss_episode_list)
-                
-        for episode_url in new_rss_episode_list:        # Comparing urls to mp3 file.
-            if episode_url not in current_episode_list:
-                episodes_to_add.append(episode_url)
-        logging.info('refreshpodcast, listepisodestoadd: %s' % episodes_to_add)
-                
-        for episode_url in current_episode_list:        # Comparing urls to mp3 file.
-            if episode_url not in new_rss_episode_list:
-                episodes_to_remove.append(episode_url)
-        logging.info('refreshpodcast, listepisodestoremove: %s' % episodes_to_remove)
-        
-        info = update_podcast_episodes(podcast, episodes_to_add, episodes_to_remove, feed_info)
         return dump_json(self, info)
-        
-        # Need to do something with feed_info, unless I just want to do a full page refresh.
-        # If I want to do ajax, may need jQuery
 
 class AddToPlaylist(webapp2.RequestHandler):
     def post(self):
-        page_list_item = {};
+        return_info = {};
         
         """ Add check to see if episoode is already in playlist """
 
         # Get values from ajax / post request
-        episode_url = self.request.get('episode_url')
-        podcast_key = ndb.Key(urlsafe = self.request.get('urlsafe_key'))
-        playlist_key = ndb.Key(urlsafe = self.request.get('playlist_urlsafe_key'))
-                
+        data = self.request.params
+        episode_url = data['episode_url']
+        podcast_key = ndb.Key(urlsafe = data['podcast_urlsafe_key'])
+        playlist_key = ndb.Key(urlsafe = data['playlist_urlsafe_key'])
+
         # Add item to playlist and save updated playlist to datastore
         playlist = playlist_key.get()
-        list_item = ListItem(episode_url=episode_url, podcast_key=podcast_key)
-        playlist.list_item.append(list_item)
-        playlist.put()
+        
+        playlist_urls = [item.episode_url for item in playlist.list_item ]
+        logging.info('addtoplaylist, playlisturls: %s' % playlist_urls)
+        logging.info('addtoplaylist, episode_url: %s' % episode_url)
+        if episode_url not in playlist_urls:
+            list_item = ListItem(episode_url=episode_url, podcast_key=podcast_key)
+            playlist.list_item.append(list_item)
+            playlist.put()
         
         # Since json.dumps can not serialize a datastore model, I create a custom
         # dictionary to send to the page
-        podcast = podcast_key.get()
-        page_list_item['podcast_title'] = podcast.title
-        page_list_item['urlsafe_key'] = podcast.key.urlsafe()
-        
-        for episode in podcast.episode:
-            if episode.url == episode_url:
-                page_list_item['episode_title'] = episode.title
-                page_list_item['episode_url'] = episode.url
-                page_list_item['current_time'] = 0
-                break
+            podcast = podcast_key.get()
+            for episode in podcast.episode:
+                if episode.url == episode_url:
+                    return_info = dict_from_episode(podcast, episode)
+                    break
                 
-        logging.info('addtoplaylist %s' % page_list_item)
-        # self.response.headers['Content-Type'] = 'application/json'
-        # self.response.write(json.dumps(page_list_item))
-        dump_json(self, page_list_item)
+            logging.info('addtoplaylist, return_info: %s' % return_info)
+        else:
+            return_info['alreadyInList'] = True
+            logging.info('episode is already in the playlist')
+        dump_json(self, return_info)
 
 # Playlist page functions
-
-def episode_info(podcast, url, info):
-    for episode in podcast.episode:
-        if episode.url == url:
-            return getattr(episode, info)
-
 class RemoveFromPlaylist(webapp2.RequestHandler):
     """ Removes entry from datastore using episode's url and returns that episodes 
     title to web page."""
@@ -536,6 +626,12 @@ class RemoveFromPlaylist(webapp2.RequestHandler):
             if (item.episode_url == url):
                 playlist.list_item.remove(item)
         playlist.put()
+
+        t = time.ctime(time.time())
+        logging.info('removefromplaylist, %s,  before 5s sleep: %s' %(url, t))
+        time.sleep(5)
+        t = time.ctime(time.time())
+        logging.info('removefromplaylist, after sleep: %s' % t)
 
 class SavePlaybackTime(webapp2.RequestHandler):
     """ Saves current playback position to datastore. Used to retrieve on startup to resume where user stopped listening. """
@@ -579,6 +675,41 @@ class SaveNowPlaying(webapp2.RequestHandler):
         playlist.put()
         
         dump_json(self, returnInfo)
+
+# New page classes
+class RefreshAllPodcasts(webapp2.RequestHandler):
+    def post(self):
+        
+        start = time.time()
+        
+        logging.info('refreshallfeeds')
+        podcasts = get_active_podcasts(users.get_current_user())
+        all_podcasts_info = []
+        
+        # rss_url_list = [podcast.url for podcast in podcasts]
+        # logging.info('refreshallfeeds, rss_url_list: %s' % rss_url_list )
+        
+        # for url in rss_url_list:
+        last = start
+        for podcast in podcasts:
+            # changes = compare stored in datastore to rss feeds.
+            info = get_podcast_changes(podcast)
+            all_podcasts_info.append(info)
+            # logging.info('refreshallpodcasts, infoadd: %s' % info['add'])
+            update_new_list(info['add'])
+            logging.info('refreshallfeeds, updatenewlist: %s' % all_podcasts_info)
+            now = time.time()
+            logging.info('refreshallfeeds, time since last: %s' % (now-last))
+            last = now
+
+        
+        logging.info('refreshallfeeds, updatenewlist: %s' % all_podcasts_info)
+        
+        dump_json(self, all_podcasts_info)
+        logging.info('RefreshAllFeeds, total load time: %.2f s' % (time.time()-start))
+
+        # Get all podcasts.
+        # for podcast in podcasts call refresh feed
 
 app = webapp2.WSGIApplication([
         # list of functions / actions /methods, not sure proper term
