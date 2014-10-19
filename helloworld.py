@@ -221,10 +221,11 @@ class PlaylistPage(webapp2.RequestHandler):
         tail = os.path.splitext(playlist.now_playing_url)
         # logging.info('playlist page, tail: %s' % tail)
         logging.info('playlist page, tail: %s' % tail[1])
-        if(tail[1] == 'mp4'):
+        if(tail[1] == '.mp4'):
+            playlist.now_playing_audio_url  = '#'
             playlist.now_playing_video_url  = playlist.now_playing_url
-            playlist.now_playing_url        = '#'
         else:
+            playlist.now_playing_audio_url  = playlist.now_playing_url
             playlist.now_playing_video_url  = '#'
         
         # logging.info('playlistpage, playlist before serving jinja %s' % playlist)
@@ -641,12 +642,15 @@ class SavePlaybackTime(webapp2.RequestHandler):
         urlsafe_key = self.request.get('urlsafe_key')    # podcast key
         current_time = self.request.get('current_time')
         
+        logging.info('saveplaybacktime, %s, %s, %s' %(current_time, episode_url, urlsafe_key))
+        
         podcast = ndb.Key(urlsafe=urlsafe_key).get()
         for episode in podcast.episode:
             if episode.url == episode_url:
                 episode.current_time = int(current_time)
         
         podcast.put()
+        logging.info('saveplaybacktime, podcast: %s' %(podcast))
 
 class SaveNowPlaying(webapp2.RequestHandler):
     """ Initializes player with last played episode and last playback time.

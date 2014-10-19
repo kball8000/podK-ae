@@ -1,8 +1,42 @@
-
 // **--   jQuery mobile overrides:   --** 
 /* $.mobile.page.prototype.options.domCache = true; */
 
 // **--   Home - Pocast page script   --** 
+function getPlayerElem(){
+    var audioSrc    = document.getElementById('audioSrc');
+    var audioType   = audioSrc.src.split('.').pop();
+    var videoSrc    = document.getElementById('videoSrc');
+    var videoType   = videoSrc.src.split('.').pop();
+    var defaultUrl  = location.href + '#'; 
+    
+    if (audioType === 'mp3'){
+        return document.getElementById('audioPlayer');
+    }
+    else if(videoType === 'mp4'){
+        return document.getElementById('videoPlayer');
+    }
+    else{
+        return false;
+    }
+}
+
+/* **-- Marked for deletion as it us unused and more importantly probably does not work
+currently, not checking for defaul # url. --** */
+function getPlayerSrc(){
+    var audioSrc = document.getElementById('audioPlayer');
+    var videoSrc = document.getElementById('videoPlayer');
+    
+    if (audioSrc.src){
+        return audioSrc;
+    }
+    else if(videoSrc.src){
+        return videoSrc;
+    }
+    else{
+        return false;
+    }
+}
+
 function createPlaylistListviewItem(add){
     var html = '';
 
@@ -92,8 +126,75 @@ function updateAllPodcastsHtml(listview, newEpisodesForAllPodcasts){
     }
 }
 
+function setSliderLocation(player){
+    // var player = document.getElementById('audioPlayer');
+    var time = player.currentTime;
+    var duration = player.duration;
+    
+    console.log('setsliderlocation, player below, time and duration right:' + time + ', ' + duration );
+    console.dir(player);
+    
+    $('#playerSlider').prop('value', (time/duration*100));
+    $('#playerSlider').slider('refresh');
+}
+
 function lastTimer(val){
     this.val = val;
+}
+
+function colorSliderBackround(start, length, roundStart, roundEnd){
+    roundStart = (roundStart) ? roundStart : false;
+    roundEnd = (roundEnd) ? roundEnd : false;
+
+    var div = document.createElement('div');
+    div.className = 'seekableSegment';
+    div.style.left = start + 'px';
+    div.style.width = length + 'px';
+    if(roundStart){
+      div.style.borderTopLeftRadius = 5 + 'px';
+      div.style.borderBottomLeftRadius = 5 + 'px';
+    }
+    if(roundEnd){
+      div.style.borderTopRightRadius = 5 + 'px';
+      div.style.borderBottomRightRadius = 5 + 'px';
+    }
+    $('.ui-slider-track').prepend(div);
+  }
+
+function displayAudioSeekable(){
+    // var player = document.getElementById('audioPlayer');
+    var player = getPlayerElem();
+    var duration = player.duration; // seconds
+    /* var seekable = player.buffered; */
+    var seekable = player.seekable;
+    var widthSlider = $('.ui-slider-track').prop('clientWidth')-1;
+    var roundStart, roundEnd = false;
+    var start_s, end_s, start_percent, end_percent, start_px, width_px;
+
+    $('.seekableSegment').remove();
+
+    for(var i=0; i<seekable.length; i+=1 ){
+        start_s = seekable.start(i);
+        end_s = seekable.end(i);
+        
+        start_percent = start_s / duration;
+        end_percent = end_s / duration;
+        
+        start_px = Math.floor(start_percent * widthSlider);
+        width_px = Math.floor(end_percent * widthSlider) - start_px;
+        
+        if (start_px<5){
+            roundStart = true;
+        }
+        if ((end_percent > 0.99)){
+            roundEnd = true;
+        }
+        
+/*         console.log('widthSlider' + widthSlider);
+        console.log(start_px + ', '+width_px+', '+roundStart+', '+roundEnd); */
+        colorSliderBackround(start_px, width_px, roundStart, roundEnd);
+        roundStart = roundEnd = false;
+    }
 }
 
 function playTrack(eCaller){
@@ -101,7 +202,9 @@ function playTrack(eCaller){
     /* Plays podcast, saves current playback time so user can pick up where they left off and goes to next episode
         on the list when the current playing is finished. */
     var savePlaybackPositionTimer;
-    var player = document.getElementById('audioPlayer');
+/*     var player = document.getElementById('audioPlayer'); */
+    var player      = getPlayerElem();
+    var playerDiv    = document.getElementById('playerDiv');
 
     function savePlaybackPosition(){
         // Save playback postion to datastore.
@@ -112,14 +215,19 @@ function playTrack(eCaller){
         }
 
          var data = {
-            urlsafe_key: $( player ).data('podcast-id'),
-            episode_url:  $( player ).data('episode-url') ,
+/*             urlsafe_key: $( player ).data('podcast-id'),
+            episode_url:  $( player ).data('episode-url') , */
+            urlsafe_key: $( playerDiv ).data('podcast-id'),
+            episode_url:  $( playerDiv ).data('episode-url') ,
             current_time: Math.floor( player.currentTime )
         };
         
         console.log('Saving time to datastore, timer(right), data(below): ' + 
                     savePlaybackPositionTimer);
         console.dir(data);
+        displayAudioSeekable();
+        setSliderLocation(player);
+
         
         var request = $.ajax({
             url: '/saveplaybacktime',
@@ -135,32 +243,38 @@ function playTrack(eCaller){
         }
         player.play();
         $('#playBtn').html('||');
+        console.log('playtrack, after player.play() ' + $('#playBtn').html());
+        setSliderLocation(player);
+
     }
     else{
         player.pause();
         $('#playBtn').html('&#9654;');
+        console.log('playtrack, after player.pause() ' + $('#playBtn').html());
     }
 }
 
 function setPlayerAttributes(player, data){
     var setTimeInt;
+    var playerDiv = document.getElementById('playerDiv');
     setTimeInt = setInterval( function(){
         console.log('setPlayerAttributes, checking ready state');
         if (player.readyState > 3){
             console.log('setPlayerAttributes, setting time and playing');
             player.currentTime = data.currentTime;
             playTrack();
+            setSliderLocation(player);
             clearInterval(setTimeInt);
         }
     }, 300);
-    $( player ).data('episode-url', data.url);
-    $( player ).data('podcast-id', data.podcastUrlsafeKey);
+    $( playerDiv ).data('episode-url', data.url);
+    $( playerDiv ).data('podcast-id', data.podcast_urlsafe_key);
 /*     $(player).on('canplay', function(){
         $(player).currentTime = result.current_time;
     }); */
 }
 
-function setTrackAttributes(player, result){
+function setTrackAttributes(result){
     // $( elem.playerSrc ).attr( 'src', data.url );
     console.log('setTrackAttributes: data, result:');
     console.dir(result);
@@ -177,7 +291,7 @@ function saveNowPlaying(player, data){
     });
     request.done( function(result){
         // Set values in player to the now current title
-        setTrackAttributes(player, result);
+        setTrackAttributes(result);
     });
 }
 
@@ -208,25 +322,67 @@ function removeFromPlaylist(e){
     
 }
 
+function changePlayer(new_url){
+/* Decide whether to show / hide or leave video player as is. */
+    var audio = document.getElementById('audioPlayer');
+    var audioSrc = document.getElementById('audioSrc');
+    var video = document.getElementById('videoPlayer');
+    var videoSrc = document.getElementById('videoSrc');
+
+    var player = getPlayerElem();
+    var defaultUrl = location.href + '#';
+
+    var prevFiletype = player.children[0].src.split('.').pop();
+    var newFiletype = new_url.split('.').pop();
+
+    if(!player.paused){
+        playTrack();    // Pauses track.
+    }
+    
+    console.log('changeplayer, audio src: ' + audioSrc.src);
+    console.log('changeplayer, video src: ' + videoSrc.src);
+
+/* ***--- Work on this region, need to consider if previous is location.href#  ---***  */
+/* ***--- Can make this way simplyer if I just rehide or reshow video, so 
+no need to check old version. and remove the fadein slideout suff if needed.---***  */
+    if (prevFiletype === 'mp4' && newFiletype !== 'mp4'){
+        videoSrc.src = defaultUrl;
+        $(video).hide();
+        player = audio;
+    }
+    else if(prevFiletype !== 'mp4' && newFiletype ==='mp4'){
+        audioSrc.src = defaultUrl;
+        $(video).fadeIn(500);
+        player = video;
+    }
+    else if(prevFiletype === 'mp4' && newFiletype ==='mp4'){
+        player = video;
+    }
+    else if(prevFiletype === 'mp3' && newFiletype ==='mp3'){
+        player = audio;
+    }
+    else{
+        player = false;
+    }
+        
+/*     audio.src = '';
+    video.src = ''; */
+    return player;
+}
+
 function sendEpisodeToPlayer(e){
 // When clicking episode in playlist (listview) play the episode
 // Saves to datastore and updates player to show titles.
-    // var elem = {
-    //    player: $( '#audioPlayer' )
-    // };
-    // Added separately, since it's dependant on the player element of elem dict.
-    // elem.playerSrc = $( elem.player ).children()[0];
-
-    var player = document.getElementById('audioPlayer');
-    var playerSrc = document.getElementById('audioSrc');
+    // var player = document.getElementById('audioPlayer');
+    //var playerSrc = document.getElementById('audioSrc');
+    // var player = getPlayerElem();
+    // var playerSrc = getPlayerSrc();
+    var player, playerSrc;
     
     var timeElem = $(this).find('.episodeCurrentTime');
-    var timeElem_0 = $(this).find('.episodeCurrentTime')[0];
+    var time = parseInt($(timeElem).data('playback-time'));
     console.log('sendEpisodeToPlayer, timeElem below:');
     console.dir(timeElem);
-    console.dir(timeElem_0);
-    console.log('sendEpisodeToPlayer, timeElem[0]:' + timeElem_0);
-    var time = parseInt($(timeElem).data('playback-time'));
     console.log('sendEpisodeToPlayer, time:' + time);
     
     var data = {
@@ -235,12 +391,31 @@ function sendEpisodeToPlayer(e){
         playlist_urlsafe_key: $('#playlist').data('playlist-id'),
         currentTime: time
     };
-    console.log('sendEpisodeToPlayer, data below:');
-    console.dir(data);
+        
+    player = changePlayer(data.url);
+    playerSrc = player.children[0];
+    // console.log('sendEpisodeToPlayer, playerSrc' + playerSrc);
 
     if(!player.paused){    
         playTrack();        // Pauses player
     }
+
+/*     var filetype = data.url.split('.').pop();
+
+    if (filetype === 'mp3'){
+        player = document.getElementById('audioPlayer');
+        playerSrc = document.getElementById('audioSrc');
+        playerSrc.src = data.url;
+    }
+    else{
+        player = document.getElementById('videoPlayer');
+        playerSrc = document.getElementById('videoSrc');
+        playerSrc.src = data.url;
+    }
+     */
+    console.log('sendEpisodeToPlayer, data below:');
+    console.dir(data);
+
     playerSrc.src = data.url;
     player.load();    
     setPlayerAttributes(player, data);  // ui
@@ -381,33 +556,6 @@ function refreshAllPodcasts(e){
 }
 
 // **--   Playlist page script   --** 
-function getPlayerElem(){
-    var audioPlayer = document.getElementById('audioPlayer');
-    var videoPlayer = document.getElementById('videoPlayer');
-    
-    if (audioPlayer.src){
-        return audioPlayer;
-    }
-    else if(videoPlayer.src){
-        return videoPlayer;
-    }
-    else{
-        return false;
-    }
-}
-
-function setPlayerLoadedUi(e){
-/*     console.log('setplayerloadedui, is this where it is switching back to play button?'); */
-    var player = document.getElementById('audioPlayer');
-    $('#playBtn').html('&#9654;');
-    $('#playerTimeCurrent').css('fontWeight', 'bold');
-
-    $('.ui-slider-track').css('backgroundColor', 'rgb(241, 210, 170)');
-
-    $('.ui-slider-handle').css('backgroundColor', 'rgb(231, 175, 124)');
-    $('.ui-slider-handle').css('border-color', 'rgba(50, 50, 50, 40)');
-}
-
 function secondsToReadableTime(time_s, duration){
 
     var hr = Math.floor(time_s/3600);
@@ -444,70 +592,22 @@ function findItemPlaylist(episode_url){
     return elem;
 }
 
-function colorSliderBackround(start, length, roundStart, roundEnd){
-    roundStart = (roundStart) ? roundStart : false;
-    roundEnd = (roundEnd) ? roundEnd : false;
-
-    var div = document.createElement('div');
-    div.className = 'seekableSegment';
-    div.style.left = start + 'px';
-    div.style.width = length + 'px';
-    if(roundStart){
-      div.style.borderTopLeftRadius = 5 + 'px';
-      div.style.borderBottomLeftRadius = 5 + 'px';
-    }
-    if(roundEnd){
-      div.style.borderTopRightRadius = 5 + 'px';
-      div.style.borderBottomRightRadius = 5 + 'px';
-    }
-    $('.ui-slider-track').prepend(div);
-  }
-
-function displayAudioSeekable(){
-    var player = document.getElementById('audioPlayer');
-    var duration = player.duration; // seconds
-    /* var seekable = player.buffered; */
-    var seekable = player.seekable;
-    var widthSlider = $('.ui-slider-track').prop('clientWidth')-1;
-    var roundStart, roundEnd = false;
-    var start_s, end_s, start_percent, end_percent, start_px, width_px;
-
-    $('.seekableSegment').remove();
-
-    for(var i=0; i<seekable.length; i+=1 ){
-        start_s = seekable.start(i);
-        end_s = seekable.end(i);
-        
-        start_percent = start_s / duration;
-        end_percent = end_s / duration;
-        
-        start_px = Math.floor(start_percent * widthSlider);
-        width_px = Math.floor(end_percent * widthSlider) - start_px;
-        
-        if (start_px<5){
-            roundStart = true;
-        }
-        if ((end_percent > 0.99)){
-            roundEnd = true;
-        }
-        
-/*         console.log('widthSlider' + widthSlider);
-        console.log(start_px + ', '+width_px+', '+roundStart+', '+roundEnd); */
-        colorSliderBackround(start_px, width_px, roundStart, roundEnd);
-        roundStart = roundEnd = false;
-    }
-}
-
 function displayPlayerTime(event, time){
     /* Displays the time in the player region of the ui.*/
     /* Temporarily also displays the playlist region of the ui.*/
 
-    var player = document.getElementById('audioPlayer');
+    // var player = document.getElementById('audioPlayer');
+    var player          = getPlayerElem();
+    var playerDiv       = document.getElementById('playerDiv');
+    
 
-    var playerTime_s = Math.floor(player.currentTime);  // time in seconds
-    var duration = Math.floor(player.duration);
-    var episodeUrl = $(player).data('episode-url');
+    var playerTime_s    = Math.floor(player.currentTime);  // time in seconds
+    var duration        = Math.floor(player.duration);
+    // var episodeUrl      = $(player).data('episode-url');
+    var episodeUrl      = $(playerDiv).data('episode-url');
 
+    console.log('displayPlayerTime, player below, time and url: ' + playerTime_s + ', ' + episodeUrl);
+    console.dir(player);
     // If we are just updating the ui, take time from player, but if we are 
     // updating based on slide position, use value from call within slide funciton
     if (time){
@@ -529,13 +629,14 @@ function displayPlayerTime(event, time){
     playlistItemTime.data('playback-time', playerTime_s);
     
     // console.log('displayplayertime, oncanplaythru:' + player.oncanplaythrough);
-    displayAudioSeekable();
+/*     displayAudioSeekable(); */
 }
 
 function updateTimeFromSlidestart(e){
     console.log('updateTimeFromSlidetart fired');
 
-    var player = document.getElementById('audioPlayer');
+    // var player = document.getElementById('audioPlayer');
+    var player = getPlayerElem();
     
     if(!player.paused){
         playTrack(e);    // pauses track
@@ -551,7 +652,8 @@ function updateTimeFromSlidestop(e){
     console.log('updateTimeFromSlidetop fired');
     console.dir(e);
 
-    var player = document.getElementById('audioPlayer');
+    // var player = document.getElementById('audioPlayer');
+    var player = getPlayerElem();
     var location = $('#playerSlider').prop('value');
     var duration = player.duration;
     
@@ -564,43 +666,80 @@ function updateTimeFromSlidestop(e){
 
 }
 
-function setSliderLocation(){
-    var player = document.getElementById('audioPlayer');
-    var time = player.currentTime;
-    var duration = player.duration;
-    
-    $('#playerSlider').prop('value', (time/duration*100));
-    $('#playerSlider').slider('refresh');
-}
-
-function resumePlayerTime(){
+function resumePlayerTime(player){
+    var setTimeInt;
     var initialPlaybackTime = $('#playerTimeCurrent').data('playback-time');
-    console.log('resumePlayerTime, initialPlaybacktime: ' + initialPlaybackTime);
+/*     var player = getPlayerElem(); */
+    // console.log('resumePlayerTime, initialPlaybacktime: ' + initialPlaybackTime);
 
     /*     Set the player time and set the ui player time*/
-    $('#audioPlayer').prop('currentTime', initialPlaybackTime);
+    setTimeInt = setInterval( function(){
+        console.log('resumePlayerTime, checking ready state');
+        if (player.readyState > 3){
+            player.currentTime = initialPlaybackTime;
+            // console.log('resumePlayerTime, setting time: ' + player.currentTime);
+            setSliderLocation(player);
+            clearInterval(setTimeInt);
+        }
+    }, 300);
+
+    
+/*     player.currentTime = initialPlaybackTime; */
+/*     $(player).prop('currentTime', initialPlaybackTime); */
     $('#playerTimeCurrent').html(initialPlaybackTime);
-    setSliderLocation();
 }
 
-function audioPlayerInit(){
-    console.log('audioplayerinit');
-    var player = document.getElementById('audioPlayer');
+function setPlayerLoadedUi(player){
+/*     console.log('setplayerloadedui, is this where it is switching back to play button?'); */
+    // var player = document.getElementById('audioPlayer');
+/*     var player = getPlayerElem(); */
+    $('#playBtn').html('&#9654;');
+    $('#playerTimeCurrent').css('fontWeight', 'bold');
+
+    $('.ui-slider-track').css('backgroundColor', 'rgb(241, 210, 170)');
+    $('.ui-slider-handle').css('backgroundColor', 'rgb(231, 175, 124)');
+    $('.ui-slider-handle').css('border-color', 'rgba(50, 50, 50, 40)');
+}
+
+function playerInit(){
+    console.log('playerInit');
+    
+/*     var audioPlayer = document.getElementById('audioPlayer'); */
+/*     var audioSrc = document.getElementById('audioSrc'); */
+    var player = getPlayerElem();
     var videoPlayer = document.getElementById('videoPlayer');
-    console.log('audioplayerint: audio, video below.');
+    var videoSrc = document.getElementById('videoSrc');
+    var playerInactiveUrl = location.href + '#';
+/*     var playerInactiveUrl = location.href; */
+
+    console.log('audioplayerint: player, video below.');
     console.dir(player);
+/*     console.dir(audioPlayer); */
     console.dir(videoPlayer);
     
-    if(videoPlayer.src){
+    console.log('playerInit, before if, videoPlayersrc: ' + videoSrc.src);
+    console.log('playerInit, before if, playerInactiveUrl: ' + playerInactiveUrl);
+    if(videoSrc.src !== playerInactiveUrl){
+        console.log('playerInit, in if');
+        $(videoPlayer).fadeIn(2500);
+    }
+    
+    resumePlayerTime(player);
+    setPlayerLoadedUi(player);
+/*     setSliderLocation(player); */
+    
+/*     if(videoSrc.src !== activePlayerCheck){
+        console.log('playerInit, in videoPlayersrc? ' + videoSrc.src);
         videoPlayer.load();
     }
     else{
         $(videoPlayer).hide();
     }
     
-    if(player.src){
-        player.load();
-    }
+    if(audioSrc.src !== activePlayerCheck){
+        audioPlayer.load();
+        console.log('hid player loading');
+    } */
 }
 
 function playNextTrack(){
@@ -608,13 +747,15 @@ function playNextTrack(){
 }
 
 function rewindTrack(){
-    var player = $('#audioPlayer')[0];
+    var player = getPlayerElem();
     player.currentTime -= 15;
+    setSliderLocation(player);
 }
 
 function fastForwardTrack(){
-    var player = $('#audioPlayer')[0];
+    var player = getPlayerElem();
     player.currentTime += 30;
+    setSliderLocation(player);
 }
 
 function muteAudio(){
@@ -818,7 +959,8 @@ function showITunesSearchResults(arg){
 
 // **--   Page container scripts   --** 
 function checkPlayerRunning(event, ui){
-    var player = document.getElementById('audioPlayer');
+    // var player = document.getElementById('audioPlayer');
+    var player = getPlayerElem();
     console.log('beforehide, checkplayerunning');
     if (player){
         console.log('player exists. is paused = ' + player.paused );
@@ -859,15 +1001,24 @@ $('#PodcastPage').on('pagecreate', function(e, ui){
     $( '.subscriptionList' ).on( 'click', '.addToPlaylist', addToPlaylist );
 });
 // Playlists Page
+/* $('#PlaylistPage').on('pageshow', function(e, ui){
+    console.log('PlaylistPage pageshow starting...:');
+    playerInit();
+}); */
 $('#PlaylistPage').on('pagecreate', function(e, ui){
+    console.log('PlaylistPage pagecreate starting...:');
     /* Player functions. */
-    audioPlayerInit();
-    $( '#audioPlayer' ).on( 'durationchange', resumePlayerTime);
-    $( '#audioPlayer' ).on( 'canplay', setPlayerLoadedUi);
+    playerInit();
+    /* Chose duration change a bit arbitrarily, just wanted to be sure time was
+    there in the player to be modified. */
+/*     $( '#audioPlayer' ).on( 'durationchange', resumePlayerTime); */
+/*     $( '#audioPlayer' ).on( 'canplay', setPlayerLoadedUi); */
     $( '#audioPlayer' ).on( 'timeupdate', displayPlayerTime);
+    $( '#videoPlayer' ).on( 'timeupdate', displayPlayerTime);
     $( '#playerSlider' ).on( 'slidestart', updateTimeFromSlidestart);
     $( '#playerSlider' ).on( 'slidestop', updateTimeFromSlidestop);
     $( '#audioPlayer' ).on( 'ended', playNextTrack);
+    $( '#videoPlayer' ).on( 'ended', playNextTrack);
 
     /* Player ui functions. */
     $( '#playBtn' ).on( 'click', playTrack );
@@ -882,14 +1033,14 @@ $('#PlaylistPage').on('pagecreate', function(e, ui){
 
 // New Page
 $('#NewPage').on('pagecreate', function(e, ui){
-    console.log('in really new page, domcache next:');
-    console.log($.mobile.page.prototype.options.domCache);
+    console.log('NewPage, domcache:' + $.mobile.page.prototype.options.domCache);
     $('#refreshAllPodcasts').on('click', refreshAllPodcasts);
     $( '#newList' ).on( 'click', 'li', fromNewToPlaylist );
 });
 
 // Search Page
 $('#SearchPage').on('pagecreate', function(e, ui){
+    console.log('SearchPage, domcache:' + $.mobile.page.prototype.options.domCache);
     $( '#iTunesSearchForm' ).on( 'submit', sendITunesSearchRequest );
     $( '#rssSubscribeForm' ).on( 'submit', addPodcastFromRssUrl );
     $( '#iTunesSearchResultsHtml' ).on( 'click', 'li', addPodcastFromITunesSearch );
