@@ -347,7 +347,7 @@ function changePlayer(new_url){
 no need to check old version. and remove the fadein slideout suff if needed.---***  */
     if (prevFiletype === 'mp4' && newFiletype !== 'mp4'){
         videoSrc.src = defaultUrl;
-        $(video).hide();
+        $(video).slideUp(1000);
         player = audio;
     }
     else if(prevFiletype !== 'mp4' && newFiletype ==='mp4'){
@@ -606,8 +606,6 @@ function displayPlayerTime(event, time){
     // var episodeUrl      = $(player).data('episode-url');
     var episodeUrl      = $(playerDiv).data('episode-url');
 
-    console.log('displayPlayerTime, player below, time and url: ' + playerTime_s + ', ' + episodeUrl);
-    console.dir(player);
     // If we are just updating the ui, take time from player, but if we are 
     // updating based on slide position, use value from call within slide funciton
     if (time){
@@ -630,40 +628,6 @@ function displayPlayerTime(event, time){
     
     // console.log('displayplayertime, oncanplaythru:' + player.oncanplaythrough);
 /*     displayAudioSeekable(); */
-}
-
-function updateTimeFromSlidestart(e){
-    console.log('updateTimeFromSlidetart fired');
-
-    // var player = document.getElementById('audioPlayer');
-    var player = getPlayerElem();
-    
-    if(!player.paused){
-        playTrack(e);    // pauses track
-    }
-    
-    var location = $('#playerSlider').prop('value');
-    var duration = player.duration;
-    console.log('updateTimeFromSlidestart, location' + location + ', duration: ' + duration);
-    displayPlayerTime('', (duration * (location/100)));
-}
-
-function updateTimeFromSlidestop(e){
-    console.log('updateTimeFromSlidetop fired');
-    console.dir(e);
-
-    // var player = document.getElementById('audioPlayer');
-    var player = getPlayerElem();
-    var location = $('#playerSlider').prop('value');
-    var duration = player.duration;
-    
-    displayPlayerTime('', (duration * (location/100)));
-    if(player.paused){
-        playTrack(e);    // plays track
-    }
-    
-    console.log('updateTimeFromSlidestop, location' + location + ', duration: ' + duration);
-
 }
 
 function resumePlayerTime(player){
@@ -701,6 +665,90 @@ function setPlayerLoadedUi(player){
     $('.ui-slider-handle').css('border-color', 'rgba(50, 50, 50, 40)');
 }
 
+function fullscreenTimer(val){
+    this.val = val;
+}
+
+function fullScreenVideoControls(){
+    var elem = document.getElementById('videoPlayerDiv');
+    var elem1 = document.getElementById('videoPlayer');
+    console.log('clicking on video');
+    
+    elem1.controls = false;
+
+    if(document.webkitFullscreenElement){
+        console.log('fullScreenVideoControls, in if');
+        console.log('elem.controls' + elem1.controls);
+        $('#videoRewind').fadeIn(300);
+        console.log('fullScreenVideoControls, fullscreenTimer: ' + fullscreenTimer.val);
+        if(!fullscreenTimer.val){
+            console.log('fullScreenVideoControls, in timer if');
+            fullscreenTimer.val='run';
+            console.log('fullScreenVideoControls, in if should be run: ' + fullscreenTimer.val);
+            setTimeout( function(){
+                $('#videoRewind').fadeOut(300);
+                fullscreenTimer.val = undefined;
+            }, 2000);
+            
+        }
+        
+    }
+}
+
+function fullScreenVideo(){
+    console.log('full screen video coming or going!');
+/*     var elem = document.getElementById('videoPlayerDiv'); */
+    var elem = document.getElementById('videoPlayer');
+    if(!document.webkitFullscreenElement){
+        console.log('going full screen');
+        elem.controls = false;
+        elem.webkitRequestFullscreen();
+        console.log('elem.controls' + elem.controls);
+        elem.controls = false;
+/*         $(elem).prop('controls', 'false'); */
+    }
+    else{
+        console.log('exiting full screen');
+        document.webkitExitFullscreen();
+    }
+
+}
+
+/* Playlist page - **-- Player Functions --** */
+function updateTimeFromSlidestart(e){
+    console.log('updateTimeFromSlidetart fired');
+
+    // var player = document.getElementById('audioPlayer');
+    var player = getPlayerElem();
+    
+    if(!player.paused){
+        playTrack(e);    // pauses track
+    }
+    
+    var location = $('#playerSlider').prop('value');
+    var duration = player.duration;
+    console.log('updateTimeFromSlidestart, location' + location + ', duration: ' + duration);
+    displayPlayerTime('', (duration * (location/100)));
+}
+
+function updateTimeFromSlidestop(e){
+    console.log('updateTimeFromSlidetop fired');
+    console.dir(e);
+
+    // var player = document.getElementById('audioPlayer');
+    var player = getPlayerElem();
+    var location = $('#playerSlider').prop('value');
+    var duration = player.duration;
+    
+    displayPlayerTime('', (duration * (location/100)));
+    if(player.paused){
+        playTrack(e);    // plays track
+    }
+    
+    console.log('updateTimeFromSlidestop, location' + location + ', duration: ' + duration);
+
+}
+
 function playerInit(){
     console.log('playerInit');
     
@@ -721,7 +769,7 @@ function playerInit(){
     console.log('playerInit, before if, playerInactiveUrl: ' + playerInactiveUrl);
     if(videoSrc.src !== playerInactiveUrl){
         console.log('playerInit, in if');
-        $(videoPlayer).fadeIn(2500);
+        $(videoPlayer).fadeIn(500);
     }
     
     resumePlayerTime(player);
@@ -1019,8 +1067,13 @@ $('#PlaylistPage').on('pagecreate', function(e, ui){
     $( '#playerSlider' ).on( 'slidestop', updateTimeFromSlidestop);
     $( '#audioPlayer' ).on( 'ended', playNextTrack);
     $( '#videoPlayer' ).on( 'ended', playNextTrack);
+    $( '#videoPlayer' ).on( 'dblclick', fullScreenVideo);
+    $( '#videoPlayerDiv' ).on( 'click', fullScreenVideoControls);
+/*     $( '#videoPlayerDiv' ).on( 'mouseover', fullScreenVideoControls); */
+    $( '#videoPlayer' ).on( 'mousemove', fullScreenVideoControls);
 
-    /* Player ui functions. */
+    /* Pl
+    ayer ui functions. */
     $( '#playBtn' ).on( 'click', playTrack );
     $( '#rewindBtn' ).on( 'click', rewindTrack );
     $( '#fastForwardBtn').on( 'click', fastForwardTrack );
