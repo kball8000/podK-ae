@@ -341,27 +341,39 @@ function changePlayer(new_url){
     
     console.log('changeplayer, audio src: ' + audioSrc.src);
     console.log('changeplayer, video src: ' + videoSrc.src);
+    console.log('changeplayer, prev and new: ' + prevFiletype + ', ' + newFiletype);
 
 /* ***--- Work on this region, need to consider if previous is location.href#  ---***  */
 /* ***--- Can make this way simplyer if I just rehide or reshow video, so 
 no need to check old version. and remove the fadein slideout suff if needed.---***  */
     if (prevFiletype === 'mp4' && newFiletype !== 'mp4'){
-        videoSrc.src = defaultUrl;
+        console.log('changeplayer, in first if');
+/*         videoSrc.src = defaultUrl; */
+        videoSrc.src = '#';
+        console.log('changeplayer, after #, currentSrc: ' + video.currentSrc);
+        console.log('changeplayer, after #, videoSrc.src: ' + videoSrc.src);
         $(video).slideUp(1000);
         player = audio;
     }
     else if(prevFiletype !== 'mp4' && newFiletype ==='mp4'){
-        audioSrc.src = defaultUrl;
+        console.log('changeplayer, in second if');
+/*         audioSrc.src = defaultUrl; */
+        audioSrc.src = '#';
+        console.log('changeplayer, after #, currentSrc: ' + audio.currentSrc);
+        console.log('changeplayer, after #, audioSrc.src: ' + audioSrc.src);
         $(video).fadeIn(500);
         player = video;
     }
     else if(prevFiletype === 'mp4' && newFiletype ==='mp4'){
+        console.log('changeplayer, in third if');
         player = video;
     }
     else if(prevFiletype === 'mp3' && newFiletype ==='mp3'){
+        console.log('changeplayer, in fourth if');
         player = audio;
     }
     else{
+        console.log('changeplayer, in else, at end');
         player = false;
     }
         
@@ -377,7 +389,8 @@ function sendEpisodeToPlayer(e){
     //var playerSrc = document.getElementById('audioSrc');
     // var player = getPlayerElem();
     // var playerSrc = getPlayerSrc();
-    var player, playerSrc;
+    var player = getPlayerElem();
+    var playerSrc;
     
     var timeElem = $(this).find('.episodeCurrentTime');
     var time = parseInt($(timeElem).data('playback-time'));
@@ -392,13 +405,13 @@ function sendEpisodeToPlayer(e){
         currentTime: time
     };
         
-    player = changePlayer(data.url);
-    playerSrc = player.children[0];
-    // console.log('sendEpisodeToPlayer, playerSrc' + playerSrc);
-
     if(!player.paused){    
         playTrack();        // Pauses player
     }
+
+    player = changePlayer(data.url);
+    playerSrc = player.children[0];
+    // console.log('sendEpisodeToPlayer, playerSrc' + playerSrc);
 
 /*     var filetype = data.url.split('.').pop();
 
@@ -712,6 +725,34 @@ function fullScreenVideo(){
         document.webkitExitFullscreen();
     }
 
+}
+
+function toggleFullscreen(){
+    var elem = document.getElementById('videoPlayer');
+    if (!document.fullscreenElement &&    // alternative standard method
+        !document.mozFullScreenElement && !document.webkitFullscreenElement && 
+        !document.msFullscreenElement ) {  // current working methods
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+    } 
+    else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+  }
 }
 
 /* Playlist page - **-- Player Functions --** */
@@ -1067,13 +1108,25 @@ $('#PlaylistPage').on('pagecreate', function(e, ui){
     $( '#playerSlider' ).on( 'slidestop', updateTimeFromSlidestop);
     $( '#audioPlayer' ).on( 'ended', playNextTrack);
     $( '#videoPlayer' ).on( 'ended', playNextTrack);
-    $( '#videoPlayer' ).on( 'dblclick', fullScreenVideo);
+/*     $( '#videoPlayer' ).on( 'dblclick', fullScreenVideo); */
+    $( '#videoPlayer' ).on( 'dblclick', toggleFullscreen);
     $( '#videoPlayerDiv' ).on( 'click', fullScreenVideoControls);
 /*     $( '#videoPlayerDiv' ).on( 'mouseover', fullScreenVideoControls); */
     $( '#videoPlayer' ).on( 'mousemove', fullScreenVideoControls);
+    $( 'body' ).on('click', function(){
+        var a = document.getElementById('audioPlayer');
+        var v = document.getElementById('videoPlayer');
+        console.log('document, audio currentSrc: ' + a.currentSrc);
+        console.log('document, video currentSrc: ' + v.currentSrc);
+        console.log('document, audio src: ' + a.children[0].src);
+        console.log('document, video src: ' + v.children[0].src);
+        for(var i=0; i<v.bufffered.length; i+=1){
+            console.log('document, ' + i + ', ', v.bufffered.start(i) + 
+                        ', ' + v.bufffered.end(i));
+        }
+    });
 
-    /* Pl
-    ayer ui functions. */
+    /* Player ui functions. */
     $( '#playBtn' ).on( 'click', playTrack );
     $( '#rewindBtn' ).on( 'click', rewindTrack );
     $( '#fastForwardBtn').on( 'click', fastForwardTrack );
