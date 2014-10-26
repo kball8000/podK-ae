@@ -101,7 +101,7 @@ break things. I need to find another way to do this... */
     z-index: 1;
 }
 
-#muteBtn{
+#textControlBtn{
     font-size: 0.8em;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
