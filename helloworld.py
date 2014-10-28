@@ -222,11 +222,16 @@ class PlaylistPage(webapp2.RequestHandler):
         # logging.info('playlist page, tail: %s' % tail)
         logging.info('playlist page, tail: %s' % tail[1])
         if(tail[1] == '.mp4'):
-            playlist.now_playing_audio_url  = '#'
+#             playlist.now_playing_audio_url  = '#'
+            playlist.now_playing_audio_url  = False
             playlist.now_playing_video_url  = playlist.now_playing_url
-        else:
+        elif(tail[1] == '.mp3'):
+#             playlist.now_playing_video_url  = '#'
             playlist.now_playing_audio_url  = playlist.now_playing_url
-            playlist.now_playing_video_url  = '#'
+            playlist.now_playing_video_url  = False
+        else:
+            playlist.now_playing_audio_url  = False
+            playlist.now_playing_video_url  = False
         
         # logging.info('playlistpage, playlist before serving jinja %s' % playlist)
         

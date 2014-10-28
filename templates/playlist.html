@@ -7,14 +7,20 @@
      data-episode-url='{{ playlist.now_playing_url }}'>
     <div id='videoPlayerDiv' style='position:relative'>
         <a class='ui-btn' id='videoRewind' style='position:absolute; bottom:2em; left:2em; z-index=1; padding:0 0.2em; display:none;'>&gt;</a>
-        <video id='videoPlayer' class='videoPlayer' width='100%' preload='metadata'
-        style='display:none;'>
-            <source id='videoSrc' src='{{ playlist.now_playing_video_url }}' type='video/mp4'>
+        {% if playlist.now_playing_video_url %}
+        <video id='videoPlayer' src='{{ playlist.now_playing_video_url }}' 
+               width='100%' preload='metadata' style='display:none;'>
+<!--             class='videoPlayer'  -->
+<!--             <source id='videoSrc' src='{{ playlist.now_playing_video_url }}' type='video/mp4'> -->
         </video>
+        {% endif %}
     </div>
-    <audio id='audioPlayer' class='audioPlayer' preload='metadata'>
-        <source id='audioSrc' src='{{ playlist.now_playing_audio_url }}' type='audio/mp3'>
+    {% if playlist.now_playing_audio_url %}
+    <audio id='audioPlayer' preload='metadata' src='{{ playlist.now_playing_audio_url }}'>
+<!--         class='audioPlayer'  -->
+        <!--         <source id='audioSrc' src='{{ playlist.now_playing_audio_url }}' type='audio/mp3'> -->
     </audio>
+    {% endif %}
     <div class='ui-grid-a'>
         <div class='ui-block-a'>
             <form class='full-width-slider sliderForm'>
@@ -31,11 +37,12 @@
         </div>
     </div>
     <div class='customAudioControls'>
-        <a class="playBtn ui-btn ui-btn-inline" id='playBtn'>||</a>
-        <a class="rewindBtn ui-btn ui-btn-inline" id='rewindBtn'>&lt;</a>
-        <a class="fastForwardBtn ui-btn ui-btn-inline" id='fastForwardBtn' >&gt;</a>
+        <a class="ui-btn ui-btn-inline" id='playBtn'>||</a>
+        <a class="ui-btn ui-btn-inline" id='rewindBtn'>&lt;</a>
+        <a class="ui-btn ui-btn-inline" id='fastForwardBtn' >&gt;</a>
         <a class="textControlBtn ui-btn ui-btn-inline" id='muteBtn'>Mute</a>
         <a class='textControlBtn ui-btn ui-btn-inline' id='goFsBtn' style='display:none'>FS</a>
+        <a class="textControlBtn ui-btn ui-btn-inline" id='stopDownloadBtn'>X</a>
     </div>
     <div id='playerEpisodeInfo'>
         <p id='playerPodcastTitle'>{{ playlist.now_playing_podcast_title }}</p>
