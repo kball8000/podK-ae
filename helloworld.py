@@ -186,7 +186,7 @@ class PodcastPage(webapp2.RequestHandler):
 
         template_values = {
             'navClass': {'home': 'ui-btn-active ui-state-persist' },
-            'pageTitle': 'Home',
+            'pageTitle': 'Podsy-Home',
             'pageId': 'PodcastPage',
             'playlist_urlsafe_key': playlist.key.urlsafe(),
             'podcasts': podcasts,
@@ -222,22 +222,19 @@ class PlaylistPage(webapp2.RequestHandler):
         # logging.info('playlist page, tail: %s' % tail)
         logging.info('playlist page, tail: %s' % tail[1])
         if(tail[1] == '.mp4'):
-#             playlist.now_playing_audio_url  = '#'
             playlist.now_playing_audio_url  = False
             playlist.now_playing_video_url  = playlist.now_playing_url
         elif(tail[1] == '.mp3'):
-#             playlist.now_playing_video_url  = '#'
             playlist.now_playing_audio_url  = playlist.now_playing_url
             playlist.now_playing_video_url  = False
         else:
             playlist.now_playing_audio_url  = False
             playlist.now_playing_video_url  = False
         
-        # logging.info('playlistpage, playlist before serving jinja %s' % playlist)
         
         template_values = {
             'navClass': {'playlist': 'ui-btn-active ui-state-persist' },
-            'pageTitle': 'Playlist',
+            'pageTitle': 'Podsy-Playlist',
             'pageId': 'PlaylistPage',
             'playlist': playlist
         }
@@ -268,7 +265,7 @@ class NewPage(webapp2.RequestHandler):
         template_values = {
             'navClass': {'new': 'ui-btn-active ui-state-persist' },
             'pageId': 'NewPage',
-            'pageTitle': 'New',
+            'pageTitle': 'Podsy-New',
             'newList': new_list
         }
         template = JINJA_ENVIRONMENT.get_template('new.html')
@@ -288,7 +285,7 @@ class SearchPage(webapp2.RequestHandler):
         template_values = {
             'navClass': {'search': 'ui-btn-active ui-state-persist' },
             'pageId': 'SearchPage',
-            'pageTitle': 'Search'
+            'pageTitle': 'Podsy-Search'
         }
         template = JINJA_ENVIRONMENT.get_template('search.html')
         self.response.write(template.render(template_values))
@@ -304,7 +301,7 @@ class SignOnPage(webapp2.RequestHandler):
         template_values = {
             'navClass': {'': 'ui-btn-active ui-state-persist' },
             'pageId': 'SignOnPage',
-            'pageTitle': 'Sign On',
+            'pageTitle': 'Podsy-Sign On',
             'user_welcome_href': user_welcome_href
         }
         template = JINJA_ENVIRONMENT.get_template('signon.html')
@@ -647,7 +644,7 @@ class SavePlaybackTime(webapp2.RequestHandler):
         urlsafe_key = self.request.get('urlsafe_key')    # podcast key
         current_time = self.request.get('current_time')
         
-        logging.info('saveplaybacktime, %s, %s, %s' %(current_time, episode_url, urlsafe_key))
+        logging.info('saveplaybacktime int, %s, %s, %s' %(int(current_time), episode_url, urlsafe_key))
         
         podcast = ndb.Key(urlsafe=urlsafe_key).get()
         for episode in podcast.episode:
@@ -655,7 +652,7 @@ class SavePlaybackTime(webapp2.RequestHandler):
                 episode.current_time = int(current_time)
         
         podcast.put()
-        logging.info('saveplaybacktime, podcast: %s' %(podcast))
+#         logging.info('saveplaybacktime, podcast: %s' %(podcast))
 
 class SaveNowPlaying(webapp2.RequestHandler):
     """ Initializes player with last played episode and last playback time.

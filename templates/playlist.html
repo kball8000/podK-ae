@@ -9,16 +9,12 @@
         <a class='ui-btn' id='videoRewind' style='position:absolute; bottom:2em; left:2em; z-index=1; padding:0 0.2em; display:none;'>&gt;</a>
         {% if playlist.now_playing_video_url %}
         <video id='videoPlayer' src='{{ playlist.now_playing_video_url }}' 
-               width='100%' preload='metadata' style='display:none;'>
-<!--             class='videoPlayer'  -->
-<!--             <source id='videoSrc' src='{{ playlist.now_playing_video_url }}' type='video/mp4'> -->
+               width='100%' preload='auto' style='display:none;'>
         </video>
         {% endif %}
     </div>
     {% if playlist.now_playing_audio_url %}
-    <audio id='audioPlayer' preload='metadata' src='{{ playlist.now_playing_audio_url }}'>
-<!--         class='audioPlayer'  -->
-        <!--         <source id='audioSrc' src='{{ playlist.now_playing_audio_url }}' type='audio/mp3'> -->
+    <audio id='audioPlayer' preload='auto' src='{{ playlist.now_playing_audio_url }}'>
     </audio>
     {% endif %}
     <div class='ui-grid-a'>
@@ -42,7 +38,6 @@
         <a class="ui-btn ui-btn-inline" id='fastForwardBtn' >&gt;</a>
         <a class="textControlBtn ui-btn ui-btn-inline" id='muteBtn'>Mute</a>
         <a class='textControlBtn ui-btn ui-btn-inline' id='goFsBtn' style='display:none'>FS</a>
-        <a class="textControlBtn ui-btn ui-btn-inline" id='stopDownloadBtn'>X</a>
     </div>
     <div id='playerEpisodeInfo'>
         <p id='playerPodcastTitle'>{{ playlist.now_playing_podcast_title }}</p>
