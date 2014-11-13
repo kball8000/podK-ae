@@ -21,6 +21,7 @@ break things. I need to find another way to do this... */
 
 /* ----- Podcast page specific ----- */
 
+/* 
 .subscriptionItem{
     position:relative;
 }
@@ -28,6 +29,7 @@ break things. I need to find another way to do this... */
 .subscriptionCollapsible a:first-child{
     padding-right: 5.5em;
 }
+ */
 
 .subscriptionItem img{
     border-radius:0.3em; 
@@ -47,6 +49,10 @@ break things. I need to find another way to do this... */
 
 #podcastBtnSpace{
     padding: 0 0.2em;
+}
+
+#subscriptionList .listenedEpisode{
+    color: rgb(190,190,190);
 }
 
 /* ----- Playlist page ----- */

@@ -1,0 +1,12 @@
+<html>
+    <h1>
+        Background page
+    </h1>
+    <script>
+        console.log('running background and more.');
+    	var notification = webkitNotifications.createNotification("",
+            "Simple Background App",
+            "a background notification has been created");
+        notification.show();
+    </script>
+</html>

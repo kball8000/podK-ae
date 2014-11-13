@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="mobile-web-app-capable" content="yes">
-        <link rel='manifest' href='scripts/manifest.json'>
+        <link rel='manifest' href='/scripts/manifest.json'>
         <link rel='icon' type='image/png' href='images/favicon.png'>
         <link rel="icon" sizes="192x192" href="images/launcher-icon-4x.png">
         <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
@@ -17,7 +17,6 @@
     <body>
          <div data-role='page' id='{{ pageId }}'>  <!-- data-url='{{ dataUrl }}' -->
             <div data-role='header' data-position='fixed'>
-<!--             <div data-role='header'> -->
                 <div data-role='navbar'>
                     <ul>
                         <li><a href='/' class='{{ navClass.home }}' data-icon='home' data-prefetch>Podcasts</a></li>
@@ -35,7 +34,7 @@
                 {% endblock %}
             </div> <!-- End data-role-main -->
 
-            <div data-role='footer' style='overflow:hidden;' data-position='fixed'>
+            <div data-role='footer' data-position='fixed' style='overflow:hidden;'>
                 <h2>Podsy <span style='color:rgb(150,150,150); font-family:monospace; padding-left:2em;'>by kball</span></h2>
                 <a href='#' class='reloadBtn ui-btn-right' data-icon='refresh' style='margin-top:0;'>Reload</a>
 <!--                 <a href='/settings' class='ui-btn-right' data-icon='gear' style='margin-top:0;'>Settings</a> -->

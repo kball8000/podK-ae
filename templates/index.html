@@ -13,8 +13,8 @@
 <!-- Display user's podcast subscription list -->
 <div id='subscriptionList' class='subscriptionList' data-playlist-id='{{ playlist_urlsafe_key }}'>
     {% for feed in podcasts %}
-    <div id='subscriptionItem_{{ loop.index }}' class='subscriptionItem'>
-        <div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' data-podcast-id='{{ feed.urlsafe_key }}'>
+<!--     <div class='subscriptionItem'> -->
+        <div data-role='collapsible' data-inset='false' class='subscriptionItem' data-podcast-id='{{ feed.urlsafe_key }}'>
             <h3>
                 <img src='{{ feed.image_url }}' alt='podcast logo' height='45' width='45'> 
                 <span>{{ feed.title }}</span>
@@ -26,14 +26,15 @@
             </h3>
             <ul data-role='listview'>
                 {% for episode in feed.episode %}
-<!--                 <li data-episode-title='{{ episode.title }}' data-episode-url='{{ episode.url }}'> -->
                 <li data-episode-url='{{ episode.url }}'>
-                    <a href='#' class='addToPlaylist'> {{ episode.title }} Time: {{ episode.current_time }}</a>
+                    <a href='#' class='addToPlaylist
+                        {% if episode.listened -%} listenedEpisode{%- endif %}'> 
+                        {{ episode.title }} Time: {{ episode.current_time }}</a>
                 </li>
                 {% endfor %}
             </ul>
         </div>
-    </div>
+<!--     </div> -->
     {% endfor %}
 </div>
 {% endblock %}

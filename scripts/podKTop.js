@@ -16,8 +16,8 @@ var podsyData = (function(){
 
     function set(key, value){
         dict[key] = value;
-        console.log('podsyData, setting: key: ' + key + ', value: ' + dict[key]);
-        console.dir(dict);
+/*         console.log('podsyData, setting: key: ' + key + ', value: ' + dict[key]);
+        console.dir(dict); */
     }
         
     function remove(func){
@@ -53,7 +53,7 @@ var timerStorage = (function(){
     }
     
     function clear(func){
-        console.log('clearing: ' + func + ', ' + dict[func]) ;
+/*         console.log('clearing: ' + func + ', ' + dict[func]) ; */
         clearInterval(dict[func]);
         dict[func] = false;
     } 
@@ -88,6 +88,10 @@ function getPlayerElem(){
     else{
         return false;
     }
+}
+
+function displayNotification(notification){
+    console.log('will display notification');
 }
 
 function createPlaylistListviewItem(add){
@@ -135,45 +139,47 @@ function removePodcastListviewItem(listview, remove){
     }
 }
 
-function addToPlaylistListview(listview, newEpisodes){
-    var html;
-    for(var i=0; i<newEpisodes.length; i+=1){
-        html = createPlaylistListviewItem(newEpisodes[i]);
-        console.log('addToPlaylistListview html: ' + html);
-        $(listview).prepend(html);
+function removeOverflow(li){
+    var maxLength = 100;
+    var listLength = li.childElementCount;
+    
+    while( listLength > maxLength - 1){
+        $(li.children[listLength]).remove();
+        listLength -= 1;
     }
 }
 
-function addToPodcastListview(listview, add){
+function addToNewListListview(newEpisodes){
+    var listview = document.getElementById('newList');
+    var html;
+
+    for(var i=0; i<newEpisodes.length; i+=1){
+        html = createPlaylistListviewItem(newEpisodes[i]);
+        $(listview).prepend(html);
+    }
+
+    removeOverflow(listview);
+
+    $(listview).listview('refresh');    
+}
+
+function addToPodcastListview(podcast, add){
+    var podcast_listview = $(podcast).find('ul');
     var html;
     for(var i=0; i<add.length; i+=1){
         html = createPodcastListViewItem(add[i]);
-        console.log('addToPodcastHtml html: ' + html);
-        $(listview).prepend(html);
-    }    
-}
-
-function updatePodcastHtml(elemId, result){
-    /* Update the listview on the Podcast page and the New page to reflect latest
-    rss feed */
-    var podcast_listview = $(elemId).find('ul');
-    var new_listview = $('#newList');
-    console.log('result: ');
-    console.dir(result);
-    
-    addToPodcastListview(podcast_listview, result.add);
-    addToPlaylistListview(new_listview, result.add);
-    removePodcastListviewItem(podcast_listview , result.remove);
+        $(podcast_listview).prepend(html);
+    }
     $(podcast_listview).listview('refresh');
-    $(new_listview).listview('refresh');
 }
 
-function updateAllPodcastsHtml(listview, newEpisodesForAllPodcasts){
-    console.log('updateallpodcasthtml');
-    for (var i=0; i<newEpisodesForAllPodcasts.length; i+=1){
-        console.log('updateallpodcasthtml, result[i]' + newEpisodesForAllPodcasts[i]);
-        newEpisodesForAllPodcasts[i].add.reverse();     // after op: oldest to newest.
-        addToPlaylistListview(listview, newEpisodesForAllPodcasts[i].add);
+function updateAllPodcastsHtml(allNewEpisodes){
+/*  Only runs if podcast page is unavailable for some reason, so only updating New 
+    page */
+    var length = allNewEpisodes.length;
+    for (var i=0; i<length; i+=1){
+        allNewEpisodes[i].add.reverse();     // after op: oldest to newest.
+        addToNewListListview(allNewEpisodes[i].add);
     }
 }
 
@@ -300,13 +306,13 @@ function playTrack(e){
     
     /* Update UI with timers while playing */
     $('#playBtn').html('||');
+/*     $('#playBtn').html('&#x2590;&#x2590;'); */
     startSliderTimer(player);
     startSeekableTimer(player);
 }
 
 function pauseTrack(e){
     /* Update UI */
-    console.log('pausing track, changing button.');
     $('#playBtn').html('&#9654;');
     
     // Clear timers used to update UI while track is playing.
@@ -349,17 +355,12 @@ function secondsToReadableTime(time_s, duration){
     return (hr+min+s);
 }
 
-function findItemPlaylist(episode_url){
-    
-    var elem ;
-    
-    $('.playlistItem').each( function(){
-        if ($(this).data('episode-url') === episode_url){
-            elem = $(this);
-        }
+function filterListByDataUrl(list, url){
+    var result = $('#' + list +' li').filter(function(){
+        return ($(this).data('episode-url') === url);
     });
-    
-    return elem;
+
+    return (result || false);
 }
 
 function displayPlayerTime(event, time){
@@ -368,6 +369,7 @@ function displayPlayerTime(event, time){
     
     var player          = getPlayerElem();
     var playerDiv       = document.getElementById('playerDiv');
+    var playlistList    = document.getElementById('playlist');
 
     var playerTime_s    = Math.floor(player.currentTime);  // time in seconds
     var duration        = Math.floor(player.duration);
@@ -382,7 +384,8 @@ function displayPlayerTime(event, time){
     
     var readableTime = secondsToReadableTime(playerTime_s, duration);
 
-    var playlistItem = findItemPlaylist(episodeUrl);
+/*     var playlistItem = findItemPlaylist(episodeUrl); */
+    var playlistItem = filterListByDataUrl('playlist', episodeUrl);
     var playlistItemTime = $(playlistItem).find('.episodeCurrentTime');
 
     // Update player ui and data
@@ -433,31 +436,78 @@ function saveNowPlaying(player, data){
     });
 }
 
-function removeFromPlaylist(e){
-    e.preventDefault();
-    e.stopImmediatePropagation();
-
-    var elem = $( this ).parent();
+function markListenedPodcast(data){
     
-    var id = $( elem ).attr('id');
-    var url = $( elem ).data('episode-url');
-    var playlistKey = $('#playlist').data('playlist-id');
-    console.log('url: ' + url + ', playkey: ' + playlistKey);
+    data = {
+        url: 'http://www.podtrac.com/pts/redirect.mp3/twit.cachefly.net/audio/sn/sn0479/sn0479.mp3',
+        podcast_key: 'ahRkZXZ-a2JhbGwtdGVzdC10b29sc3I_CxIMcG9kY2FzdF9mZWVkIhlkZWZhdWx0X3BvZGNhc3RfZmVlZF9saXN0DAsSB1BvZGNhc3QYgICAgIDYswoM',
+        list_key: 'ahRkZXZ-a2JhbGwtdGVzdC10b29sc3JACxIMcG9kY2FzdF9mZWVkIhlkZWZhdWx0X3BvZGNhc3RfZmVlZF9saXN0DAsSCFBsYXlsaXN0GICAgICA2P0KDA'
+    };
+    if($('#subscriptionList')){
+        console.log('will change color class of episode');
+        
+    }
+}
+
+function saveListenedStatus(data){
+    var request = $.ajax({
+        url: '/savelistenedstatus',
+        type: 'POST',
+        data: data
+    });
+}
+
+function removeFromPlaylist(elem, data){
+    var notification = {
+        message: 'Server error: Playlist is unchanged.',
+        displayTime: 1000
+    };
 
     // Remove item from datastore
     var request = $.ajax({
-        url: '/removefromplaylist',
+        url: '/removeepisodefromlist',
         type: 'POST',
-        data: { url: url, playlist_key: playlistKey }
+        data: data
     });
+    $( elem ).fadeOut(500);
     request.done( function(){
         console.log('Successfully removed from playlist');
-        $( elem ).fadeOut(800);
+        $( elem ).remove();
     });
+    request.fail( function(){
+        $( elem ).delay(1000).fadeIn(1000);
+        displayNotification(notification);
+        console.log('failed to remove: ' +  data.url);
+    });
+}
+
+function removeFromPlaylistBtn(e){
+    e.preventDefault();
+    e.stopImmediatePropagation();
     
-    // Remove item from ui
-    $( '#'+id ).remove();
+    var elem = $( this ).parent(); 
+
+    var data = {
+        url: $( elem ).data('episode-url'),
+        list_key: $('#playlist').data('playlist-id')
+    };
     
+    removeFromPlaylist(elem, data);
+}
+
+function removeFromPlaylistEnded(url){
+    // Runs when track has finished playing.
+    var elem = filterListByDataUrl('playlist', url);
+    
+    var data = {
+        url: url,
+        podcast_key: $('#playerDiv').data('podcast-id'), // Needed to save listening status
+        list_key: $('#playlist').data('playlist-id')
+    };
+
+    removeFromPlaylist(elem, data); // UI and datastore
+    saveListenedStatus(data);       // Save this to datastore.
+    markListenedPodcast(data);      // UI of podcast page
 }
 
 function removeAVHtml(player){
@@ -579,9 +629,6 @@ Must go to playlist page in order to actually play the episode*/
     data.podcast_urlsafe_key = $( elemId ).data('podcast-id');
     data.playlist_urlsafe_key = $( '#subscriptionList' ).data('playlist-id');
 
-    console.log('addtoplaylist, playlist id, data below:');
-    console.dir(data);
-    
     var request = $.ajax({
         url: '/addtoplaylist',
         type: 'POST',
@@ -599,6 +646,11 @@ Must go to playlist page in order to actually play the episode*/
     });
 }
 
+function getPodcastElem(elem){
+    var parents = $(elem).parents();
+    return $(parents).filter('.subscriptionItem');
+}
+
 function removePodcast(e){
     // -Really nice yes / no pop up in http://demos.jquerymobile.com/1.4.3/popup/ -- dialog, but way more complicated than the standard confirm
     // -May want to change this to an undo / dismiss notifcation thing that doesn't disappear until you do something else???
@@ -607,7 +659,8 @@ function removePodcast(e){
     e.stopImmediatePropagation();
     
     var title = $( this ).parent().data('podcast-title');
-    var elemId = $( this ).parents().eq(3).get(0);
+/*     var elemId = $( this ).parents().eq(3).get(0); */
+    var elemId = getPodcastElem(this);
     var storageId = $( elemId ).data('podcast-id');
     
     var html = 'Removing ' + title;
@@ -638,63 +691,31 @@ function removePodcast(e){
 function refreshPodcast(e){
     e.preventDefault();
     e.stopImmediatePropagation();
-    console.log('refreshpodcast, individual podcast click event:');
     
-    var elemId = $( this ).parents().eq(3).get(0);
-    var storageId = $( elemId ).data('podcast-id');
-    console.log('refreshpodcast, storageId:' + storageId);
+/*     var podcastElem = $( this ).parents().eq(3).get(0); */
+    var podcastElem = getPodcastElem(this);
 
-    var t = new Date();
-    console.log('refreshallpodcast, start time:' + t.toTimeString() + ', ms: ' + t.getMilliseconds());
+    var storageId = $( podcastElem ).data('podcast-id');
 
-    
     var request = $.ajax({
         url: "/refreshpodcast",
         type: "POST",
         data: { urlsafe_key : storageId }
     });
     request.done(function(result){
-        console.log('refreshpodast done.');
-        updatePodcastHtml(elemId, result);
-        t = new Date();
-        console.log('refreshallpodcast, end time:' + t.toTimeString() + ', ms: ' + t.getMilliseconds());
+        console.log('completed refresh.');
+        console.dir(result);
+        // If Podcast page exists in DOM, update it.
+        if($('#subscriptionList').length>0){
+            addToPodcastListview(podcastElem, result.add);
+            removePodcastListviewItem(podcastElem , result.remove);
+        }
+        
+        // If new page exists in DOM, update it.
+        if($('#newList').length>0){
+            addToNewListListview(result.add);
+        }
     });
-}
-
-function refreshAllPodcasts(e){
-    console.log('refreshing all podcasts');
-    var listview = $('#newList');
-    var podcastElem;
-
-    var t = new Date();
-    console.log('refreshallpodcast, start time:' + t.toTimeString() + ', ms: ' + t.getMilliseconds());
-
-    console.log('refreshallpodcasts, subscriptionList page check');
-    console.dir($('#subscriptionList'));
-    if($('#subscriptionList').length){
-        console.log('refreshAllPodcasts, simulate clicking all refresh buttons');
-        $('.refreshBtn').each( function(){
-            console.log('pushing this button, below:');
-            console.dir(this);
-            podcastElem = $(this).parents().eq(3).get(0);
-            console.dir(podcastElem);
-            console.log('id: ' + $(podcastElem).data('podcast-id'));
-            $(this).click();
-        });
-    }
-    else{
-        console.log('refreshAllPodcasts, just update new page');
-        var request = $.ajax({
-            url: '/refreshallpodcasts',
-            type: 'POST'
-        });
-        request.done( function(newEpisodes){
-            console.log('refreshallpodcast, received results from server.');
-            updateAllPodcastsHtml(listview, newEpisodes);
-            $(listview).listview('refresh');
-        });
-    }
-
 }
 
 // **--   Playlist page script   --** 
@@ -831,8 +852,27 @@ function playerInit(){
     resumePlayerTime(player);
 }
 
-function playNextTrack(){
+// Marked for deletion: function removeFromNewList()
+// At the moment, no reason to remove from newlist.
+function removeFromNewList(){
+    var player  = getPlayerElem();
+    var url     = player.src;
+    var newList = document.getElementById('newList');
+    var elem    = filterListByDataUrl('newList', url);
+
+    // **-- Combine with remove from playlist.
+    // Will need to change python portion as well depending which list.
+    // Also the remove from ui portion --**
+
+    $(elem).remove();
+}
+
+function playNextTrack(e){
     console.log('playnexttrack, find the next track in the list and play it.');
+    console.dir(e);
+    console.log(e.target.src);
+    var src = e.target.src;
+    removeFromPlaylistEnded(src);
 }
 
 function rewindTrack(){
@@ -861,6 +901,7 @@ function muteAudio(){
 }
 
 // **--   New page scripts   --** 
+
 function fromNewToPlaylist(e){
     var data = {};
     var html = '';
@@ -887,10 +928,28 @@ function fromNewToPlaylist(e){
     });
 }
 
+function refreshAllPodcasts(e){
+    /* Refresh New Page. If Podcast page exists, refresh that as well. */
+    if($('#subscriptionList').length){
+        $('.refreshBtn').each( function(){
+            $(this).click();
+        });
+    }
+    else{
+        var request = $.ajax({
+            url: '/refreshallpodcasts',
+            type: 'POST'
+        });
+        request.done( function(newEpisodes){
+            updateAllPodcastsHtml(newEpisodes);
+        });
+    }
+
+}
+
 // **--   Search page scripts   --** 
 function createHtmlPodcastPage(podcast){
-    var html = "<div class='subscriptionItem'>";
-    html += "<div data-role='collapsible' data-inset='false' class='subscriptionCollapsible' ";
+    var html = "<div data-role='collapsible' data-inset='false' class='subscriptionItem' ";
     html += "data-podcast-id='" + podcast.urlsafe_key + "'>";
     html += "<h3><img src='" + podcast.image_url + "' alt='podcast logo' height='45' width='45'>";
     html += "<span>" + podcast.title + "<\/span>";
@@ -906,7 +965,7 @@ function createHtmlPodcastPage(podcast){
         html += "<a href='#' class='addToPlaylist'>" + podcast.episode[i].title + "Time: ";
         html += podcast.episode[i].current_time + '<\/a><\/li>';
     }
-    html += "<\/ul><\/div><\/div>";    
+    html += "<\/ul><\/div>";    
     
     console.log('createhtmlpodcastpage, html = ' + html);
     return html;
@@ -937,6 +996,7 @@ function addPodcastToDatastore( url, title){
             htmlPodcastPage = createHtmlPodcastPage(podcast);
             $('#subscriptionList').prepend(htmlPodcastPage).trigger('create');
             $( '.deleteBtn' ).on( 'click', removePodcast );
+            $( '.refreshBtn').on( 'click', refreshPodcast );
             setTimeout( function(){
                 $( '#searchNotification' ).html(htmlAdded).fadeIn(300).delay(2000).fadeOut(800);
             }, 1500 ); 
@@ -1073,7 +1133,6 @@ function addReloadListener(e){
     }
 }
 
-
 // **--  Event listeners --**
 // General
 $( ':mobile-pagecontainer' ).pagecontainer({
@@ -1087,6 +1146,7 @@ $('#PodcastPage').on('pagecreate', function(e, ui){
     $( '.refreshBtn' ).on( 'click', refreshPodcast );
     $( '.subscriptionList' ).on( 'click', '.addToPlaylist', addToPlaylist );
 });
+
 // Playlists Page
 $('#PlaylistPage').on('pagecreate', function(e, ui){
     console.log('PlaylistPage pagecreate starting...:');
@@ -1107,6 +1167,7 @@ $('#PlaylistPage').on('pagecreate', function(e, ui){
     $( '#videoPlayer' ).on( 'doubletap', toggleFullscreen);
 /*     $( '#videoPlayerDiv' ).on( 'click', fullScreenVideoControls); */
 /*     $( '#reloadBtn' ).on('click', reloadPage); */
+    $('#tom').on('click', markListenedPodcast);
 
     /* Player ui functions. */
     $( '#playBtn' ).on( 'click', playTrackBtn );
@@ -1115,7 +1176,7 @@ $('#PlaylistPage').on('pagecreate', function(e, ui){
     $( '#muteBtn' ).on( 'click', muteAudio );
 
     /* Playlist functions: */
-    $( '#playlist' ).on( 'click', '.deletePlaylistBtn', removeFromPlaylist );
+    $( '#playlist' ).on( 'click', '.deletePlaylistBtn', removeFromPlaylistBtn );
     $( '#playlist' ).on( 'click', 'li', sendEpisodeToPlayer );
 });
 
