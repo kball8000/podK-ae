@@ -559,7 +559,7 @@ function changePlayer(new_url){
     var newFiletype = new_url.split('.').pop();
 
     if(!player.paused){
-        player.pause();    
+        player.pause();
     }
     
     if (prevFiletype === 'mp4' && newFiletype !== 'mp4'){
@@ -605,11 +605,16 @@ function sendEpisodeToPlayer(e){
         
     timerStorage.clearAll();
 
-    if(!player.paused){    
-        player.pause();
+    if(player){
+        if(!player.paused){
+            player.pause();
+        }
+        player = changePlayer(data.url);
+    }
+    else{
+        player = createAVHtml('audio', data.url);
     }
     
-    player = changePlayer(data.url);
     player.load();
     setPlayerAttributes(player, data);  // ui
     saveNowPlaying(player, data);       // to permanent storage
@@ -848,8 +853,10 @@ function playerInit(){
         $('#goFsBtn').show();
     }
     
-    player.load();
-    resumePlayerTime(player);
+    if(player){
+        player.load();
+        resumePlayerTime(player);
+    }
 }
 
 // Marked for deletion: function removeFromNewList()
